@@ -1,0 +1,683 @@
+{
+  "version": "3.0.0",
+  "integrations": [
+    {
+      "id": "github",
+      "name": "GitHub",
+      "category": "development",
+      "description": "Repo management, PRs, issues, and code search.",
+      "logo": "github.svg",
+      "logoColor": "#181717",
+      "setupType": "pat",
+      "envVars": [
+        { "key": "GITHUB_PERSONAL_ACCESS_TOKEN", "label": "Personal Access Token", "secret": true }
+      ],
+      "mcpServer": {
+        "name": "github",
+        "command": "npx",
+        "args": ["-y", "@modelcontextprotocol/server-github"],
+        "env": { "GITHUB_PERSONAL_ACCESS_TOKEN": "{{GITHUB_PERSONAL_ACCESS_TOKEN}}" }
+      },
+      "credentialGuide": {
+        "steps": ["Go to github.com/settings/tokens", "Click 'Generate new token (classic)'", "Select scopes: repo, read:org, read:user", "Copy the token"],
+        "url": "https://github.com/settings/tokens"
+      },
+      "what_it_enables": ["Repo management", "GSD git integration", "PR tracking", "Code search"]
+    },
+    {
+      "id": "gmail",
+      "name": "Gmail",
+      "category": "communication",
+      "description": "Email management, intake processing, and automated responses.",
+      "logo": "gmail.svg",
+      "logoColor": "#EA4335",
+      "setupType": "oauth",
+      "envVars": [
+        { "key": "GMAIL_CLIENT_ID", "label": "OAuth Client ID", "secret": false },
+        { "key": "GMAIL_CLIENT_SECRET", "label": "OAuth Client Secret", "secret": true },
+        { "key": "GMAIL_REFRESH_TOKEN", "label": "Refresh Token", "secret": true }
+      ],
+      "credentialGuide": {
+        "steps": ["Go to Google Cloud Console", "Create OAuth 2.0 credentials", "Enable Gmail API", "Complete OAuth consent flow"],
+        "url": "https://console.cloud.google.com/apis/credentials"
+      },
+      "what_it_enables": ["Email inbox in Communications Hub", "Auto-reactions", "Entity-linked emails"]
+    },
+    {
+      "id": "slack",
+      "name": "Slack",
+      "category": "communication",
+      "description": "Team communication, channel monitoring, and message intake.",
+      "logo": "slack.svg",
+      "logoColor": "#4A154B",
+      "setupType": "bot-token",
+      "envVars": [
+        { "key": "SLACK_BOT_TOKEN", "label": "Bot Token (xoxb-...)", "secret": true },
+        { "key": "SLACK_TEAM_ID", "label": "Team ID", "secret": false }
+      ],
+      "mcpServer": {
+        "name": "slack",
+        "command": "npx",
+        "args": ["-y", "@anthropic-ai/slack-mcp-server"],
+        "env": { "SLACK_BOT_TOKEN": "{{SLACK_BOT_TOKEN}}", "SLACK_TEAM_ID": "{{SLACK_TEAM_ID}}" }
+      },
+      "credentialGuide": {
+        "steps": ["Go to api.slack.com/apps", "Create new app or select existing", "Go to OAuth & Permissions", "Copy Bot User OAuth Token"],
+        "url": "https://api.slack.com/apps"
+      },
+      "what_it_enables": ["Slack messages in Communications Hub", "Channel monitoring", "Auto-intake"]
+    },
+    {
+      "id": "discord",
+      "name": "Discord",
+      "category": "communication",
+      "description": "Community management, server monitoring, and bot integration.",
+      "logo": "discord.svg",
+      "logoColor": "#5865F2",
+      "setupType": "bot-token",
+      "envVars": [
+        { "key": "DISCORD_BOT_TOKEN", "label": "Bot Token", "secret": true },
+        { "key": "DISCORD_GUILD_ID", "label": "Server (Guild) ID", "secret": false }
+      ],
+      "credentialGuide": {
+        "steps": ["Go to Discord Developer Portal", "Create application", "Create bot under application", "Copy bot token"],
+        "url": "https://discord.com/developers/applications"
+      },
+      "what_it_enables": ["Discord messages in Communications Hub", "Server monitoring"]
+    },
+    {
+      "id": "whatsapp",
+      "name": "WhatsApp",
+      "category": "communication",
+      "description": "Business messaging via WhatsApp Business API.",
+      "logo": "whatsapp.svg",
+      "logoColor": "#25D366",
+      "setupType": "api-key",
+      "envVars": [
+        { "key": "WHATSAPP_ACCESS_TOKEN", "label": "Access Token", "secret": true },
+        { "key": "WHATSAPP_PHONE_ID", "label": "Phone Number ID", "secret": false }
+      ],
+      "credentialGuide": {
+        "steps": ["Go to Meta Business Suite", "Set up WhatsApp Business API", "Get access token from App Dashboard"],
+        "url": "https://business.facebook.com"
+      },
+      "what_it_enables": ["WhatsApp messaging", "Client communication"]
+    },
+    {
+      "id": "telegram",
+      "name": "Telegram",
+      "category": "communication",
+      "description": "Bot-based messaging and notification delivery.",
+      "logo": "telegram.svg",
+      "logoColor": "#26A5E4",
+      "setupType": "bot-token",
+      "envVars": [
+        { "key": "TELEGRAM_BOT_TOKEN", "label": "Bot Token", "secret": true }
+      ],
+      "credentialGuide": {
+        "steps": ["Message @BotFather on Telegram", "Send /newbot and follow instructions", "Copy the bot token"],
+        "url": "https://t.me/BotFather"
+      },
+      "what_it_enables": ["Telegram notifications", "Bot-based client comms"]
+    },
+    {
+      "id": "x-twitter",
+      "name": "X / Twitter",
+      "category": "social",
+      "description": "Post tweets, monitor mentions, and engage with audience.",
+      "logo": "x.svg",
+      "logoColor": "#000000",
+      "setupType": "oauth",
+      "envVars": [
+        { "key": "TWITTER_API_KEY", "label": "API Key", "secret": true },
+        { "key": "TWITTER_API_SECRET", "label": "API Secret", "secret": true },
+        { "key": "TWITTER_ACCESS_TOKEN", "label": "Access Token", "secret": true },
+        { "key": "TWITTER_ACCESS_SECRET", "label": "Access Token Secret", "secret": true }
+      ],
+      "credentialGuide": {
+        "steps": ["Go to developer.x.com", "Create project and app", "Generate API keys and tokens"],
+        "url": "https://developer.x.com"
+      },
+      "what_it_enables": ["Social posting via Content Engine", "Mention monitoring", "Campaign automation"]
+    },
+    {
+      "id": "linkedin",
+      "name": "LinkedIn",
+      "category": "social",
+      "description": "Professional networking, post publishing, and lead generation.",
+      "logo": "linkedin.svg",
+      "logoColor": "#0A66C2",
+      "setupType": "oauth",
+      "envVars": [
+        { "key": "LINKEDIN_ACCESS_TOKEN", "label": "Access Token", "secret": true }
+      ],
+      "credentialGuide": {
+        "steps": ["Go to LinkedIn Developer Portal", "Create application", "Request OAuth access", "Generate access token"],
+        "url": "https://www.linkedin.com/developers"
+      },
+      "what_it_enables": ["LinkedIn posting", "Professional outreach", "Lead research"]
+    },
+    {
+      "id": "facebook",
+      "name": "Facebook",
+      "category": "social",
+      "description": "Page management, post publishing, and audience engagement.",
+      "logo": "facebook.svg",
+      "logoColor": "#1877F2",
+      "setupType": "oauth",
+      "envVars": [
+        { "key": "FACEBOOK_PAGE_TOKEN", "label": "Page Access Token", "secret": true },
+        { "key": "FACEBOOK_PAGE_ID", "label": "Page ID", "secret": false }
+      ],
+      "credentialGuide": {
+        "steps": ["Go to developers.facebook.com", "Create or select app", "Get Page Access Token via Graph API Explorer"],
+        "url": "https://developers.facebook.com"
+      },
+      "what_it_enables": ["Facebook page posting", "Social campaigns"]
+    },
+    {
+      "id": "instagram",
+      "name": "Instagram",
+      "category": "social",
+      "description": "Photo/reel publishing and engagement tracking.",
+      "logo": "instagram.svg",
+      "logoColor": "#E4405F",
+      "setupType": "oauth",
+      "envVars": [
+        { "key": "INSTAGRAM_ACCESS_TOKEN", "label": "Access Token", "secret": true },
+        { "key": "INSTAGRAM_BUSINESS_ID", "label": "Business Account ID", "secret": false }
+      ],
+      "credentialGuide": {
+        "steps": ["Connect Instagram to Facebook Business", "Get token via Graph API", "Requires Instagram Business or Creator account"],
+        "url": "https://developers.facebook.com/docs/instagram-api"
+      },
+      "what_it_enables": ["Instagram posting", "Social content pipeline"]
+    },
+    {
+      "id": "bluesky",
+      "name": "Bluesky",
+      "category": "social",
+      "description": "Decentralized social posting and engagement.",
+      "logo": "bluesky.svg",
+      "logoColor": "#0085FF",
+      "setupType": "app-password",
+      "envVars": [
+        { "key": "BLUESKY_HANDLE", "label": "Handle (e.g., you.bsky.social)", "secret": false },
+        { "key": "BLUESKY_APP_PASSWORD", "label": "App Password", "secret": true }
+      ],
+      "credentialGuide": {
+        "steps": ["Go to bsky.app/settings/app-passwords", "Create new app password", "Copy the password"],
+        "url": "https://bsky.app/settings/app-passwords"
+      },
+      "what_it_enables": ["Bluesky posting", "Social content distribution"]
+    },
+    {
+      "id": "tiktok",
+      "name": "TikTok",
+      "category": "social",
+      "description": "Short-form video publishing and analytics.",
+      "logo": "tiktok.svg",
+      "logoColor": "#000000",
+      "setupType": "oauth",
+      "envVars": [
+        { "key": "TIKTOK_ACCESS_TOKEN", "label": "Access Token", "secret": true }
+      ],
+      "credentialGuide": {
+        "steps": ["Go to developers.tiktok.com", "Create app", "Complete OAuth flow"],
+        "url": "https://developers.tiktok.com"
+      },
+      "what_it_enables": ["TikTok video upload", "Short-form content pipeline"]
+    },
+    {
+      "id": "youtube",
+      "name": "YouTube",
+      "category": "social",
+      "description": "Video upload, channel management, and analytics.",
+      "logo": "youtube.svg",
+      "logoColor": "#FF0000",
+      "setupType": "oauth",
+      "envVars": [
+        { "key": "YOUTUBE_CLIENT_ID", "label": "OAuth Client ID", "secret": false },
+        { "key": "YOUTUBE_CLIENT_SECRET", "label": "OAuth Client Secret", "secret": true },
+        { "key": "YOUTUBE_REFRESH_TOKEN", "label": "Refresh Token", "secret": true }
+      ],
+      "credentialGuide": {
+        "steps": ["Go to Google Cloud Console", "Enable YouTube Data API v3", "Create OAuth credentials", "Complete consent flow"],
+        "url": "https://console.cloud.google.com/apis/library/youtube.googleapis.com"
+      },
+      "what_it_enables": ["YouTube upload from Video Studio", "Channel analytics"]
+    },
+    {
+      "id": "reddit",
+      "name": "Reddit",
+      "category": "social",
+      "description": "Community engagement, post monitoring, and content distribution.",
+      "logo": "reddit.svg",
+      "logoColor": "#FF4500",
+      "setupType": "oauth",
+      "envVars": [
+        { "key": "REDDIT_CLIENT_ID", "label": "App Client ID", "secret": false },
+        { "key": "REDDIT_CLIENT_SECRET", "label": "App Secret", "secret": true },
+        { "key": "REDDIT_USERNAME", "label": "Username", "secret": false },
+        { "key": "REDDIT_PASSWORD", "label": "Password", "secret": true }
+      ],
+      "credentialGuide": {
+        "steps": ["Go to reddit.com/prefs/apps", "Create 'script' type app", "Note client ID and secret"],
+        "url": "https://www.reddit.com/prefs/apps"
+      },
+      "what_it_enables": ["Reddit engagement", "Community monitoring", "Social campaigns"]
+    },
+    {
+      "id": "threads",
+      "name": "Threads",
+      "category": "social",
+      "description": "Text-based social posting via Meta's Threads platform.",
+      "logo": "threads.svg",
+      "logoColor": "#000000",
+      "setupType": "oauth",
+      "envVars": [
+        { "key": "THREADS_ACCESS_TOKEN", "label": "Access Token", "secret": true }
+      ],
+      "credentialGuide": {
+        "steps": ["Requires Instagram Business account", "Access via Meta Graph API", "Generate long-lived token"],
+        "url": "https://developers.facebook.com/docs/threads"
+      },
+      "what_it_enables": ["Threads posting", "Social content distribution"]
+    },
+    {
+      "id": "supabase",
+      "name": "Supabase",
+      "category": "development",
+      "description": "Database, auth, storage, and real-time subscriptions.",
+      "logo": "supabase.svg",
+      "logoColor": "#3FCF8E",
+      "setupType": "api-key",
+      "envVars": [
+        { "key": "SUPABASE_URL", "label": "Project URL", "secret": false },
+        { "key": "SUPABASE_ANON_KEY", "label": "Anon Key", "secret": false },
+        { "key": "SUPABASE_SERVICE_ROLE_KEY", "label": "Service Role Key", "secret": true }
+      ],
+      "mcpServer": {
+        "name": "supabase",
+        "command": "npx",
+        "args": ["-y", "@supabase/mcp-server-supabase@latest", "--read-only"],
+        "env": { "SUPABASE_ACCESS_TOKEN": "{{SUPABASE_SERVICE_ROLE_KEY}}" }
+      },
+      "credentialGuide": {
+        "steps": ["Go to supabase.com/dashboard", "Select your project", "Go to Settings > API", "Copy URL, anon key, and service role key"],
+        "url": "https://supabase.com/dashboard"
+      },
+      "what_it_enables": ["Database operations", "Auth management", "File storage"]
+    },
+    {
+      "id": "netlify",
+      "name": "Netlify",
+      "category": "development",
+      "description": "Static site hosting, deploy previews, and serverless functions.",
+      "logo": "netlify.svg",
+      "logoColor": "#00C7B7",
+      "setupType": "pat",
+      "envVars": [
+        { "key": "NETLIFY_AUTH_TOKEN", "label": "Personal Access Token", "secret": true }
+      ],
+      "credentialGuide": {
+        "steps": ["Go to app.netlify.com/user/applications", "Create new personal access token"],
+        "url": "https://app.netlify.com/user/applications#personal-access-tokens"
+      },
+      "what_it_enables": ["Site deployment", "Deploy previews", "DNS management"]
+    },
+    {
+      "id": "vercel",
+      "name": "Vercel",
+      "category": "development",
+      "description": "Serverless deployment, preview environments, and edge functions.",
+      "logo": "vercel.svg",
+      "logoColor": "#000000",
+      "setupType": "pat",
+      "envVars": [
+        { "key": "VERCEL_TOKEN", "label": "Personal Access Token", "secret": true }
+      ],
+      "credentialGuide": {
+        "steps": ["Go to vercel.com/account/tokens", "Create new token"],
+        "url": "https://vercel.com/account/tokens"
+      },
+      "what_it_enables": ["Vercel deployments", "Environment management"]
+    },
+    {
+      "id": "stripe",
+      "name": "Stripe",
+      "category": "development",
+      "description": "Payment processing, subscriptions, and billing management.",
+      "logo": "stripe.svg",
+      "logoColor": "#635BFF",
+      "setupType": "api-key",
+      "envVars": [
+        { "key": "STRIPE_SECRET_KEY", "label": "Secret Key (sk_...)", "secret": true },
+        { "key": "STRIPE_PUBLISHABLE_KEY", "label": "Publishable Key (pk_...)", "secret": false }
+      ],
+      "mcpServer": {
+        "name": "stripe",
+        "command": "npx",
+        "args": ["-y", "@stripe/mcp-server"],
+        "env": { "STRIPE_SECRET_KEY": "{{STRIPE_SECRET_KEY}}" }
+      },
+      "credentialGuide": {
+        "steps": ["Go to dashboard.stripe.com/apikeys", "Copy secret and publishable keys"],
+        "url": "https://dashboard.stripe.com/apikeys"
+      },
+      "what_it_enables": ["Payment integration", "Subscription management", "Invoice generation"]
+    },
+    {
+      "id": "clerk",
+      "name": "Clerk",
+      "category": "development",
+      "description": "Authentication, user management, and session handling.",
+      "logo": "clerk.svg",
+      "logoColor": "#6C47FF",
+      "setupType": "api-key",
+      "envVars": [
+        { "key": "CLERK_SECRET_KEY", "label": "Secret Key (sk_...)", "secret": true },
+        { "key": "CLERK_PUBLISHABLE_KEY", "label": "Publishable Key (pk_...)", "secret": false }
+      ],
+      "credentialGuide": {
+        "steps": ["Go to dashboard.clerk.com", "Select application", "Go to API Keys"],
+        "url": "https://dashboard.clerk.com"
+      },
+      "what_it_enables": ["User authentication", "Session management", "User/org APIs"]
+    },
+    {
+      "id": "notion",
+      "name": "Notion",
+      "category": "productivity",
+      "description": "Second brain mirror — pages, databases, comments, and bi-directional sync.",
+      "logo": "notion.svg",
+      "logoColor": "#000000",
+      "setupType": "api-key",
+      "envVars": [
+        { "key": "NOTION_API_KEY", "label": "Integration Token (secret_...)", "secret": true }
+      ],
+      "mcpServer": {
+        "name": "notion",
+        "command": "npx",
+        "args": ["-y", "@notionhq/notion-mcp-server"],
+        "env": { "OPENAPI_MCP_HEADERS": "{\"Authorization\": \"Bearer {{NOTION_API_KEY}}\", \"Notion-Version\": \"2022-06-28\"}" }
+      },
+      "credentialGuide": {
+        "steps": ["Go to notion.so/my-integrations", "Create new integration", "Copy the Internal Integration Token", "Share relevant pages/databases with the integration"],
+        "url": "https://www.notion.so/my-integrations"
+      },
+      "what_it_enables": ["Notion sync", "Database management", "Page creation", "Timesheet sync"]
+    },
+    {
+      "id": "google-drive",
+      "name": "Google Drive",
+      "category": "productivity",
+      "description": "File storage, document sync, and shared drive management.",
+      "logo": "google-drive.svg",
+      "logoColor": "#4285F4",
+      "setupType": "oauth",
+      "envVars": [
+        { "key": "GDRIVE_CLIENT_ID", "label": "OAuth Client ID", "secret": false },
+        { "key": "GDRIVE_CLIENT_SECRET", "label": "OAuth Client Secret", "secret": true },
+        { "key": "GDRIVE_REFRESH_TOKEN", "label": "Refresh Token", "secret": true }
+      ],
+      "credentialGuide": {
+        "steps": ["Go to Google Cloud Console", "Enable Drive API", "Create OAuth credentials"],
+        "url": "https://console.cloud.google.com/apis/library/drive.googleapis.com"
+      },
+      "what_it_enables": ["File sync", "Document management", "Shared drive access"]
+    },
+    {
+      "id": "google-calendar",
+      "name": "Google Calendar",
+      "category": "productivity",
+      "description": "Calendar management, event scheduling, and meeting integration.",
+      "logo": "google-calendar.svg",
+      "logoColor": "#4285F4",
+      "setupType": "oauth",
+      "envVars": [
+        { "key": "GCAL_CLIENT_ID", "label": "OAuth Client ID", "secret": false },
+        { "key": "GCAL_CLIENT_SECRET", "label": "OAuth Client Secret", "secret": true },
+        { "key": "GCAL_REFRESH_TOKEN", "label": "Refresh Token", "secret": true }
+      ],
+      "credentialGuide": {
+        "steps": ["Go to Google Cloud Console", "Enable Calendar API", "Create OAuth credentials"],
+        "url": "https://console.cloud.google.com/apis/library/calendar-json.googleapis.com"
+      },
+      "what_it_enables": ["Calendar sync", "Meeting scheduling", "Event reminders"]
+    },
+    {
+      "id": "obsidian",
+      "name": "Obsidian",
+      "category": "productivity",
+      "description": "Knowledge vault, session archival, and markdown-based note management.",
+      "logo": "obsidian.svg",
+      "logoColor": "#7C3AED",
+      "setupType": "local-path",
+      "envVars": [
+        { "key": "OBSIDIAN_VAULT_PATH", "label": "Vault Path", "secret": false }
+      ],
+      "credentialGuide": {
+        "steps": ["Locate your Obsidian vault folder", "Provide the full path"],
+        "url": "https://obsidian.md"
+      },
+      "what_it_enables": ["Session archival", "Knowledge vault sync", "Conversation search"]
+    },
+    {
+      "id": "openai",
+      "name": "OpenAI",
+      "category": "ai",
+      "description": "GPT models, DALL-E image generation, and embeddings.",
+      "logo": "openai.svg",
+      "logoColor": "#412991",
+      "setupType": "api-key",
+      "envVars": [
+        { "key": "OPENAI_API_KEY", "label": "API Key (sk-...)", "secret": true }
+      ],
+      "credentialGuide": {
+        "steps": ["Go to platform.openai.com/api-keys", "Create new secret key"],
+        "url": "https://platform.openai.com/api-keys"
+      },
+      "what_it_enables": ["Image generation", "Embeddings", "Alternative AI models"]
+    },
+    {
+      "id": "anthropic",
+      "name": "Anthropic",
+      "category": "ai",
+      "description": "Claude API for programmatic AI access beyond Claude Code.",
+      "logo": "anthropic.svg",
+      "logoColor": "#D97757",
+      "setupType": "api-key",
+      "envVars": [
+        { "key": "ANTHROPIC_API_KEY", "label": "API Key", "secret": true }
+      ],
+      "credentialGuide": {
+        "steps": ["Go to console.anthropic.com/settings/keys", "Create new API key"],
+        "url": "https://console.anthropic.com/settings/keys"
+      },
+      "what_it_enables": ["Programmatic Claude access", "Background AI processing", "Content generation"]
+    },
+    {
+      "id": "elevenlabs",
+      "name": "ElevenLabs",
+      "category": "ai",
+      "description": "Text-to-speech, voice cloning, and audio generation.",
+      "logo": "elevenlabs.svg",
+      "logoColor": "#000000",
+      "setupType": "api-key",
+      "envVars": [
+        { "key": "ELEVENLABS_API_KEY", "label": "API Key", "secret": true }
+      ],
+      "credentialGuide": {
+        "steps": ["Go to elevenlabs.io/app/settings/api-keys", "Create new API key"],
+        "url": "https://elevenlabs.io/app/settings/api-keys"
+      },
+      "what_it_enables": ["Voice AI plugin", "Text-to-speech", "Voice cloning"]
+    },
+    {
+      "id": "heygen",
+      "name": "HeyGen",
+      "category": "ai",
+      "description": "AI avatar video generation and talking head creation.",
+      "logo": "heygen.svg",
+      "logoColor": "#5046E4",
+      "setupType": "api-key",
+      "envVars": [
+        { "key": "HEYGEN_API_KEY", "label": "API Key", "secret": true }
+      ],
+      "credentialGuide": {
+        "steps": ["Go to app.heygen.com/settings", "Navigate to API section", "Copy API key"],
+        "url": "https://app.heygen.com/settings"
+      },
+      "what_it_enables": ["Avatar video generation", "Talking head videos"]
+    },
+    {
+      "id": "veo3",
+      "name": "Veo 3 (Google)",
+      "category": "ai",
+      "description": "Google's video generation model for AI-created video content.",
+      "logo": "google.svg",
+      "logoColor": "#4285F4",
+      "setupType": "api-key",
+      "envVars": [
+        { "key": "GOOGLE_AI_API_KEY", "label": "Google AI API Key", "secret": true }
+      ],
+      "credentialGuide": {
+        "steps": ["Go to aistudio.google.com/apikey", "Create API key"],
+        "url": "https://aistudio.google.com/apikey"
+      },
+      "what_it_enables": ["AI video generation", "Video Studio enhancement"]
+    },
+    {
+      "id": "postiz",
+      "name": "Postiz",
+      "category": "publishing",
+      "description": "Social media scheduling and cross-platform publishing.",
+      "logo": "postiz.svg",
+      "logoColor": "#FF6B35",
+      "setupType": "api-key",
+      "envVars": [
+        { "key": "POSTIZ_API_KEY", "label": "API Key", "secret": true },
+        { "key": "POSTIZ_URL", "label": "Instance URL", "secret": false }
+      ],
+      "credentialGuide": {
+        "steps": ["Self-host Postiz or use cloud instance", "Go to Settings > API", "Generate API key"],
+        "url": "https://postiz.com"
+      },
+      "what_it_enables": ["Social media scheduling", "Cross-platform publishing", "Content calendar"]
+    },
+    {
+      "id": "late-dev",
+      "name": "Late.dev",
+      "category": "publishing",
+      "description": "AI-powered social media scheduling and content optimization.",
+      "logo": "late.svg",
+      "logoColor": "#6366F1",
+      "setupType": "api-key",
+      "envVars": [
+        { "key": "LATE_API_KEY", "label": "API Key", "secret": true }
+      ],
+      "credentialGuide": {
+        "steps": ["Go to late.dev/settings", "Navigate to API section", "Generate API key"],
+        "url": "https://late.dev"
+      },
+      "what_it_enables": ["AI social scheduling", "Content optimization"]
+    },
+    {
+      "id": "buffer",
+      "name": "Buffer",
+      "category": "publishing",
+      "description": "Social media management and scheduled publishing.",
+      "logo": "buffer.svg",
+      "logoColor": "#168EEA",
+      "setupType": "pat",
+      "envVars": [
+        { "key": "BUFFER_ACCESS_TOKEN", "label": "Access Token", "secret": true }
+      ],
+      "credentialGuide": {
+        "steps": ["Go to buffer.com/developers", "Create application", "Get access token"],
+        "url": "https://buffer.com/developers"
+      },
+      "what_it_enables": ["Scheduled social posts", "Multi-platform publishing"]
+    },
+    {
+      "id": "gohighlevel",
+      "name": "GoHighLevel",
+      "category": "crm",
+      "description": "CRM, marketing automation, and client management.",
+      "logo": "gohighlevel.svg",
+      "logoColor": "#FF6B00",
+      "setupType": "api-key",
+      "envVars": [
+        { "key": "GHL_API_KEY", "label": "API Key", "secret": true },
+        { "key": "GHL_LOCATION_ID", "label": "Location ID", "secret": false }
+      ],
+      "credentialGuide": {
+        "steps": ["Go to GoHighLevel settings", "Navigate to API Keys", "Generate new key"],
+        "url": "https://app.gohighlevel.com"
+      },
+      "what_it_enables": ["CRM sync", "Marketing automation", "Client pipeline"]
+    },
+    {
+      "id": "firecrawl",
+      "name": "Firecrawl",
+      "category": "research",
+      "description": "Web scraping, crawling, and structured data extraction.",
+      "logo": "firecrawl.svg",
+      "logoColor": "#FF6B35",
+      "setupType": "api-key",
+      "envVars": [
+        { "key": "FIRECRAWL_API_KEY", "label": "API Key", "secret": true }
+      ],
+      "mcpServer": {
+        "name": "firecrawl",
+        "command": "npx",
+        "args": ["-y", "firecrawl-mcp"],
+        "env": { "FIRECRAWL_API_KEY": "{{FIRECRAWL_API_KEY}}" }
+      },
+      "credentialGuide": {
+        "steps": ["Go to firecrawl.dev/app/api-keys", "Create new API key"],
+        "url": "https://firecrawl.dev/app/api-keys"
+      },
+      "what_it_enables": ["Web scraping", "Lead research", "URL intelligence gathering"]
+    },
+    {
+      "id": "screenpipe",
+      "name": "Screenpipe",
+      "category": "research",
+      "description": "Local screen recording and OCR for passive context capture.",
+      "logo": "screenpipe.svg",
+      "logoColor": "#000000",
+      "setupType": "local",
+      "envVars": [],
+      "mcpServer": {
+        "name": "screenpipe",
+        "command": "npx",
+        "args": ["-y", "@anthropic-ai/screenpipe-mcp-server"],
+        "env": {}
+      },
+      "credentialGuide": {
+        "steps": ["Install Screenpipe for your platform", "Start Screenpipe service", "Verify localhost:3030 is accessible"],
+        "url": "https://screenpi.pe"
+      },
+      "what_it_enables": ["Background learning (Full Context tier)", "Screen OCR", "Activity tracking"]
+    },
+    {
+      "id": "resend",
+      "name": "Resend",
+      "category": "email",
+      "description": "Developer-first email sending API for transactional and marketing emails.",
+      "logo": "resend.svg",
+      "logoColor": "#000000",
+      "setupType": "api-key",
+      "envVars": [
+        { "key": "RESEND_API_KEY", "label": "API Key (re_...)", "secret": true }
+      ],
+      "credentialGuide": {
+        "steps": ["Go to resend.com/api-keys", "Create new API key"],
+        "url": "https://resend.com/api-keys"
+      },
+      "what_it_enables": ["Email sequence sending", "Outreach automation", "Transactional emails"]
+    }
+  ]
+}
