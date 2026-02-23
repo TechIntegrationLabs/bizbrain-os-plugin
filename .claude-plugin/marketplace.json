@@ -1,6 +1,6 @@
 {
   "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
-  "name": "bizbrain-marketplace",
+  "name": "bizbrain-os",
   "owner": {
     "name": "Tech Integration Labs",
     "email": "hello@techintegrationlabs.com"
@@ -8,7 +8,7 @@
   "plugins": [
     {
       "name": "bizbrain-os",
-      "description": "The AI context layer that teaches Claude your business",
+      "description": "The context layer that teaches AI your business. Persistent knowledge brain that compounds context across every Claude Code session.",
       "version": "1.0.0",
       "author": { "name": "Tech Integration Labs" },
       "source": "./",
