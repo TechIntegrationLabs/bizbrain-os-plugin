@@ -1,0 +1,44 @@
+{
+  "id": "developer",
+  "name": "Developer / Technical Solopreneur",
+  "description": "Software developer, indie hacker, or technical founder. Manages code projects, clients, and technical knowledge.",
+  "icon": "code",
+  "features": {
+    "entity_management": true,
+    "project_tracking": true,
+    "gsd_workflow": true,
+    "knowledge_management": true,
+    "time_tracking": true,
+    "credential_management": true,
+    "mcp_management": true,
+    "todo_management": true,
+    "intake_processing": true,
+    "communications": false,
+    "content_pipeline": false,
+    "outreach_engine": false,
+    "session_archiving": true
+  },
+  "auto_behaviors": {
+    "entity_detection": "auto_update",
+    "action_item_extraction": "auto_update",
+    "project_status_tracking": "auto_update",
+    "credential_detection": "ask_first",
+    "time_tracking": "auto_update"
+  },
+  "scan_targets": {
+    "code_projects": true,
+    "documents": true,
+    "git_history": true,
+    "package_managers": true,
+    "service_configs": true,
+    "social_profiles": false,
+    "email_exports": false
+  },
+  "scan_paths": {
+    "code": ["~/Repos", "~/Projects", "~/Code", "~/src", "~/dev", "~/workspace"],
+    "documents": ["~/Documents"],
+    "recent": ["~/Desktop", "~/Downloads"]
+  },
+  "recommended_integrations": ["github", "supabase", "stripe", "notion", "slack"],
+  "recommended_mcps": ["github", "supabase"]
+}

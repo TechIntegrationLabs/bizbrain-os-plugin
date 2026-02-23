@@ -1,0 +1,44 @@
+{
+  "id": "personal",
+  "name": "Personal / Life Organizer",
+  "description": "Anyone who wants to organize their work, knowledge, and tasks with AI assistance. Minimal setup, maximum utility.",
+  "icon": "user",
+  "features": {
+    "entity_management": false,
+    "project_tracking": true,
+    "gsd_workflow": false,
+    "knowledge_management": true,
+    "time_tracking": false,
+    "credential_management": true,
+    "mcp_management": true,
+    "todo_management": true,
+    "intake_processing": true,
+    "communications": false,
+    "content_pipeline": false,
+    "outreach_engine": false,
+    "session_archiving": true
+  },
+  "auto_behaviors": {
+    "entity_detection": "off",
+    "action_item_extraction": "auto_update",
+    "project_status_tracking": "auto_update",
+    "credential_detection": "ask_first",
+    "time_tracking": "off"
+  },
+  "scan_targets": {
+    "code_projects": false,
+    "documents": true,
+    "git_history": false,
+    "package_managers": false,
+    "service_configs": false,
+    "social_profiles": false,
+    "email_exports": false
+  },
+  "scan_paths": {
+    "code": [],
+    "documents": ["~/Documents"],
+    "recent": ["~/Desktop", "~/Downloads"]
+  },
+  "recommended_integrations": ["notion"],
+  "recommended_mcps": ["notion"]
+}

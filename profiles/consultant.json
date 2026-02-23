@@ -1,0 +1,44 @@
+{
+  "id": "consultant",
+  "name": "Consultant / Freelancer",
+  "description": "Consultant, freelancer, or service provider. Manages client relationships, proposals, contracts, and timesheets.",
+  "icon": "briefcase",
+  "features": {
+    "entity_management": true,
+    "project_tracking": true,
+    "gsd_workflow": true,
+    "knowledge_management": true,
+    "time_tracking": true,
+    "credential_management": true,
+    "mcp_management": true,
+    "todo_management": true,
+    "intake_processing": true,
+    "communications": true,
+    "content_pipeline": false,
+    "outreach_engine": false,
+    "session_archiving": true
+  },
+  "auto_behaviors": {
+    "entity_detection": "auto_update",
+    "action_item_extraction": "auto_update",
+    "project_status_tracking": "auto_update",
+    "credential_detection": "ask_first",
+    "time_tracking": "auto_update"
+  },
+  "scan_targets": {
+    "code_projects": true,
+    "documents": true,
+    "git_history": true,
+    "package_managers": false,
+    "service_configs": true,
+    "social_profiles": false,
+    "email_exports": true
+  },
+  "scan_paths": {
+    "code": ["~/Repos", "~/Projects"],
+    "documents": ["~/Documents"],
+    "recent": ["~/Desktop", "~/Downloads"]
+  },
+  "recommended_integrations": ["gmail", "notion", "slack", "stripe", "github"],
+  "recommended_mcps": ["notion", "github"]
+}

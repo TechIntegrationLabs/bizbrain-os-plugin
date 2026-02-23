@@ -1,0 +1,44 @@
+{
+  "id": "agency",
+  "name": "Agency Owner",
+  "description": "Agency owner managing multiple clients, projects, team members, and deliverables. All features active.",
+  "icon": "building",
+  "features": {
+    "entity_management": true,
+    "project_tracking": true,
+    "gsd_workflow": true,
+    "knowledge_management": true,
+    "time_tracking": true,
+    "credential_management": true,
+    "mcp_management": true,
+    "todo_management": true,
+    "intake_processing": true,
+    "communications": true,
+    "content_pipeline": true,
+    "outreach_engine": true,
+    "session_archiving": true
+  },
+  "auto_behaviors": {
+    "entity_detection": "auto_update",
+    "action_item_extraction": "auto_update",
+    "project_status_tracking": "auto_update",
+    "credential_detection": "ask_first",
+    "time_tracking": "auto_update"
+  },
+  "scan_targets": {
+    "code_projects": true,
+    "documents": true,
+    "git_history": true,
+    "package_managers": true,
+    "service_configs": true,
+    "social_profiles": true,
+    "email_exports": true
+  },
+  "scan_paths": {
+    "code": ["~/Repos", "~/Projects", "~/Code"],
+    "documents": ["~/Documents"],
+    "recent": ["~/Desktop", "~/Downloads"]
+  },
+  "recommended_integrations": ["github", "gmail", "slack", "notion", "stripe", "supabase"],
+  "recommended_mcps": ["github", "notion", "slack"]
+}

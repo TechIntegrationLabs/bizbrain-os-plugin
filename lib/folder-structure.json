@@ -1,0 +1,48 @@
+{
+  "version": "1.0.0",
+  "core": [
+    { "path": "Knowledge", "description": "Documentation, references, and accumulated knowledge" },
+    { "path": "Knowledge/systems", "description": "How your systems and processes work" },
+    { "path": "Knowledge/decisions", "description": "Key decisions and their rationale" },
+    { "path": "Knowledge/templates", "description": "Reusable templates" },
+    { "path": "Knowledge/references", "description": "External references and bookmarks" },
+    { "path": "_intake-dump", "description": "Drop zone for files to be processed" },
+    { "path": "_intake-dump/conversations", "description": "Auto-captured conversation transcripts" },
+    { "path": "_intake-dump/files", "description": "PDFs, docs, images to be processed" },
+    { "path": "Operations", "description": "System operations and configuration" },
+    { "path": "Operations/credentials", "description": "API keys and secrets (local only)" },
+    { "path": "Operations/learning", "description": "Brain observations and patterns" },
+    { "path": "Operations/learning/sessions", "description": "Per-session activity logs" },
+    { "path": "Operations/integrations", "description": "Connected service configurations" },
+    { "path": ".bizbrain", "description": "Plugin state (managed by BizBrain OS)" }
+  ],
+  "features": {
+    "entity_management": [
+      { "path": "Entities", "description": "People and organizations" },
+      { "path": "Entities/Clients", "description": "Client records" },
+      { "path": "Entities/Partners", "description": "Partner records" },
+      { "path": "Entities/Vendors", "description": "Vendor records" },
+      { "path": "Entities/People", "description": "Individual contacts" }
+    ],
+    "project_tracking": [
+      { "path": "Projects", "description": "Project workspaces" }
+    ],
+    "todo_management": [
+      { "path": "Operations/todos", "description": "Aggregated task tracking" }
+    ],
+    "time_tracking": [
+      { "path": "Operations/timesheets", "description": "Time tracking" },
+      { "path": "Operations/timesheets/logs", "description": "Session time logs" }
+    ],
+    "mcp_management": [
+      { "path": "Operations/mcp-configs", "description": "MCP configuration profiles" },
+      { "path": "Operations/mcp-configs/profiles", "description": "Named MCP profiles" }
+    ],
+    "communications": [
+      { "path": "Communications", "description": "Communication channels and history" }
+    ],
+    "content_pipeline": [
+      { "path": "Content", "description": "Content pipeline and drafts" }
+    ]
+  }
+}

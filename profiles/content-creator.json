@@ -1,0 +1,44 @@
+{
+  "id": "content-creator",
+  "name": "Content Creator",
+  "description": "Blogger, YouTuber, social media creator, or writer. Manages content pipelines, publishing schedules, and audience engagement.",
+  "icon": "pen-tool",
+  "features": {
+    "entity_management": true,
+    "project_tracking": true,
+    "gsd_workflow": false,
+    "knowledge_management": true,
+    "time_tracking": true,
+    "credential_management": true,
+    "mcp_management": true,
+    "todo_management": true,
+    "intake_processing": true,
+    "communications": true,
+    "content_pipeline": true,
+    "outreach_engine": true,
+    "session_archiving": true
+  },
+  "auto_behaviors": {
+    "entity_detection": "auto_update",
+    "action_item_extraction": "auto_update",
+    "project_status_tracking": "auto_update",
+    "credential_detection": "ask_first",
+    "time_tracking": "auto_update"
+  },
+  "scan_targets": {
+    "code_projects": false,
+    "documents": true,
+    "git_history": false,
+    "package_managers": false,
+    "service_configs": true,
+    "social_profiles": true,
+    "email_exports": true
+  },
+  "scan_paths": {
+    "code": [],
+    "documents": ["~/Documents", "~/Creative", "~/Content"],
+    "recent": ["~/Desktop", "~/Downloads"]
+  },
+  "recommended_integrations": ["youtube", "twitter", "linkedin", "notion", "slack"],
+  "recommended_mcps": ["notion"]
+}
