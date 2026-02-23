@@ -14,7 +14,7 @@ if "%~1"=="" (
     exit /b 1
 )
 
-set "HOOK_DIR=%~dp0"
+set "HOOK_DIR=%~dp0scripts\"
 
 REM Try Git for Windows bash in standard locations
 if exist "C:\Program Files\Git\bin\bash.exe" (
@@ -38,7 +38,7 @@ exit /b 0
 CMDBLOCK
 
 # Unix: run the named script directly
-SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+SCRIPT_DIR="$(cd "$(dirname "$0")/scripts" && pwd)"
 SCRIPT_NAME="$1"
 shift
 exec bash "${SCRIPT_DIR}/${SCRIPT_NAME}" "$@"

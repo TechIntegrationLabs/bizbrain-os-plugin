@@ -1,0 +1,61 @@
+#!/usr/bin/env bash
+# BizBrain OS — SessionStart Hook
+# Detects brain folder, generates context, injects into Claude's system prompt.
+# Runs on every session start, resume, clear, and compact.
+
+set -euo pipefail
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]:-$0}")" && pwd)"
+PLUGIN_ROOT="$(cd "${SCRIPT_DIR}/../.." && pwd)"
+
+# --- Brain Path Discovery ---
+# Priority: BIZBRAIN_PATH env → ~/bizbrain-os → ~/Repos/bizbrain-os
+BRAIN_PATH=""
+if [ -n "${BIZBRAIN_PATH:-}" ] && [ -d "$BIZBRAIN_PATH" ]; then
+  BRAIN_PATH="$BIZBRAIN_PATH"
+elif [ -d "${HOME}/bizbrain-os" ]; then
+  BRAIN_PATH="${HOME}/bizbrain-os"
+elif [ -d "${HOME}/Repos/bizbrain-os" ]; then
+  BRAIN_PATH="${HOME}/Repos/bizbrain-os"
+fi
+
+# --- JSON Escaping (pure bash, no sed/awk) ---
+escape_for_json() {
+    local s="$1"
+    s="${s//\\/\\\\}"
+    s="${s//\"/\\\"}"
+    s="${s//$'\n'/\\n}"
+    s="${s//$'\r'/\\r}"
+    s="${s//$'\t'/\\t}"
+    printf '%s' "$s"
+}
+
+# --- Generate Context ---
+if [ -n "$BRAIN_PATH" ]; then
+  CONTEXT=$(node "${PLUGIN_ROOT}/scripts/generate-context.js" "$BRAIN_PATH" 2>/dev/null || echo "# BizBrain OS\n\nError loading brain context. Run \`/brain status\` to diagnose.")
+else
+  CONTEXT="# BizBrain OS\n\nNo brain folder found. Run \`/brain setup\` to scan your machine and create your knowledge brain.\n\n## Available Commands\n| Command | Description |\n|---------|-------------|\n| \`/brain setup\` | First-time setup |\n| \`/brain status\` | Show brain status |"
+fi
+
+ESCAPED_CONTEXT=$(escape_for_json "$CONTEXT")
+
+# --- Update Session State ---
+if [ -n "$BRAIN_PATH" ] && [ -d "$BRAIN_PATH/.bizbrain" ]; then
+  TIMESTAMP=$(date -u +"%Y-%m-%dT%H:%M:%SZ" 2>/dev/null || date +"%Y-%m-%dT%H:%M:%SZ")
+  echo "{\"lastSessionStart\":\"$TIMESTAMP\",\"sessionActive\":true}" > "$BRAIN_PATH/.bizbrain/session-state.json" 2>/dev/null || true
+fi
+
+# --- Output Context Injection ---
+SESSION_CONTEXT="<bizbrain-os-context>\\n${ESCAPED_CONTEXT}\\n</bizbrain-os-context>"
+
+cat <<EOF
+{
+  "additional_context": "${SESSION_CONTEXT}",
+  "hookSpecificOutput": {
+    "hookEventName": "SessionStart",
+    "additionalContext": "${SESSION_CONTEXT}"
+  }
+}
+EOF
+
+exit 0
