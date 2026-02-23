@@ -12,6 +12,18 @@
           }
         ]
       }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Read|Write|Edit|Bash|WebFetch",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "'${CLAUDE_PLUGIN_ROOT}/hooks/run-hook.cmd' post-tool-use",
+            "timeout": 5
+          }
+        ]
+      }
     ]
   }
 }

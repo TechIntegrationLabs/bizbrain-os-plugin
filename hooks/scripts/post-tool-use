@@ -1,0 +1,52 @@
+#!/usr/bin/env bash
+# BizBrain OS — PostToolUse Hook
+# Write-through observation: timestamps activity for time tracking.
+# This command hook handles only deterministic operations (timestamping).
+# Entity detection and semantic analysis are handled by the skills/agents.
+
+set -euo pipefail
+
+# --- Brain Path Discovery ---
+BRAIN_PATH=""
+if [ -n "${BIZBRAIN_PATH:-}" ] && [ -d "$BIZBRAIN_PATH" ]; then
+  BRAIN_PATH="$BIZBRAIN_PATH"
+elif [ -d "${HOME}/bizbrain-os" ]; then
+  BRAIN_PATH="${HOME}/bizbrain-os"
+elif [ -d "${HOME}/Repos/bizbrain-os" ]; then
+  BRAIN_PATH="${HOME}/Repos/bizbrain-os"
+fi
+
+# No brain? Exit silently.
+if [ -z "$BRAIN_PATH" ]; then
+  echo '{"continue": true, "suppressOutput": true}'
+  exit 0
+fi
+
+# --- Read Hook Input ---
+INPUT=$(cat)
+
+# Extract tool_name from JSON input using node (available since we require it)
+TOOL_NAME=""
+if command -v node &>/dev/null; then
+  TOOL_NAME=$(echo "$INPUT" | node -e "
+    let d='';
+    process.stdin.on('data',c=>d+=c);
+    process.stdin.on('end',()=>{
+      try{console.log(JSON.parse(d).tool_name||'')}
+      catch(e){console.log('')}
+    })
+  " 2>/dev/null || echo "")
+fi
+
+# --- Time Tracking: Write heartbeat ---
+TIMESTAMP=$(date -u +"%Y-%m-%dT%H:%M:%SZ" 2>/dev/null || date +"%Y-%m-%dT%H:%M:%SZ")
+SESSION_LOG_DIR="$BRAIN_PATH/Operations/learning/sessions"
+mkdir -p "$SESSION_LOG_DIR" 2>/dev/null || true
+
+# Append timestamp + tool name to today's session log
+TODAY=$(date +"%Y-%m-%d" 2>/dev/null || date +"%Y-%m-%d")
+echo "$TIMESTAMP $TOOL_NAME" >> "$SESSION_LOG_DIR/$TODAY.log" 2>/dev/null || true
+
+# --- Output ---
+echo '{"continue": true, "suppressOutput": true}'
+exit 0
