@@ -207,4 +207,102 @@ if (scan_cache?.lastScanAt) {
   lines.push('');
 }
 
+// --- Continuous Learning Instructions ---
+// These tell Claude to AUTOMATICALLY write back to the brain during every session.
+lines.push('## Continuous Learning (ACTIVE)');
+lines.push('');
+lines.push('**You MUST proactively feed learnings back to the brain throughout this session.**');
+lines.push('Use the `brain-learner` agent to write back observations. Do NOT wait for the user to ask.');
+lines.push('');
+lines.push('### Auto-Capture Triggers');
+lines.push('');
+
+if (auto_behaviors?.action_item_extraction !== 'off') {
+  lines.push('- **Action Items:** When the user mentions a task, deadline, or follow-up → invoke brain-learner to capture it');
+}
+if (auto_behaviors?.decision_logging !== 'off') {
+  lines.push('- **Decisions:** When the user makes a tech/architecture/business decision → invoke brain-learner to log it');
+}
+lines.push('- **Project Status:** When significant work is completed on a project → invoke brain-learner to update project status');
+lines.push('- **New Repos:** If the current working directory is a git repo NOT listed in Active Projects above → invoke brain-learner to onboard it');
+lines.push('- **Session Summary:** Before the session ends or when wrapping up → invoke brain-learner to save a summary');
+lines.push('- **Relationship Updates:** When collaborators are mentioned with new info → invoke entity-watchdog');
+lines.push('');
+
+// Check for untracked repos
+const untrackedDir = path.join(brainPath, '.bizbrain', 'untracked-repos');
+if (fs.existsSync(untrackedDir)) {
+  try {
+    const untrackedFiles = fs.readdirSync(untrackedDir).filter(f => f.endsWith('.json'));
+    if (untrackedFiles.length > 0) {
+      lines.push('### Untracked Repos Detected');
+      lines.push('The PostToolUse hook detected work in repos not yet in the brain:');
+      for (const f of untrackedFiles.slice(0, 5)) {
+        try {
+          const data = JSON.parse(fs.readFileSync(path.join(untrackedDir, f), 'utf8'));
+          lines.push(`- **${data.name}** at \`${data.path}\` (detected ${data.detectedAt})`);
+        } catch(e) {}
+      }
+      lines.push('');
+      lines.push('Invoke brain-learner to add these to the brain, or ask the user if they should be tracked.');
+      lines.push('');
+    }
+  } catch(e) {}
+}
+
+// Check for last session summary
+const lastSessionPath = path.join(brainPath, '.bizbrain', 'last-session.json');
+if (fs.existsSync(lastSessionPath)) {
+  try {
+    const lastSession = JSON.parse(fs.readFileSync(lastSessionPath, 'utf8'));
+    if (lastSession.sessionEnd) {
+      lines.push('### Last Session');
+      lines.push(`- Ended: ${lastSession.sessionEnd}`);
+      lines.push(`- Tool uses: ${lastSession.heartbeats || 'unknown'}`);
+      lines.push('');
+    }
+  } catch(e) {}
+}
+
+// Recent learnings (show last 3 session summaries so Claude has continuity)
+const summariesDir = path.join(brainPath, 'Operations', 'learning', 'summaries');
+if (fs.existsSync(summariesDir)) {
+  try {
+    const summaryFiles = fs.readdirSync(summariesDir)
+      .filter(f => f.endsWith('.md'))
+      .sort()
+      .reverse()
+      .slice(0, 3);
+    if (summaryFiles.length > 0) {
+      lines.push('### Recent Session Summaries');
+      for (const f of summaryFiles) {
+        const content = fs.readFileSync(path.join(summariesDir, f), 'utf8');
+        const preview = content.split('\n').slice(0, 8).join('\n');
+        lines.push(preview);
+        lines.push('');
+      }
+    }
+  } catch(e) {}
+}
+
+// Recent decisions (last 5 for continuity)
+const decisionsDir = path.join(brainPath, 'Knowledge', 'decisions');
+if (fs.existsSync(decisionsDir)) {
+  try {
+    const decisionFiles = fs.readdirSync(decisionsDir).filter(f => f.endsWith('.md'));
+    if (decisionFiles.length > 0) {
+      lines.push('### Recent Decisions');
+      for (const f of decisionFiles.slice(-3)) {
+        const content = fs.readFileSync(path.join(decisionsDir, f), 'utf8');
+        const lastDecision = content.split('\n## ').pop();
+        if (lastDecision) {
+          const preview = lastDecision.split('\n').slice(0, 4).join('\n');
+          lines.push(`**${f.replace('.md', '')}:** ${preview}`);
+        }
+      }
+      lines.push('');
+    }
+  } catch(e) {}
+}
+
 process.stdout.write(lines.join('\n'));

@@ -15,12 +15,24 @@
     ],
     "PostToolUse": [
       {
-        "matcher": "Read|Write|Edit|Bash|WebFetch",
+        "matcher": "Read|Write|Edit|Bash|WebFetch|Grep|Glob|Task",
         "hooks": [
           {
             "type": "command",
             "command": "'${CLAUDE_PLUGIN_ROOT}/hooks/run-hook.cmd' post-tool-use",
             "timeout": 5
+          }
+        ]
+      }
+    ],
+    "SessionEnd": [
+      {
+        "matcher": "*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "'${CLAUDE_PLUGIN_ROOT}/hooks/run-hook.cmd' session-end",
+            "timeout": 10
           }
         ]
       }

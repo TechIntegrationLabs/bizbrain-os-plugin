@@ -1,8 +1,14 @@
 #!/usr/bin/env bash
 # BizBrain OS — PostToolUse Hook
-# Write-through observation: timestamps activity for time tracking.
-# This command hook handles only deterministic operations (timestamping).
-# Entity detection and semantic analysis are handled by the skills/agents.
+# Collects signals from every tool use for brain learning:
+#   - Time tracking heartbeats
+#   - Working directory / project detection
+#   - New repo discovery (flags untracked repos for brain-learner agent)
+#   - File path patterns (what areas of code are being worked on)
+#
+# NOTE: This hook handles MECHANICAL collection only (5s timeout).
+# AI-powered analysis (entity detection, action items, decisions) is handled
+# by the brain-learner agent and context injection instructions.
 
 set -euo pipefail
 
@@ -25,27 +31,65 @@ fi
 # --- Read Hook Input ---
 INPUT=$(cat)
 
-# Extract tool_name from JSON input using node (available since we require it)
+# Extract tool_name and file_path from JSON input
 TOOL_NAME=""
+FILE_PATH=""
 if command -v node &>/dev/null; then
-  TOOL_NAME=$(echo "$INPUT" | node -e "
+  PARSED=$(echo "$INPUT" | node -e "
     let d='';
     process.stdin.on('data',c=>d+=c);
     process.stdin.on('end',()=>{
-      try{console.log(JSON.parse(d).tool_name||'')}
-      catch(e){console.log('')}
+      try{
+        const j=JSON.parse(d);
+        const tool=j.tool_name||'';
+        const fp=j.tool_input?.file_path||j.tool_input?.path||j.tool_input?.command||'';
+        console.log(tool+'|'+fp);
+      }catch(e){console.log('|')}
     })
-  " 2>/dev/null || echo "")
+  " 2>/dev/null || echo "|")
+  TOOL_NAME="${PARSED%%|*}"
+  FILE_PATH="${PARSED#*|}"
 fi
 
-# --- Time Tracking: Write heartbeat ---
 TIMESTAMP=$(date -u +"%Y-%m-%dT%H:%M:%SZ" 2>/dev/null || date +"%Y-%m-%dT%H:%M:%SZ")
+TODAY=$(date +"%Y-%m-%d" 2>/dev/null || date +"%Y-%m-%d")
+
+# --- 1. Time Tracking Heartbeat ---
 SESSION_LOG_DIR="$BRAIN_PATH/Operations/learning/sessions"
 mkdir -p "$SESSION_LOG_DIR" 2>/dev/null || true
+echo "$TIMESTAMP $TOOL_NAME $FILE_PATH" >> "$SESSION_LOG_DIR/$TODAY.log" 2>/dev/null || true
 
-# Append timestamp + tool name to today's session log
-TODAY=$(date +"%Y-%m-%d" 2>/dev/null || date +"%Y-%m-%d")
-echo "$TIMESTAMP $TOOL_NAME" >> "$SESSION_LOG_DIR/$TODAY.log" 2>/dev/null || true
+# --- 2. Working Directory Detection ---
+CWD="${PWD:-}"
+if [ -n "$CWD" ]; then
+  # Check if this is a git repo we're not tracking yet
+  if [ -d "$CWD/.git" ] || git -C "$CWD" rev-parse --git-dir &>/dev/null 2>&1; then
+    REPO_ROOT=$(git -C "$CWD" rev-parse --show-toplevel 2>/dev/null || echo "$CWD")
+    REPO_NAME=$(basename "$REPO_ROOT")
+
+    # Check if this project exists in the brain
+    if [ ! -d "$BRAIN_PATH/Projects/$REPO_NAME" ]; then
+      # Flag as untracked — brain-learner agent will pick this up
+      UNTRACKED_DIR="$BRAIN_PATH/.bizbrain/untracked-repos"
+      mkdir -p "$UNTRACKED_DIR" 2>/dev/null || true
+      # Only write if not already flagged
+      if [ ! -f "$UNTRACKED_DIR/$REPO_NAME.json" ]; then
+        echo "{\"name\":\"$REPO_NAME\",\"path\":\"$REPO_ROOT\",\"detectedAt\":\"$TIMESTAMP\"}" > "$UNTRACKED_DIR/$REPO_NAME.json" 2>/dev/null || true
+      fi
+    fi
+
+    # Log activity for this project
+    PROJECT_LOG_DIR="$BRAIN_PATH/Projects/$REPO_NAME"
+    if [ -d "$PROJECT_LOG_DIR" ]; then
+      echo "$TIMESTAMP $TOOL_NAME" >> "$PROJECT_LOG_DIR/.activity.log" 2>/dev/null || true
+    fi
+  fi
+fi
+
+# --- 3. Tool Usage Patterns ---
+PATTERNS_DIR="$BRAIN_PATH/Operations/learning/patterns"
+mkdir -p "$PATTERNS_DIR" 2>/dev/null || true
+echo "$TOOL_NAME" >> "$PATTERNS_DIR/$TODAY-tools.log" 2>/dev/null || true
 
 # --- Output ---
 echo '{"continue": true, "suppressOutput": true}'

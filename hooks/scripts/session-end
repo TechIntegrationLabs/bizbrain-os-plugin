@@ -1,0 +1,62 @@
+#!/usr/bin/env bash
+# BizBrain OS — SessionEnd Hook
+# Captures session metadata, duration, and working directory for brain learning.
+# The AI-powered session summary is handled by generate-context.js instructions
+# that tell Claude to write back learnings throughout the session.
+
+set -euo pipefail
+
+# --- Brain Path Discovery ---
+BRAIN_PATH=""
+if [ -n "${BIZBRAIN_PATH:-}" ] && [ -d "$BIZBRAIN_PATH" ]; then
+  BRAIN_PATH="$BIZBRAIN_PATH"
+elif [ -d "${HOME}/bizbrain-os" ]; then
+  BRAIN_PATH="${HOME}/bizbrain-os"
+elif [ -d "${HOME}/Repos/bizbrain-os" ]; then
+  BRAIN_PATH="${HOME}/Repos/bizbrain-os"
+fi
+
+# No brain? Exit silently.
+if [ -z "$BRAIN_PATH" ]; then
+  exit 0
+fi
+
+TIMESTAMP=$(date -u +"%Y-%m-%dT%H:%M:%SZ" 2>/dev/null || date +"%Y-%m-%dT%H:%M:%SZ")
+TODAY=$(date +"%Y-%m-%d" 2>/dev/null || date +"%Y-%m-%d")
+
+# --- Calculate session duration from heartbeats ---
+SESSION_LOG="$BRAIN_PATH/Operations/learning/sessions/$TODAY.log"
+DURATION_MINS=0
+if [ -f "$SESSION_LOG" ]; then
+  FIRST_LINE=$(head -1 "$SESSION_LOG" 2>/dev/null || echo "")
+  LAST_LINE=$(tail -1 "$SESSION_LOG" 2>/dev/null || echo "")
+  HEARTBEAT_COUNT=$(wc -l < "$SESSION_LOG" 2>/dev/null || echo "0")
+
+  # Extract timestamps and calculate rough duration
+  if [ -n "$FIRST_LINE" ] && [ -n "$LAST_LINE" ]; then
+    FIRST_TS=$(echo "$FIRST_LINE" | cut -d' ' -f1)
+    LAST_TS=$(echo "$LAST_LINE" | cut -d' ' -f1)
+    # Store for context generator to use
+    echo "{\"sessionEnd\":\"$TIMESTAMP\",\"heartbeats\":$HEARTBEAT_COUNT,\"firstActivity\":\"$FIRST_TS\",\"lastActivity\":\"$LAST_TS\"}" > "$BRAIN_PATH/.bizbrain/last-session.json" 2>/dev/null || true
+  fi
+fi
+
+# --- Detect working directory (what project was active) ---
+CWD="${PWD:-}"
+PROJECT_NAME=""
+if [ -n "$CWD" ]; then
+  # Try to extract project name from path
+  PROJECT_NAME=$(basename "$CWD" 2>/dev/null || echo "")
+fi
+
+# --- Append to session history ---
+HISTORY_DIR="$BRAIN_PATH/Operations/learning/history"
+mkdir -p "$HISTORY_DIR" 2>/dev/null || true
+echo "$TIMESTAMP|end|$PROJECT_NAME|$CWD" >> "$HISTORY_DIR/$TODAY.log" 2>/dev/null || true
+
+# --- Mark session inactive ---
+if [ -d "$BRAIN_PATH/.bizbrain" ]; then
+  echo "{\"lastSessionEnd\":\"$TIMESTAMP\",\"sessionActive\":false}" > "$BRAIN_PATH/.bizbrain/session-state.json" 2>/dev/null || true
+fi
+
+exit 0

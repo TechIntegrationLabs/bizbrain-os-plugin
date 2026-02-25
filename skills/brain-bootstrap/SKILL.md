@@ -106,6 +106,51 @@ Proceed? (yes/no)
 
 Store selections in `.bizbrain/scan-cache.json` (full results) and only populate the brain with selected items in Step 5. The excluded items are saved so `/brain scan` can offer them again later.
 
+### Step 3.7: Plugin Ecosystem Detection
+
+Scan the user's Claude Code setup to detect existing plugins and integrations:
+
+1. **Read `~/.claude/settings.json`** → extract `enabledPlugins` list
+2. **Scan `~/.claude/plugins/marketplaces/`** → list registered marketplaces
+3. **Check for key plugins** and record what's already available:
+
+| Plugin | What It Provides | Brain Integration |
+|--------|-----------------|-------------------|
+| `superpowers` | TDD, debugging, brainstorming, plan writing, git worktrees | Brain stores plans and decisions from superpowers workflows |
+| `gsd` (if standalone) | Phase-based project execution | Brain tracks GSD phases, roadmaps, and completion |
+| `code-review` | PR review workflows | Brain logs review feedback and patterns |
+| `commit-commands` | Git commit workflows | Brain captures commit patterns |
+| `feature-dev` | Guided feature development | Brain stores feature specs and architecture decisions |
+| `hookify` | Custom hook creation | Brain can suggest hooks based on patterns |
+| `slidev` | Presentation creation | Brain tracks presentation assets |
+
+4. **Store detected plugins** in `config.json` under `integrations.detected_plugins`
+5. **Recommend missing plugins** that would enhance the brain:
+
+```
+I detected these Claude Code plugins already installed:
+  ✓ superpowers (TDD, debugging, brainstorming)
+  ✓ code-review
+  ✓ commit-commands
+  ✓ feature-dev
+
+These plugins would supercharge your brain:
+  [1] hookify — Create custom automations (your brain can suggest hooks)
+  [2] context7 — Library documentation lookup
+  [3] episodic-memory — Semantic search across past sessions
+
+Install any? Type numbers or "skip":
+```
+
+6. **Configure integrations** — For detected plugins, the brain automatically:
+   - Stores GSD roadmaps/plans in `Projects/<name>/.planning/`
+   - Logs decisions from brainstorming sessions to `Knowledge/decisions/`
+   - Captures feature specs from feature-dev to `Knowledge/specs/`
+   - Tracks code review feedback patterns
+   - Feeds superpowers' TDD results into project status
+
+The brain doesn't duplicate these plugins — it **wraps around them**, capturing the outputs they produce and feeding context back in. Superpowers does TDD; the brain remembers what was tested and why. GSD manages phases; the brain persists phase history across sessions.
+
 ### Step 4: Create the Brain Folder
 
 1. Create `~/bizbrain-os/` (or chosen path)
@@ -315,23 +360,34 @@ If yes, help set up each one conversationally.
 
 1. Generate the brain's `CLAUDE.md` (will be auto-refreshed by SessionStart hook on future sessions)
 2. Set `BIZBRAIN_PATH` environment variable if not already set
-3. Present the finish message:
+3. Create `Operations/learning/summaries/` and `Knowledge/decisions/` directories
+4. Present the finish message:
 
 ```
-Your brain is alive! Here's what happens next:
+Your brain is alive! Here's what's now running automatically:
 
-  ✓ Every Claude Code session now starts with your full context
-  ✓ Entity Watchdog is monitoring for client/partner mentions
-  ✓ Time tracking is automatic
-  ✓ Your brain compounds — every session makes the next one smarter
+  ✓ SessionStart hook — Injects your full context into every session
+  ✓ PostToolUse hook — Tracks time, detects new repos, logs activity
+  ✓ SessionEnd hook — Captures session duration and metadata
+  ✓ Entity Watchdog — Monitors conversations for client/partner mentions
+  ✓ Brain Learner — Writes back decisions, action items, and session summaries
+  ✓ Continuous Learning — Every session compounds context for the next one
+
+What happens from here:
+  • Open Claude Code anywhere → it already knows your projects, clients, and stack
+  • Make a decision → brain logs it automatically
+  • Mention a task → brain captures it as an action item
+  • Work in a new repo → brain detects it and offers to onboard it
+  • End a session → brain saves a summary for next time
 
 Try these:
   /brain status    — See your brain's current state
   /brain scan      — Re-scan for new projects
   /todo            — View tasks across all projects
   /entity <name>   — Look up any client or collaborator
+  /gsd             — Structured project execution
 
-Restart Claude Code to activate the SessionStart hook.
+Restart Claude Code to activate all hooks and agents.
 ```
 
 ## Important Notes
