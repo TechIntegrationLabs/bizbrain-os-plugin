@@ -3,6 +3,7 @@
   "name": "Developer / Technical Solopreneur",
   "description": "Software developer, indie hacker, or technical founder. Manages code projects, clients, and technical knowledge.",
   "icon": "code",
+  "recommended_mode": "full",
   "features": {
     "entity_management": true,
     "project_tracking": true,

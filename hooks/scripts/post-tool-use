@@ -12,18 +12,13 @@
 
 set -euo pipefail
 
-# --- Brain Path Discovery ---
-BRAIN_PATH=""
-if [ -n "${BIZBRAIN_PATH:-}" ] && [ -d "$BIZBRAIN_PATH" ]; then
-  BRAIN_PATH="$BIZBRAIN_PATH"
-elif [ -d "${HOME}/bizbrain-os" ]; then
-  BRAIN_PATH="${HOME}/bizbrain-os"
-elif [ -d "${HOME}/Repos/bizbrain-os" ]; then
-  BRAIN_PATH="${HOME}/Repos/bizbrain-os"
-fi
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]:-$0}")" && pwd)"
+
+# --- Brain Discovery (shared) ---
+source "${SCRIPT_DIR}/_discover-brain"
 
 # No brain? Exit silently.
-if [ -z "$BRAIN_PATH" ]; then
+if [ -z "$BRAIN_PATH" ] || [ ! -d "$BRAIN_PATH" ]; then
   echo '{"continue": true, "suppressOutput": true}'
   exit 0
 fi
@@ -74,7 +69,7 @@ if [ -n "$CWD" ]; then
       mkdir -p "$UNTRACKED_DIR" 2>/dev/null || true
       # Only write if not already flagged
       if [ ! -f "$UNTRACKED_DIR/$REPO_NAME.json" ]; then
-        echo "{\"name\":\"$REPO_NAME\",\"path\":\"$REPO_ROOT\",\"detectedAt\":\"$TIMESTAMP\"}" > "$UNTRACKED_DIR/$REPO_NAME.json" 2>/dev/null || true
+        echo "{\"name\":\"$REPO_NAME\",\"path\":\"$REPO_ROOT\",\"detectedAt\":\"$TIMESTAMP\",\"zone\":\"$BIZBRAIN_ZONE\"}" > "$UNTRACKED_DIR/$REPO_NAME.json" 2>/dev/null || true
       fi
     fi
 

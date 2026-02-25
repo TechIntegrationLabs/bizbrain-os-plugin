@@ -6,18 +6,13 @@
 
 set -euo pipefail
 
-# --- Brain Path Discovery ---
-BRAIN_PATH=""
-if [ -n "${BIZBRAIN_PATH:-}" ] && [ -d "$BIZBRAIN_PATH" ]; then
-  BRAIN_PATH="$BIZBRAIN_PATH"
-elif [ -d "${HOME}/bizbrain-os" ]; then
-  BRAIN_PATH="${HOME}/bizbrain-os"
-elif [ -d "${HOME}/Repos/bizbrain-os" ]; then
-  BRAIN_PATH="${HOME}/Repos/bizbrain-os"
-fi
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]:-$0}")" && pwd)"
+
+# --- Brain Discovery (shared) ---
+source "${SCRIPT_DIR}/_discover-brain"
 
 # No brain? Exit silently.
-if [ -z "$BRAIN_PATH" ]; then
+if [ -z "$BRAIN_PATH" ] || [ ! -d "$BRAIN_PATH" ]; then
   exit 0
 fi
 
@@ -37,7 +32,7 @@ if [ -f "$SESSION_LOG" ]; then
     FIRST_TS=$(echo "$FIRST_LINE" | cut -d' ' -f1)
     LAST_TS=$(echo "$LAST_LINE" | cut -d' ' -f1)
     # Store for context generator to use
-    echo "{\"sessionEnd\":\"$TIMESTAMP\",\"heartbeats\":$HEARTBEAT_COUNT,\"firstActivity\":\"$FIRST_TS\",\"lastActivity\":\"$LAST_TS\"}" > "$BRAIN_PATH/.bizbrain/last-session.json" 2>/dev/null || true
+    echo "{\"sessionEnd\":\"$TIMESTAMP\",\"heartbeats\":$HEARTBEAT_COUNT,\"firstActivity\":\"$FIRST_TS\",\"lastActivity\":\"$LAST_TS\",\"zone\":\"$BIZBRAIN_ZONE\",\"mode\":\"$BIZBRAIN_MODE\"}" > "$BRAIN_PATH/.bizbrain/last-session.json" 2>/dev/null || true
   fi
 fi
 
@@ -45,18 +40,17 @@ fi
 CWD="${PWD:-}"
 PROJECT_NAME=""
 if [ -n "$CWD" ]; then
-  # Try to extract project name from path
   PROJECT_NAME=$(basename "$CWD" 2>/dev/null || echo "")
 fi
 
 # --- Append to session history ---
 HISTORY_DIR="$BRAIN_PATH/Operations/learning/history"
 mkdir -p "$HISTORY_DIR" 2>/dev/null || true
-echo "$TIMESTAMP|end|$PROJECT_NAME|$CWD" >> "$HISTORY_DIR/$TODAY.log" 2>/dev/null || true
+echo "$TIMESTAMP|end|$PROJECT_NAME|$CWD|$BIZBRAIN_ZONE" >> "$HISTORY_DIR/$TODAY.log" 2>/dev/null || true
 
 # --- Mark session inactive ---
 if [ -d "$BRAIN_PATH/.bizbrain" ]; then
-  echo "{\"lastSessionEnd\":\"$TIMESTAMP\",\"sessionActive\":false}" > "$BRAIN_PATH/.bizbrain/session-state.json" 2>/dev/null || true
+  echo "{\"lastSessionEnd\":\"$TIMESTAMP\",\"sessionActive\":false,\"zone\":\"$BIZBRAIN_ZONE\"}" > "$BRAIN_PATH/.bizbrain/session-state.json" 2>/dev/null || true
 fi
 
 exit 0

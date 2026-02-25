@@ -3,6 +3,7 @@
   "name": "Personal / Life Organizer",
   "description": "Anyone who wants to organize their work, knowledge, and tasks with AI assistance. Minimal setup, maximum utility.",
   "icon": "user",
+  "recommended_mode": "compact",
   "features": {
     "entity_management": false,
     "project_tracking": true,

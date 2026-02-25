@@ -3,6 +3,7 @@
   "name": "Agency Owner",
   "description": "Agency owner managing multiple clients, projects, team members, and deliverables. All features active.",
   "icon": "building",
+  "recommended_mode": "full",
   "features": {
     "entity_management": true,
     "project_tracking": true,

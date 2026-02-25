@@ -1,11 +1,50 @@
 {
-  "version": "1.0.0",
+  "version": "2.0.0",
+  "modes": {
+    "compact": {
+      "description": "Single folder — brain is the root. Simple and complete.",
+      "structure": "flat",
+      "contextLines": 300
+    },
+    "full": {
+      "description": "Three-zone architecture with context isolation. Power user setup.",
+      "structure": "zoned",
+      "contextLines": {
+        "brain": 300,
+        "workspaces": 80,
+        "conversations": 120
+      },
+      "zones": {
+        "brain": {
+          "dir": "brain",
+          "label": "Business Intelligence",
+          "description": "Your full business knowledge — entities, projects, operations, knowledge base",
+          "contextWeight": "full"
+        },
+        "workspaces": {
+          "dir": "workspaces",
+          "label": "Code Workspaces",
+          "description": "Code repos with lean context — fast AI, no business overhead loading",
+          "contextWeight": "lean"
+        },
+        "conversations": {
+          "dir": "conversations",
+          "label": "Brain Conversations",
+          "description": "Quick business discussions with auto-capture — entity watchdog active",
+          "contextWeight": "medium"
+        }
+      }
+    }
+  },
+  "root_marker": ".bizbrain-root.json",
   "core": [
     { "path": "Knowledge", "description": "Documentation, references, and accumulated knowledge" },
     { "path": "Knowledge/systems", "description": "How your systems and processes work" },
     { "path": "Knowledge/decisions", "description": "Key decisions and their rationale" },
     { "path": "Knowledge/templates", "description": "Reusable templates" },
     { "path": "Knowledge/references", "description": "External references and bookmarks" },
+    { "path": "Knowledge/reports", "description": "Generated analysis and reports" },
+    { "path": "Knowledge/recommendations", "description": "Saved AI-generated recommendations" },
     { "path": "_intake-dump", "description": "Drop zone for files to be processed" },
     { "path": "_intake-dump/conversations", "description": "Auto-captured conversation transcripts" },
     { "path": "_intake-dump/files", "description": "PDFs, docs, images to be processed" },
@@ -13,6 +52,9 @@
     { "path": "Operations/credentials", "description": "API keys and secrets (local only)" },
     { "path": "Operations/learning", "description": "Brain observations and patterns" },
     { "path": "Operations/learning/sessions", "description": "Per-session activity logs" },
+    { "path": "Operations/learning/summaries", "description": "AI-generated session summaries" },
+    { "path": "Operations/learning/patterns", "description": "Detected behavioral patterns" },
+    { "path": "Operations/learning/history", "description": "Session history" },
     { "path": "Operations/integrations", "description": "Connected service configurations" },
     { "path": ".bizbrain", "description": "Plugin state (managed by BizBrain OS)" }
   ],
@@ -43,6 +85,9 @@
     ],
     "content_pipeline": [
       { "path": "Content", "description": "Content pipeline and drafts" }
+    ],
+    "outreach_engine": [
+      { "path": "Operations/outreach", "description": "Lead pipeline and sequences" }
     ]
   }
 }

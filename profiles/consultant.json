@@ -3,6 +3,7 @@
   "name": "Consultant / Freelancer",
   "description": "Consultant, freelancer, or service provider. Manages client relationships, proposals, contracts, and timesheets.",
   "icon": "briefcase",
+  "recommended_mode": "full",
   "features": {
     "entity_management": true,
     "project_tracking": true,

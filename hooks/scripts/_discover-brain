@@ -1,0 +1,100 @@
+#!/usr/bin/env bash
+# BizBrain OS — Shared Brain Discovery
+# Sources by all hook scripts to find the brain path and detect mode/zone.
+#
+# After sourcing, these variables are set:
+#   BIZBRAIN_ROOT   — Root folder (e.g., ~/bizbrain-os)
+#   BRAIN_PATH      — Actual brain data folder (root in compact, root/brain in full)
+#   BIZBRAIN_MODE   — "compact" or "full"
+#   BIZBRAIN_ZONE   — "brain", "workspaces", "conversations", or "external"
+#   WORKSPACES_PATH — Path to workspaces dir (full mode only, empty otherwise)
+#   CONVERSATIONS_PATH — Path to conversations dir (full mode only, empty otherwise)
+
+BIZBRAIN_ROOT=""
+BRAIN_PATH=""
+BIZBRAIN_MODE="compact"
+BIZBRAIN_ZONE="external"
+WORKSPACES_PATH=""
+CONVERSATIONS_PATH=""
+
+# --- Find root ---
+_find_root() {
+  local candidate=""
+
+  # Priority 1: BIZBRAIN_PATH env var
+  if [ -n "${BIZBRAIN_PATH:-}" ] && [ -d "$BIZBRAIN_PATH" ]; then
+    candidate="$BIZBRAIN_PATH"
+  # Priority 2: ~/bizbrain-os
+  elif [ -d "${HOME}/bizbrain-os" ]; then
+    candidate="${HOME}/bizbrain-os"
+  # Priority 3: ~/Repos/bizbrain-os (legacy)
+  elif [ -d "${HOME}/Repos/bizbrain-os" ]; then
+    candidate="${HOME}/Repos/bizbrain-os"
+  fi
+
+  [ -n "$candidate" ] || return 1
+  BIZBRAIN_ROOT="$candidate"
+}
+
+# --- Detect mode ---
+_detect_mode() {
+  local root_marker="$BIZBRAIN_ROOT/.bizbrain-root.json"
+
+  if [ -f "$root_marker" ] && command -v node &>/dev/null; then
+    BIZBRAIN_MODE=$(node -e "
+      try {
+        const d = require('$root_marker');
+        console.log(d.mode || 'compact');
+      } catch(e) { console.log('compact'); }
+    " 2>/dev/null || echo "compact")
+  elif [ -f "$BIZBRAIN_ROOT/brain/config.json" ]; then
+    # No marker file but brain/ subdir exists with config — assume full mode
+    BIZBRAIN_MODE="full"
+  else
+    BIZBRAIN_MODE="compact"
+  fi
+
+  # Set brain path based on mode
+  if [ "$BIZBRAIN_MODE" = "full" ]; then
+    BRAIN_PATH="$BIZBRAIN_ROOT/brain"
+    WORKSPACES_PATH="$BIZBRAIN_ROOT/workspaces"
+    CONVERSATIONS_PATH="$BIZBRAIN_ROOT/conversations"
+  else
+    BRAIN_PATH="$BIZBRAIN_ROOT"
+  fi
+}
+
+# --- Detect which zone the CWD is in ---
+_detect_zone() {
+  local cwd="${PWD:-}"
+  [ -n "$cwd" ] || { BIZBRAIN_ZONE="external"; return; }
+
+  if [ "$BIZBRAIN_MODE" = "full" ]; then
+    case "$cwd" in
+      "$BIZBRAIN_ROOT/brain"*|"$BRAIN_PATH"*)
+        BIZBRAIN_ZONE="brain" ;;
+      "$BIZBRAIN_ROOT/workspaces"*|"$WORKSPACES_PATH"*)
+        BIZBRAIN_ZONE="workspaces" ;;
+      "$BIZBRAIN_ROOT/conversations"*|"$CONVERSATIONS_PATH"*)
+        BIZBRAIN_ZONE="conversations" ;;
+      "$BIZBRAIN_ROOT"*)
+        BIZBRAIN_ZONE="brain" ;;
+      *)
+        BIZBRAIN_ZONE="external" ;;
+    esac
+  else
+    # Compact mode: if inside root, you're in the brain
+    case "$cwd" in
+      "$BIZBRAIN_ROOT"*)
+        BIZBRAIN_ZONE="brain" ;;
+      *)
+        BIZBRAIN_ZONE="external" ;;
+    esac
+  fi
+}
+
+# --- Run discovery ---
+if _find_root; then
+  _detect_mode
+  _detect_zone
+fi

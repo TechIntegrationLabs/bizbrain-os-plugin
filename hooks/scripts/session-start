@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # BizBrain OS — SessionStart Hook
-# Detects brain folder, generates context, injects into Claude's system prompt.
+# Detects brain folder, generates zone-aware context, injects into Claude's system prompt.
 # Runs on every session start, resume, clear, and compact.
 
 set -euo pipefail
@@ -8,16 +8,8 @@ set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]:-$0}")" && pwd)"
 PLUGIN_ROOT="$(cd "${SCRIPT_DIR}/../.." && pwd)"
 
-# --- Brain Path Discovery ---
-# Priority: BIZBRAIN_PATH env → ~/bizbrain-os → ~/Repos/bizbrain-os
-BRAIN_PATH=""
-if [ -n "${BIZBRAIN_PATH:-}" ] && [ -d "$BIZBRAIN_PATH" ]; then
-  BRAIN_PATH="$BIZBRAIN_PATH"
-elif [ -d "${HOME}/bizbrain-os" ]; then
-  BRAIN_PATH="${HOME}/bizbrain-os"
-elif [ -d "${HOME}/Repos/bizbrain-os" ]; then
-  BRAIN_PATH="${HOME}/Repos/bizbrain-os"
-fi
+# --- Brain Discovery (shared) ---
+source "${SCRIPT_DIR}/_discover-brain"
 
 # --- JSON Escaping (pure bash, no sed/awk) ---
 escape_for_json() {
@@ -31,8 +23,8 @@ escape_for_json() {
 }
 
 # --- Generate Context ---
-if [ -n "$BRAIN_PATH" ]; then
-  CONTEXT=$(node "${PLUGIN_ROOT}/scripts/generate-context.js" "$BRAIN_PATH" 2>/dev/null || echo "# BizBrain OS\n\nError loading brain context. Run \`/brain status\` to diagnose.")
+if [ -n "$BRAIN_PATH" ] && [ -d "$BRAIN_PATH" ]; then
+  CONTEXT=$(node "${PLUGIN_ROOT}/scripts/generate-context.js" "$BRAIN_PATH" "$BIZBRAIN_MODE" "$BIZBRAIN_ZONE" "$BIZBRAIN_ROOT" 2>/dev/null || echo "# BizBrain OS\n\nError loading brain context. Run \`/brain status\` to diagnose.")
 else
   CONTEXT="# BizBrain OS\n\nNo brain folder found. Run \`/brain setup\` to scan your machine and create your knowledge brain.\n\n## Available Commands\n| Command | Description |\n|---------|-------------|\n| \`/brain setup\` | First-time setup |\n| \`/brain status\` | Show brain status |"
 fi
@@ -42,7 +34,7 @@ ESCAPED_CONTEXT=$(escape_for_json "$CONTEXT")
 # --- Update Session State ---
 if [ -n "$BRAIN_PATH" ] && [ -d "$BRAIN_PATH/.bizbrain" ]; then
   TIMESTAMP=$(date -u +"%Y-%m-%dT%H:%M:%SZ" 2>/dev/null || date +"%Y-%m-%dT%H:%M:%SZ")
-  echo "{\"lastSessionStart\":\"$TIMESTAMP\",\"sessionActive\":true}" > "$BRAIN_PATH/.bizbrain/session-state.json" 2>/dev/null || true
+  echo "{\"lastSessionStart\":\"$TIMESTAMP\",\"sessionActive\":true,\"zone\":\"$BIZBRAIN_ZONE\",\"mode\":\"$BIZBRAIN_MODE\"}" > "$BRAIN_PATH/.bizbrain/session-state.json" 2>/dev/null || true
 fi
 
 # --- Output Context Injection ---
