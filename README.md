@@ -17,16 +17,10 @@ No more re-explaining your tech stack. No more listing your clients again. No mo
 claude plugin marketplace add TechIntegrationLabs/bizbrain-os-plugin
 
 # Install the plugin
-claude plugin install bizbrain-os@bizbrain-os
+claude plugin install bizbrain-os@bizbrain-os-plugin
 
-# Run first-time setup
+# Restart Claude Code, then run first-time setup
 /brain setup
-```
-
-Or install from the official Claude Code plugin directory:
-
-```bash
-claude plugin install bizbrain-os@claude-plugin-directory
 ```
 
 ## Features
