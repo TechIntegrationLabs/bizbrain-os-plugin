@@ -13,15 +13,19 @@ No more re-explaining your tech stack. No more listing your clients again. No mo
 ## Quick Install
 
 ```bash
-# Add the marketplace
+# Add the marketplace & install the plugin
 claude plugin marketplace add TechIntegrationLabs/bizbrain-os-plugin
-
-# Install the plugin
 claude plugin install bizbrain-os@bizbrain-os-plugin
-
-# Restart Claude Code, then run first-time setup
-/brain setup
 ```
+
+Then open a **new terminal**, start Claude Code, and run your first brain setup:
+
+```
+claude
+> /brain setup
+```
+
+The brain scans your machine, shows what it found, lets you choose what to track, and generates a personalized intelligence report. Every Claude Code session after that starts with your full business context automatically.
 
 ## Features
 
