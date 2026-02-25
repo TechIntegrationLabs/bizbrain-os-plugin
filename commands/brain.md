@@ -31,7 +31,12 @@ You are managing the user's BizBrain OS brain.
 Invoke the `bizbrain-os:brain-bootstrap` skill.
 
 **If "scan":**
-Run the scanner script at `${CLAUDE_PLUGIN_ROOT}/scripts/scanner.sh`, compare results to existing brain state, and update Projects/ and Operations/ with new discoveries. Report what changed.
+Run the scanner script at `${CLAUDE_PLUGIN_ROOT}/scripts/scanner.sh`, compare results to existing brain state.
+- Show **new discoveries** with the same interactive selection UI from brain-bootstrap Step 3.5
+- Show **previously excluded** items (from `.bizbrain/scan-cache.json`) and ask if user wants to add any
+- Show **removed items** (previously tracked but no longer found on disk) and ask if user wants to remove them
+- Update Projects/ and Operations/ based on user selections
+- Update `.bizbrain/scan-cache.json` with new full results
 
 **If "configure":**
 Read current config.json and present settings as an interactive menu using AskUserQuestion. Allow toggling features and auto-behaviors.

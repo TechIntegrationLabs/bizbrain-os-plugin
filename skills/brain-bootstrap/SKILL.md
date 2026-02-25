@@ -44,7 +44,67 @@ Run the scanner script to discover:
 - Claude Code configuration (existing MCPs, project contexts)
 - Service configs (.env files, API keys)
 
-Present a summary: "I found X projects, Y documents, Z services. Here's what I'll add to your brain:"
+Store full scan results in memory for the selection step.
+
+### Step 3.5: Interactive Selection
+
+Present scan results as numbered lists organized by category. All items are **included by default**.
+The user types numbers to exclude, "all" to keep everything, or "none" to skip a category.
+
+**For each category with results, present a selection prompt using AskUserQuestion:**
+
+**Projects/Repos** (if any found):
+```
+Found N code repositories:
+
+  [1] ✓ geoviz-app          NextJS    ~/Repos/geoviz-app
+  [2] ✓ bizbrain-os         Rust      ~/Repos/bizbrain-os
+  [3] ✓ old-prototype       Node      ~/Projects/old-prototype
+  [4] ✓ client-portal       Python    ~/Repos/client-portal
+
+Type numbers to EXCLUDE (e.g. "3 4"), "all" to keep all, or "none" to skip:
+```
+
+**Services/Tools** (if any found):
+```
+Found N services and tools:
+
+  [1] ✓ GitHub CLI           authenticated
+  [2] ✓ Node.js              v20.11.0
+  [3] ✓ Python               3.13
+  [4] ✓ Claude Code config   ~/.claude.json
+
+Type numbers to EXCLUDE, "all" to keep all, or "none" to skip:
+```
+
+**Entities/Collaborators** (if any found from git history):
+```
+Found N collaborators in git history:
+
+  [1] ✓ Jane Smith           jane@example.com      12 commits
+  [2] ✓ Bob Johnson          bob@corp.com           5 commits
+  [3] ✓ GitHub Actions       noreply@github.com     3 commits
+
+Type numbers to EXCLUDE, "all" to keep all, or "none" to skip:
+```
+
+**Processing user response:**
+- Numbers (e.g. "3 4" or "3, 4") → exclude those items, keep the rest
+- "all" → keep everything in this category
+- "none" → exclude everything in this category
+- Empty response → treat as "all" (keep everything)
+
+After all categories are selected, show a final summary:
+```
+Brain will track:
+  Projects: 2 of 4
+  Services: 4 of 4
+  Entities: 2 of 3
+
+Proceed? (yes/no)
+```
+
+Store selections in `.bizbrain/scan-cache.json` (full results) and only populate the brain with selected items in Step 5. The excluded items are saved so `/brain scan` can offer them again later.
 
 ### Step 4: Create the Brain Folder
 
@@ -56,17 +116,40 @@ Present a summary: "I found X projects, Y documents, Z services. Here's what I'l
 6. Write `.bizbrain/state.json` with initial state
 7. Write `.bizbrain/hooks-state.json` with auto_behaviors from profile
 
-### Step 5: Populate from Scan Results
+### Step 5: Populate from Selections
 
-For each discovered project:
+**Only populate items the user selected in Step 3.5.**
+
+For each **selected** project:
 - Create `Projects/<name>/_meta.json` with repo path, stack, last activity
 - Create `Projects/<name>/overview.md` with basic info
 
-For each discovered service/credential:
+For each **selected** service/credential:
 - Add to `Operations/credentials/registry.json` (catalog only — don't copy secrets)
 
-For each discovered entity (from git history collaborators):
-- Queue for user confirmation: "Found these collaborators: [list]. Add any as entities?"
+For each **selected** entity (from git history collaborators):
+- Create entity records in the appropriate `Entities/` subfolder
+
+**Save full scan results** (both selected and excluded) to `.bizbrain/scan-cache.json`:
+```json
+{
+  "lastScanAt": "2026-02-25T14:32:00Z",
+  "projects": {
+    "selected": [{ "name": "...", "path": "...", "stack": "..." }],
+    "excluded": [{ "name": "...", "path": "...", "stack": "..." }]
+  },
+  "services": {
+    "selected": [...],
+    "excluded": [...]
+  },
+  "entities": {
+    "selected": [...],
+    "excluded": [...]
+  }
+}
+```
+
+This allows `/brain scan` to show previously-excluded items and offer to add them.
 
 ### Step 6: Generate CLAUDE.md
 
