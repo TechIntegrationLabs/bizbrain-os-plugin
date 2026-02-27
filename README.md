@@ -52,18 +52,21 @@ The brain scans your machine, shows what it found, lets you choose what to track
 
 ### 1. Brain Folder
 
-BizBrain OS creates a `~/bizbrain-os/` folder that serves as your persistent knowledge brain:
+BizBrain OS creates a `~/bizbrain-os/` folder with three zones optimized for different types of work:
 
 ```
 ~/bizbrain-os/
-  Knowledge/          # Systems, decisions, templates, references
-  Projects/           # Auto-discovered project workspaces
-  Entities/           # Clients, partners, vendors, people
-  Operations/         # Credentials, todos, timesheets, learning
-  _intake-dump/       # Drop zone for files to process
-  .bizbrain/          # Plugin state
-  config.json         # Brain configuration
+  launchpad/          # Start all Claude Code sessions here (recommended)
+  workspaces/         # Clone/create code repos here (lean context ~80 lines)
+  brain/              # Full business intelligence
+    Knowledge/        # Systems, decisions, templates, references
+    Projects/         # Auto-discovered project workspaces
+    Entities/         # Clients, partners, vendors, people
+    Operations/       # Credentials, todos, timesheets, learning
+    _intake-dump/     # Drop zone for files to process
 ```
+
+**Why three zones?** Claude Code loads context from CLAUDE.md files. Different zones inject different amounts — the launchpad gives you optimized context (~120 lines) with auto-capture, while workspaces give code repos ultra-lean context (~80 lines). This means faster startup and less token overhead for every session.
 
 ### 2. SessionStart Hook
 
@@ -84,6 +87,18 @@ The PostToolUse hook monitors your work and feeds observations back to the brain
 - Action items extracted
 
 Every session makes the next session smarter.
+
+## Getting Started
+
+After install and `/brain setup`, here's how to use BizBrain OS day-to-day:
+
+1. **Start sessions in `~/bizbrain-os/launchpad/`** — This is your default Claude Code starting point. Open a terminal, `cd ~/bizbrain-os/launchpad && claude`. You get optimized context with auto-capture, all commands available, and entity watchdog active.
+
+2. **Clone/create code repos in `~/bizbrain-os/workspaces/`** — When you need to write code, repos here get ultra-lean context (~80 lines). Just the essentials for fast development. Brain commands still work.
+
+3. **Use `~/bizbrain-os/brain/` for deep operations** — Full brain context loads here (~300 lines). Use this for entity management, intake processing, or brain administration.
+
+**Why this structure?** Claude Code loads CLAUDE.md files from your working directory. By starting in different zones, you control how much context gets injected — optimizing for speed when coding and richness when doing business work. The launchpad hits the sweet spot for most sessions.
 
 ## Commands
 

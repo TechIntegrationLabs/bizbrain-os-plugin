@@ -12,7 +12,7 @@
       "contextLines": {
         "brain": 300,
         "workspaces": 80,
-        "conversations": 120
+        "launchpad": 120
       },
       "zones": {
         "brain": {
@@ -27,10 +27,10 @@
           "description": "Code repos with lean context — fast AI, no business overhead loading",
           "contextWeight": "lean"
         },
-        "conversations": {
-          "dir": "conversations",
-          "label": "Brain Conversations",
-          "description": "Quick business discussions with auto-capture — entity watchdog active",
+        "launchpad": {
+          "dir": "launchpad",
+          "label": "Launchpad",
+          "description": "Start all Claude Code sessions here — auto-capture, entity watchdog, full commands",
           "contextWeight": "medium"
         }
       }

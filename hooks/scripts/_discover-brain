@@ -6,16 +6,16 @@
 #   BIZBRAIN_ROOT   — Root folder (e.g., ~/bizbrain-os)
 #   BRAIN_PATH      — Actual brain data folder (root in compact, root/brain in full)
 #   BIZBRAIN_MODE   — "compact" or "full"
-#   BIZBRAIN_ZONE   — "brain", "workspaces", "conversations", or "external"
+#   BIZBRAIN_ZONE   — "brain", "workspaces", "launchpad", or "external"
 #   WORKSPACES_PATH — Path to workspaces dir (full mode only, empty otherwise)
-#   CONVERSATIONS_PATH — Path to conversations dir (full mode only, empty otherwise)
+#   LAUNCHPAD_PATH — Path to launchpad dir (full mode only, empty otherwise)
 
 BIZBRAIN_ROOT=""
 BRAIN_PATH=""
 BIZBRAIN_MODE="compact"
 BIZBRAIN_ZONE="external"
 WORKSPACES_PATH=""
-CONVERSATIONS_PATH=""
+LAUNCHPAD_PATH=""
 
 # --- Find root ---
 _find_root() {
@@ -58,7 +58,7 @@ _detect_mode() {
   if [ "$BIZBRAIN_MODE" = "full" ]; then
     BRAIN_PATH="$BIZBRAIN_ROOT/brain"
     WORKSPACES_PATH="$BIZBRAIN_ROOT/workspaces"
-    CONVERSATIONS_PATH="$BIZBRAIN_ROOT/conversations"
+    LAUNCHPAD_PATH="$BIZBRAIN_ROOT/launchpad"
   else
     BRAIN_PATH="$BIZBRAIN_ROOT"
   fi
@@ -75,8 +75,8 @@ _detect_zone() {
         BIZBRAIN_ZONE="brain" ;;
       "$BIZBRAIN_ROOT/workspaces"*|"$WORKSPACES_PATH"*)
         BIZBRAIN_ZONE="workspaces" ;;
-      "$BIZBRAIN_ROOT/conversations"*|"$CONVERSATIONS_PATH"*)
-        BIZBRAIN_ZONE="conversations" ;;
+      "$BIZBRAIN_ROOT/launchpad"*|"$LAUNCHPAD_PATH"*)
+        BIZBRAIN_ZONE="launchpad" ;;
       "$BIZBRAIN_ROOT"*)
         BIZBRAIN_ZONE="brain" ;;
       *)

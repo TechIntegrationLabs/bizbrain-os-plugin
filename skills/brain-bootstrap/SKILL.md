@@ -46,9 +46,9 @@ Present the choice using AskUserQuestion:
 How should your brain be organized?
 
   [1] Full Install (Recommended)
-      Three separate zones inside one folder: brain, workspaces, and conversations.
+      Three separate zones inside one folder: brain, workspaces, and launchpad.
       Your code repos get lean AI context (~80 lines vs ~300).
-      Business conversations get auto-captured with entity watchdog.
+      All sessions launched here get auto-captured with entity watchdog.
       Best for: getting the most out of BizBrain OS.
 
   [2] Simple
@@ -247,7 +247,7 @@ Three-zone architecture with context isolation:
   │   ├── CLAUDE.md               # Lean dev commands (~80 lines)
   │   └── (repos cloned/created here)
   │
-  └── conversations/              # Quick brain chats (medium context)
+  └── launchpad/              # Start all sessions here (optimized context)
       ├── CLAUDE.md               # Compact brain briefing + entity watchdog
       └── (auto-captured sessions)
 ```
@@ -260,13 +260,13 @@ Three-zone architecture with context isolation:
      "version": "2.0.0",
      "brainDir": "brain",
      "workspacesDir": "workspaces",
-     "conversationsDir": "conversations"
+     "launchpadDir": "launchpad"
    }
    ```
 3. Copy zone CLAUDE.md templates from `${CLAUDE_PLUGIN_ROOT}/lib/zone-templates/`:
    - `root-claude.md` → `~/bizbrain-os/CLAUDE.md`
    - `workspaces-claude.md` → `~/bizbrain-os/workspaces/CLAUDE.md`
-   - `conversations-claude.md` → `~/bizbrain-os/conversations/CLAUDE.md`
+   - `launchpad-claude.md` → `~/bizbrain-os/launchpad/CLAUDE.md`
 4. Create `brain/` subdirectory
 5. Read `${CLAUDE_PLUGIN_ROOT}/lib/folder-structure.json`
 6. Create all `core` folders inside `brain/`
@@ -507,41 +507,75 @@ If the user selects a vault:
 1. Generate the brain's `CLAUDE.md` (will be auto-refreshed by SessionStart hook on future sessions)
 2. Set `BIZBRAIN_PATH` environment variable if not already set
 3. Create `Operations/learning/summaries/` and `Knowledge/decisions/` directories
-4. **Full mode only:** Remind the user about the three zones:
+4. Present the **Getting Started** guide (this is critical — the user needs to know how to use the system):
+
    ```
-   Your brain has three zones:
-     brain/          — Open Claude Code here for full brain operations
-     workspaces/     — Clone or create code repos here for lean dev context
-     conversations/  — Open Claude Code here for business discussions
+   ## Getting Started — How to Use BizBrain OS
+
+   Your brain has three zones, each optimized for a different type of work:
+
+     launchpad/   — START ALL SESSIONS HERE (recommended)
+                    Optimized context (~120 lines), auto-capture, entity watchdog,
+                    all commands available. This is your daily driver.
+
+     workspaces/  — Clone or create code repos here
+                    Ultra-lean context (~80 lines) for fast development.
+                    Brain commands still work. Time tracking active.
+
+     brain/       — Full brain operations (advanced)
+                    Complete business intelligence (~300 lines).
+                    Use for entity management, intake processing, brain admin.
+
+   ### Daily Workflow
+
+   1. Open terminal → cd ~/bizbrain-os/launchpad → claude
+   2. Work on anything — code, business, planning, brainstorming
+   3. When you need to write code: cd ~/bizbrain-os/workspaces/my-project → claude
+
+   ### Why This Structure
+
+   Claude Code loads CLAUDE.md from your working directory. Different zones inject
+   different amounts of context — this means faster startup and less token overhead.
+   The launchpad is the sweet spot for most sessions.
+
+   ### Where Repos Go
+
+   Clone or create code repos inside workspaces/:
+     cd ~/bizbrain-os/workspaces
+     git clone https://github.com/you/your-app.git
+     cd your-app && claude    # Ultra-lean context, fast dev
+
+   The brain automatically detects new repos in workspaces/ and offers to onboard them.
    ```
-5. Present the finish message:
 
-```
-Your brain is alive! Here's what's now running automatically:
+5. Present the automated features:
 
-  ✓ SessionStart hook — Injects your full context into every session
-  ✓ PostToolUse hook — Tracks time, detects new repos, logs activity
-  ✓ SessionEnd hook — Captures session duration and metadata
-  ✓ Entity Watchdog — Monitors conversations for client/partner mentions
-  ✓ Brain Learner — Writes back decisions, action items, and session summaries
-  ✓ Continuous Learning — Every session compounds context for the next one
+   ```
+   ## What's Running Automatically
 
-What happens from here:
-  • Open Claude Code anywhere → it already knows your projects, clients, and stack
-  • Make a decision → brain logs it automatically
-  • Mention a task → brain captures it as an action item
-  • Work in a new repo → brain detects it and offers to onboard it
-  • End a session → brain saves a summary for next time
+     ✓ SessionStart hook — Injects your context into every session
+     ✓ PostToolUse hook — Tracks time, detects new repos, logs activity
+     ✓ SessionEnd hook — Captures session duration and metadata
+     ✓ Entity Watchdog — Monitors sessions for client/partner mentions
+     ✓ Brain Learner — Writes back decisions, action items, and session summaries
+     ✓ Continuous Learning — Every session compounds context for the next one
 
-Try these:
-  /brain status    — See your brain's current state
-  /brain scan      — Re-scan for new projects
-  /todo            — View tasks across all projects
-  /entity <name>   — Look up any client or collaborator
-  /gsd             — Structured project execution
+   What happens from here:
+     • Open Claude Code in launchpad/ → it already knows your projects, clients, and stack
+     • Make a decision → brain logs it automatically
+     • Mention a task → brain captures it as an action item
+     • Clone a repo in workspaces/ → brain detects it and offers to onboard it
+     • End a session → brain saves a summary for next time
 
-Restart Claude Code to activate all hooks and agents.
-```
+   Quick commands to try:
+     /brain status    — See your brain's current state
+     /brain scan      — Re-scan for new projects
+     /todo            — View tasks across all projects
+     /entity <name>   — Look up any client or collaborator
+     /gsd             — Structured project execution
+
+   Restart Claude Code to activate all hooks and agents.
+   ```
 
 ## Important Notes
 

@@ -54,7 +54,7 @@ A local-only knowledge store on your machine. Organized folders for everything:
   ├── workspaces/             # Code repos (lean AI context)
   │   └── my-app/
   │
-  └── conversations/          # Business chats (auto-captured)
+  └── launchpad/               # Start all sessions here (auto-captured)
 ```
 
 ### Pillar 2: Automatic Context Injection
@@ -123,14 +123,14 @@ Five profiles optimized for different workflows:
 | **Developer / Technical Solopreneur** | Solo devs, indie hackers, technical founders | Full dev stack: GSD, repos, Supabase, GitHub, entity management | Full (3-zone) |
 | **Agency Owner** | Multi-client agencies | ALL features: clients, billing, content, outreach, comms | Full (3-zone) |
 | **Consultant / Freelancer** | Service providers | Client tracking, proposals, time tracking, billing | Full (3-zone) |
-| **Content Creator** | Bloggers, YouTubers, writers | Content pipeline, social media, scheduling | Compact |
-| **Personal / Life Organizer** | Personal productivity | Minimal: knowledge, todos, intake | Compact |
+| **Content Creator** | Bloggers, YouTubers, writers | Content pipeline, social media, scheduling | Full (3-zone) |
+| **Personal / Life Organizer** | Personal productivity | Minimal: knowledge, todos, intake | Full (3-zone) |
 
 ### 2c. Choose Your Mode
 
 **Simple (Compact):** Brain is a single folder. Easy, straightforward. Everything in one place. Best for content creators and personal use.
 
-**Power User (Full):** Three-zone architecture. Code repos get lean AI context (~80 lines instead of ~300). Business conversations get auto-captured with entity watchdog. This is the setup that serious developers and agencies want.
+**Full Install (Recommended):** Three-zone architecture. Code repos get lean AI context (~80 lines instead of ~300). All sessions launched from the launchpad get auto-captured with entity watchdog. This is the recommended setup for everyone.
 
 ### 2d. Machine Scan
 
@@ -168,7 +168,7 @@ The three-zone system solves this with **physical directory separation**:
 |------|---------|------------|---------|
 | `brain/` | Full business intelligence | ~300 lines | Business operations, entity management, intake |
 | `workspaces/` | Lean dev commands | ~80 lines | Code development — fast, minimal overhead |
-| `conversations/` | Compact brain briefing | ~120 lines | Business discussions with auto-capture |
+| `launchpad/` | Optimized brain context | ~120 lines | Start all sessions here — auto-capture enabled |
 
 ### The Brain Zone (`brain/`)
 
@@ -188,14 +188,14 @@ Clone or create code repos here. When you `cd workspaces/my-app && claude`:
 - New repos are auto-detected for brain onboarding
 - No business context overhead
 
-### The Conversations Zone (`conversations/`)
+### The Launchpad (`launchpad/`)
 
-Open Claude Code here for business discussions. You get:
-- Compact brain briefing (projects, entities, action items)
+**Start all Claude Code sessions here.** This is your default starting point. You get:
+- Optimized brain context (~120 lines — fast startup, less token overhead)
 - Full entity watchdog (auto-detects mentions)
 - All brain commands available
-- **Auto-capture:** Every conversation is saved to the brain's intake for processing
-- Where to record decisions, action items, and updates back to the brain
+- **Auto-capture:** Every session is saved to the brain for future reference
+- Decisions, action items, and updates are automatically recorded back to the brain
 
 ### How It All Connects
 
@@ -595,14 +595,14 @@ This is the compound interest of AI context. Every session deposits. Every futur
 │                   ~/bizbrain-os/                         │
 ├──────────────────┬──────────────────┬───────────────────┤
 │                  │                  │                    │
-│   brain/         │   workspaces/    │   conversations/   │
+│   brain/         │   workspaces/    │   launchpad/       │
 │   ┌──────────┐   │   ┌──────────┐  │   ┌──────────┐    │
-│   │Knowledge │   │   │ my-app/  │  │   │ Auto-    │    │
-│   │Entities  │   │   │ api-svc/ │  │   │ captured │    │
-│   │Projects  │   │   │ website/ │  │   │ sessions │    │
+│   │Knowledge │   │   │ my-app/  │  │   │ Start    │    │
+│   │Entities  │   │   │ api-svc/ │  │   │ sessions │    │
+│   │Projects  │   │   │ website/ │  │   │ here     │    │
 │   │Operations│   │   └──────────┘  │   └──────────┘    │
 │   │_intake   │   │                  │                    │
-│   └──────────┘   │   Lean context   │   Medium context   │
+│   └──────────┘   │   Lean context   │   Optimized ctx    │
 │   Full context   │   ~80 lines      │   ~120 lines       │
 │   ~300 lines     │                  │                    │
 ├──────────────────┴──────────────────┴───────────────────┤

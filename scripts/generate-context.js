@@ -6,7 +6,7 @@
 // Usage: node generate-context.js <brain-path> [mode] [zone] [root-path]
 //   brain-path: path to the brain data folder (where config.json lives)
 //   mode: "compact" or "full" (default: compact)
-//   zone: "brain", "workspaces", "conversations", "external" (default: brain)
+//   zone: "brain", "workspaces", "launchpad", "external" (default: brain)
 //   root-path: root container path (full mode only)
 
 const fs = require('fs');
@@ -312,26 +312,26 @@ function generateWorkspacesContext() {
   return lines.join('\n');
 }
 
-function generateConversationsContext() {
-  // Medium context — compact brain briefing for business discussions
+function generateLaunchpadContext() {
+  // Medium context — optimized starting point for all Claude Code sessions
   const lines = [];
   const projects = loadProjects();
   const actionItems = loadActionItems(10);
   const entitySummary = loadEntitySummary(40);
 
-  lines.push(`# ${profile.businessName || 'My'} Brain — Conversations`);
+  lines.push(`# ${profile.businessName || 'My'} Brain — Launchpad`);
   lines.push('');
   lines.push(`> Owner: ${profile.userName || 'Unknown'}`);
   if (profile.businessType) lines.push(`> Type: ${profile.businessType}`);
   lines.push(`> Brain: \`${brainPath}\``);
   lines.push('');
 
-  lines.push('**This is the conversations zone.** Business discussions with auto-capture enabled.');
-  lines.push('All sessions here are automatically captured to the brain for processing.');
+  lines.push('**This is the launchpad.** Start all Claude Code sessions here for optimized context with auto-capture.');
+  lines.push('All sessions are automatically captured to the brain for future reference.');
   lines.push('');
 
   // All commands available
-  const cmds = buildCommandsTable('conversations');
+  const cmds = buildCommandsTable('launchpad');
   lines.push('## Commands');
   lines.push('| Command | Description |');
   lines.push('|---------|-------------|');
@@ -444,7 +444,7 @@ function generateExternalContext() {
   lines.push(`> Brain: \`${brainPath}\``);
   if (mode === 'full' && rootPath) {
     lines.push(`> Workspaces: \`${rootPath}/workspaces\``);
-    lines.push(`> Conversations: \`${rootPath}/conversations\``);
+    lines.push(`> Launchpad: \`${rootPath}/launchpad\``);
   }
   lines.push('');
 
@@ -581,8 +581,8 @@ switch (zone) {
   case 'workspaces':
     output = generateWorkspacesContext();
     break;
-  case 'conversations':
-    output = generateConversationsContext();
+  case 'launchpad':
+    output = generateLaunchpadContext();
     break;
   case 'external':
     output = generateExternalContext();

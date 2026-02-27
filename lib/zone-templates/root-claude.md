@@ -4,9 +4,9 @@
 
 | Zone | Purpose | Open Claude Code Here For |
 |------|---------|--------------------------|
-| `brain/` | Full business intelligence | Business operations, entity management, intake processing |
+| `launchpad/` | Start here (recommended) | Any session — code, business, planning, brainstorming |
+| `brain/` | Full business intelligence | Deep brain operations, entity management, intake processing |
 | `workspaces/` | Code projects (lean context) | Development work — fast, minimal overhead |
-| `conversations/` | Quick brain chats | Business discussions with auto-capture |
 
 ## Quick Commands (Available Everywhere)
 
@@ -15,5 +15,11 @@
 | `/brain status` | Brain dashboard |
 | `/todo` | View tasks |
 | `/knowledge <topic>` | Load brain knowledge |
+
+## Getting Started
+
+1. **Start sessions in `launchpad/`** — optimized context with auto-capture
+2. **Clone/create code repos in `workspaces/`** — lean context for fast dev work
+3. **Use `brain/` for deep operations** — full context when you need everything
 
 *Context is automatically optimized based on which zone you're in.*
