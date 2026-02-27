@@ -27,12 +27,13 @@ If a brain already exists, ask: "Found an existing brain at [path]. Reconfigure 
 Ask the user (one question at a time, use AskUserQuestion):
 1. "What's your name?" (for the brain's owner field)
 2. "What's your business or project name?" (or "What should we call your brain?")
-3. Profile selection — present the 5 profiles with descriptions:
-   - Developer / Technical Solopreneur
+3. Profile selection — present the 5 profiles with descriptions using AskUserQuestion:
+   - Developer / Technical Solopreneur (Recommended)
    - Content Creator
    - Consultant / Freelancer
    - Agency Owner
    - Personal / Life Organizer
+   The user can also type their own description if none of these fit — adapt the closest profile and customize features based on what they describe.
 
 ### Step 2.5: Mode Selection
 
@@ -44,21 +45,24 @@ Present the choice using AskUserQuestion:
 ```
 How should your brain be organized?
 
-  [1] Simple (Recommended for [profile])
-      Everything in one folder. Quick setup, easy to manage.
-      Best for: most users, content creators, personal use.
-
-  [2] Power User
-      Three separate zones: brain, workspaces, and conversations.
+  [1] Full Install (Recommended)
+      Three separate zones inside one folder: brain, workspaces, and conversations.
       Your code repos get lean AI context (~80 lines vs ~300).
       Business conversations get auto-captured with entity watchdog.
-      Best for: developers, agencies, consultants managing multiple projects.
+      Best for: getting the most out of BizBrain OS.
+
+  [2] Simple
+      Everything in one folder. Quick setup, easy to manage.
+      Best for: trying it out or minimal setups.
+
+This is optional — you can switch modes later with /brain configure.
 ```
 
-If the profile's `recommended_mode` is "full", make Power User the recommended option.
-If "compact", make Simple the recommended option.
+Full Install is always the recommended option regardless of profile. The three-zone architecture gives every user the best experience.
 
-Store the choice as `mode` ("compact" or "full") for Step 4.
+The user can also type a custom answer to describe their own preference.
+
+Store the choice as `mode` ("full" or "compact") for Step 4.
 
 ### Step 3: Scan the Machine
 
@@ -77,7 +81,19 @@ Store full scan results in memory for the selection step.
 Present scan results as numbered lists organized by category. All items are **included by default**.
 The user types numbers to exclude, "all" to keep everything, or "none" to skip a category.
 
-**For each category with results, present a selection prompt using AskUserQuestion:**
+**Before presenting categories, offer a quick shortcut:**
+
+```
+I found projects, services, and collaborators on your machine.
+
+  [1] Include Everything (Recommended) — add all discovered items to your brain
+  [2] Let Me Choose — review each category and pick what to include
+
+This step is optional — you can always add or remove items later with /brain scan.
+```
+
+If the user picks "Include Everything", skip the per-category selection and include all items.
+If the user picks "Let Me Choose" (or types a custom response), present each category:
 
 **Projects/Repos** (if any found):
 ```
@@ -88,7 +104,8 @@ Found N code repositories:
   [3] ✓ old-prototype       Node      ~/Projects/old-prototype
   [4] ✓ client-portal       Python    ~/Repos/client-portal
 
-Type numbers to EXCLUDE (e.g. "3 4"), "all" to keep all, or "none" to skip:
+Type numbers to EXCLUDE (e.g. "3 4"), "all" to keep all, "none" to skip,
+or type your own paths to add manually:
 ```
 
 **Services/Tools** (if any found):
@@ -100,18 +117,20 @@ Found N services and tools:
   [3] ✓ Python               3.13
   [4] ✓ Claude Code config   ~/.claude.json
 
-Type numbers to EXCLUDE, "all" to keep all, or "none" to skip:
+Type numbers to EXCLUDE, "all" to keep all, "none" to skip,
+or type a service name to add manually:
 ```
 
-**Entities/Collaborators** (if any found from git history):
+**Entities/Collaborators** (if any found from git history — optional):
 ```
-Found N collaborators in git history:
+Found N collaborators in git history (optional — skip if you don't need entity tracking):
 
   [1] ✓ Jane Smith           jane@example.com      12 commits
   [2] ✓ Bob Johnson          bob@corp.com           5 commits
   [3] ✓ GitHub Actions       noreply@github.com     3 commits
 
-Type numbers to EXCLUDE, "all" to keep all, or "none" to skip:
+Type numbers to EXCLUDE, "all" to keep all, "none" to skip,
+or type names/emails to add people not found in git:
 ```
 
 **Processing user response:**
@@ -119,6 +138,7 @@ Type numbers to EXCLUDE, "all" to keep all, or "none" to skip:
 - "all" → keep everything in this category
 - "none" → exclude everything in this category
 - Empty response → treat as "all" (keep everything)
+- Free text (paths, names, services) → add those manually in addition to discovered items
 
 After all categories are selected, show a final summary:
 ```
@@ -165,7 +185,7 @@ These plugins would supercharge your brain:
   [2] context7 — Library documentation lookup
   [3] episodic-memory — Semantic search across past sessions
 
-Install any? Type numbers or "skip":
+Install any? (optional) Type numbers, "skip", or describe a plugin you'd like:
 ```
 
 6. **Configure integrations** — For detected plugins, the brain automatically:
@@ -370,7 +390,8 @@ Based on what I found, here are some things I could build for you:
   [5] Commit-to-Content Pipeline — Auto-draft changelogs, dev blog
       posts, and social updates from your recent development work.
 
-Want me to build any of these? Type numbers (e.g. "1 3") or "skip":
+Want me to build any of these? (optional) Type numbers (e.g. "1 3"), "skip",
+or describe your own idea:
 ```
 
 If the user selects any:
@@ -440,7 +461,7 @@ A few things I noticed that could level you up:
   • 2 projects haven't been touched in 30+ days (stale?)
 
 These aren't urgent — just things your brain will keep an eye on.
-Want me to help with any of these now?
+Want me to help with any of these now? (optional — type numbers, "skip", or describe something else)
 ```
 
 Save gap analysis to `Knowledge/reports/gap-analysis.md`.
@@ -448,9 +469,9 @@ Save gap analysis to `Knowledge/reports/gap-analysis.md`.
 ### Step 10: MCP Recommendations
 
 Based on detected services (GitHub authenticated? Notion docs found?), recommend MCPs:
-"I detected you use GitHub and Notion. Want me to configure their MCP servers?"
+"I detected you use GitHub and Notion. Want me to configure their MCP servers? (optional)"
 
-If yes, help set up each one conversationally.
+If yes, help set up each one conversationally. The user can also type custom MCP names or skip entirely.
 
 ### Step 10.5: Obsidian Session Archiving
 
@@ -464,7 +485,7 @@ I found Obsidian vault(s) on your machine:
 Want to automatically archive your Claude Code sessions to Obsidian?
 Every session will be saved as a searchable note with metadata, tags, and summaries.
 
-Select a vault (or "skip"):
+Select a vault, "skip", or type a custom vault path (optional):
 ```
 
 If the user selects a vault:

@@ -3,7 +3,7 @@
   "name": "Content Creator",
   "description": "Blogger, YouTuber, social media creator, or writer. Manages content pipelines, publishing schedules, and audience engagement.",
   "icon": "pen-tool",
-  "recommended_mode": "compact",
+  "recommended_mode": "full",
   "features": {
     "entity_management": true,
     "project_tracking": true,

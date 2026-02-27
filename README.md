@@ -13,9 +13,11 @@ No more re-explaining your tech stack. No more listing your clients again. No mo
 ## Quick Install
 
 ```bash
-# Add the marketplace & install the plugin
+# Step 1: Add the marketplace
 claude plugin marketplace add TechIntegrationLabs/bizbrain-os-plugin
-claude plugin install bizbrain-os@bizbrain-os-plugin
+
+# Step 2: Install the plugin
+claude plugin install bizbrain-os
 ```
 
 Then open a **new terminal**, start Claude Code, and run your first brain setup:
