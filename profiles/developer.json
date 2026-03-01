@@ -17,7 +17,8 @@
     "communications": false,
     "content_pipeline": false,
     "outreach_engine": false,
-    "session_archiving": true
+    "session_archiving": true,
+    "meeting_transcription": false
   },
   "auto_behaviors": {
     "entity_detection": "auto_update",

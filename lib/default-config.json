@@ -1,5 +1,5 @@
 {
-  "version": "2.0.0",
+  "version": "3.0.1",
   "mode": "compact",
   "profile_id": "",
   "profile": {
@@ -27,7 +27,8 @@
     "content_pipeline": false,
     "outreach_engine": false,
     "session_archiving": true,
-    "continuous_learning": true
+    "continuous_learning": true,
+    "meeting_transcription": false
   },
   "auto_behaviors": {
     "entity_detection": "auto_update",

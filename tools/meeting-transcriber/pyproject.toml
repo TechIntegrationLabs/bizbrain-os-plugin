@@ -1,0 +1,31 @@
+[project]
+name = "bizbrain-meetings"
+version = "0.1.0"
+description = "Local meeting transcription for BizBrain OS — replaces Otter.ai for $0/month"
+readme = "README.md"
+requires-python = ">=3.10"
+license = "AGPL-3.0-only"
+authors = [{ name = "Tech Integration Labs", email = "hello@techintegrationlabs.com" }]
+dependencies = [
+    "faster-whisper>=1.0.0",
+    "pyaudiowpatch>=0.2.12",
+    "sounddevice>=0.4.6",
+    "numpy>=1.24.0",
+    "psutil>=5.9.0",
+]
+
+[project.optional-dependencies]
+diarization = [
+    "pyannote-audio>=3.1.0",
+    "torch>=2.0.0",
+]
+
+[project.scripts]
+bizbrain-meetings = "meeting_transcriber.cli:main"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["meeting_transcriber"]

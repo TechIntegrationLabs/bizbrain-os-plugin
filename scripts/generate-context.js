@@ -121,6 +121,9 @@ function buildCommandsTable(zone) {
   if (features?.outreach_engine) {
     cmds.push(['`/outreach`', 'Lead pipeline management']);
   }
+  if (features?.meeting_transcription) {
+    cmds.push(['`/meetings`', 'Local meeting transcription']);
+  }
   return cmds;
 }
 
@@ -189,6 +192,28 @@ function generateBrainContext() {
     lines.push('## Entity Index');
     lines.push(entitySummary);
     lines.push('');
+  }
+
+  // Recent meeting transcripts
+  if (features?.meeting_transcription) {
+    const transcriptsDir = path.join(brainPath, 'Operations', 'meetings', 'transcripts');
+    if (fs.existsSync(transcriptsDir)) {
+      try {
+        const transcriptFiles = fs.readdirSync(transcriptsDir)
+          .filter(f => f.endsWith('.md'))
+          .sort()
+          .reverse()
+          .slice(0, 5);
+        if (transcriptFiles.length > 0) {
+          lines.push('## Recent Meeting Transcripts');
+          transcriptFiles.forEach(f => {
+            const name = f.replace('.md', '').replace(/^\d{4}-\d{2}-\d{2}-/, '');
+            lines.push(`- \`${f}\` — ${name}`);
+          });
+          lines.push('');
+        }
+      } catch(e) {}
+    }
   }
 
   // Auto-behaviors
@@ -422,6 +447,28 @@ function generateLaunchpadContext() {
     lines.push('');
     lines.push(`Entity Index: \`${brainPath}/Entities/People/ENTITY-INDEX.md\``);
     lines.push('');
+  }
+
+  // Recent meeting transcripts (launchpad)
+  if (features?.meeting_transcription) {
+    const transcriptsDir = path.join(brainPath, 'Operations', 'meetings', 'transcripts');
+    if (fs.existsSync(transcriptsDir)) {
+      try {
+        const transcriptFiles = fs.readdirSync(transcriptsDir)
+          .filter(f => f.endsWith('.md'))
+          .sort()
+          .reverse()
+          .slice(0, 3);
+        if (transcriptFiles.length > 0) {
+          lines.push('## Recent Transcripts');
+          transcriptFiles.forEach(f => {
+            const name = f.replace('.md', '').replace(/^\d{4}-\d{2}-\d{2}-/, '');
+            lines.push(`- \`${f}\` — ${name}`);
+          });
+          lines.push('');
+        }
+      } catch(e) {}
+    }
   }
 
   // Auto-behaviors (relevant subset)

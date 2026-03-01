@@ -47,6 +47,7 @@ The brain scans your machine, shows what it found, lets you choose what to track
 | **Communications Hub** | Unified communication tracking across email, Slack, Discord, and more |
 | **Content Pipeline** | Content creation, scheduling, and publishing workflow |
 | **Session Archiving** | Archive Claude Code sessions for searchability and reference |
+| **Meeting Transcription** | Local meeting recording and transcription — replaces Otter.ai for $0/month |
 
 ## How It Works
 
@@ -116,6 +117,7 @@ After install and `/brain setup`, here's how to use BizBrain OS day-to-day:
 | `/gsd` | Structured project execution workflow |
 | `/intake` | Process files dropped into the intake folder |
 | `/mcp` | MCP server management: status, enable, disable, profiles |
+| `/meetings` | Local meeting transcription: record, transcribe, review |
 
 ## Profiles
 
@@ -157,6 +159,7 @@ BizBrain OS includes two background agents:
 
 - **Entity Watchdog** — Automatically detects entity mentions in conversations and maintains brain records
 - **Brain Gateway** — Provides full brain access from any repository or project
+- **Brain Learner** — Continuous learning agent that captures observations back to the brain
 
 ## Architecture
 
@@ -171,9 +174,11 @@ bizbrain-os-plugin/
     scripts/
       session-start       # Brain detection + context generation
       post-tool-use       # Continuous learning + time tracking
-  commands/               # Slash commands (/brain, /mcp, /todo, etc.)
-  skills/                 # Deep capabilities (brain-bootstrap, credential-management, etc.)
-  agents/                 # Background agents (entity-watchdog, brain-gateway)
+  commands/               # Slash commands (/brain, /mcp, /todo, /meetings, etc.)
+  skills/                 # Deep capabilities (brain-bootstrap, meeting-transcription, etc.)
+  agents/                 # Background agents (entity-watchdog, brain-gateway, brain-learner)
+  tools/
+    meeting-transcriber/  # Python package: local meeting transcription daemon
   profiles/               # Role-based feature profiles (5 built-in)
   scripts/
     scanner.sh            # Machine scanner for project/service discovery
@@ -189,6 +194,34 @@ bizbrain-os-plugin/
 - Claude Code (latest version with plugin support)
 - Node.js 18+ (for context generation)
 - Bash (Git Bash on Windows, native on macOS/Linux)
+- Python 3.10+ (optional, for meeting transcription)
+
+## Local-First Free Alternatives
+
+BizBrain OS enables truly private, $0 versions of expensive SaaS tools by running optimized local implementations integrated with your brain.
+
+### Meeting Transcription (NEW in v3.0.1)
+
+Replaces Otter.ai, Fireflies.ai, and similar services. Records system audio via WASAPI loopback, transcribes locally with faster-whisper, and saves brain-compatible transcripts with automatic entity linking and action item extraction.
+
+- **$0/month** — No API keys, no cloud, no subscriptions
+- **100% private** — Audio and transcripts never leave your machine
+- **Platform agnostic** — Works with Zoom, Meet, Teams, Slack, Discord, or any audio source
+- **Brain integrated** — Transcripts feed into intake for entity linking and action items
+
+```bash
+# Install the transcriber (one-time)
+cd ~/.claude/plugins/bizbrain-os/tools/meeting-transcriber
+uv pip install -e .
+
+# Use via plugin
+/meetings start          # Start listening for meetings
+/meetings status         # Check daemon status
+/meetings list           # View recent transcripts
+/meetings stop           # Stop the daemon
+```
+
+Requires: Python 3.10+, Windows (WASAPI loopback)
 
 ## Privacy & Security
 

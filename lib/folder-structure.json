@@ -88,6 +88,11 @@
     ],
     "outreach_engine": [
       { "path": "Operations/outreach", "description": "Lead pipeline and sequences" }
+    ],
+    "meeting_transcription": [
+      { "path": "Operations/meetings", "description": "Meeting transcription data" },
+      { "path": "Operations/meetings/transcripts", "description": "Saved meeting transcripts" },
+      { "path": "Operations/meetings/_audio", "description": "Temporary audio chunks" }
     ]
   }
 }

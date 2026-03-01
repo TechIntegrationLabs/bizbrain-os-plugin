@@ -1,6 +1,6 @@
 {
   "name": "bizbrain-os",
-  "version": "2.0.0",
+  "version": "3.0.1",
   "description": "The context layer that teaches AI your business. Persistent knowledge brain that compounds context across every Claude Code session.",
   "author": {
     "name": "Tech Integration Labs",
