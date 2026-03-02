@@ -20,6 +20,7 @@ class MeetingInfo:
     window_title: str = ""
     audio_chunks: list[Path] = field(default_factory=list)
     transcript_path: Path | None = None
+    recording_path: Path | None = None
 
     @property
     def slug(self) -> str:
@@ -39,6 +40,7 @@ class MeetingInfo:
         d["ended_at"] = self.ended_at.isoformat() if self.ended_at else None
         d["audio_chunks"] = [str(p) for p in self.audio_chunks]
         d["transcript_path"] = str(self.transcript_path) if self.transcript_path else None
+        d["recording_path"] = str(self.recording_path) if self.recording_path else None
         return d
 
 

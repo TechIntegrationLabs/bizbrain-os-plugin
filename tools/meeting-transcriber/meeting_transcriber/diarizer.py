@@ -6,7 +6,11 @@ Also requires a HuggingFace token with access to pyannote models.
 
 from __future__ import annotations
 
+import tempfile
+import wave
 from pathlib import Path
+
+import numpy as np
 
 from .models import TranscriptSegment, SpeakerSegment
 
@@ -47,7 +51,7 @@ class SpeakerDiarizer:
         audio_path: Path,
         segments: list[TranscriptSegment],
     ) -> list[SpeakerSegment]:
-        """Run diarization on audio and merge speaker labels with transcript segments.
+        """Run diarization on a single audio file and merge with transcript segments.
 
         Each transcript segment gets the speaker label from whoever spoke
         during the majority of that segment's time range.
@@ -55,24 +59,54 @@ class SpeakerDiarizer:
         self._load_pipeline()
         diarization = self._pipeline(str(audio_path))
 
-        # Build speaker timeline: list of (start, end, speaker)
-        speaker_timeline: list[tuple[float, float, str]] = []
-        for turn, _, speaker in diarization.itertracks(yield_label=True):
-            speaker_timeline.append((turn.start, turn.end, speaker))
+        speaker_timeline = _build_speaker_timeline(diarization)
+        return _merge_speakers(segments, speaker_timeline)
 
-        # Merge: assign each transcript segment to the dominant speaker
-        result = []
-        for seg in segments:
-            speaker = self._find_dominant_speaker(seg.start, seg.end, speaker_timeline)
-            result.append(SpeakerSegment(
-                start=seg.start,
-                end=seg.end,
-                text=seg.text,
-                speaker=speaker,
-                language=seg.language,
-            ))
+    def diarize_full_meeting(
+        self,
+        chunk_paths: list[Path],
+        segments: list[TranscriptSegment],
+        tmp_dir: Path | None = None,
+    ) -> list[SpeakerSegment]:
+        """Stitch all audio chunks and run diarization on the full meeting.
 
-        return result
+        Fixes the single-chunk diarization bug by concatenating all WAV chunks
+        into one temp file, running pyannote on the complete audio, then cleaning up.
+        """
+        if not chunk_paths:
+            return [
+                SpeakerSegment(
+                    start=s.start, end=s.end, text=s.text,
+                    speaker="Unknown", language=s.language,
+                )
+                for s in segments
+            ]
+
+        # Single chunk — no stitching needed
+        if len(chunk_paths) == 1:
+            return self.diarize_and_merge(chunk_paths[0], segments)
+
+        # Stitch all chunks into a single temp WAV
+        self._load_pipeline()
+        cleanup_tmp_dir = tmp_dir is None
+        if tmp_dir is None:
+            tmp_dir = Path(tempfile.mkdtemp(prefix="bizbrain-diarize-"))
+
+        stitched_path = tmp_dir / "full_meeting.wav"
+        try:
+            _stitch_wav_files(chunk_paths, stitched_path)
+            diarization = self._pipeline(str(stitched_path))
+            speaker_timeline = _build_speaker_timeline(diarization)
+            return _merge_speakers(segments, speaker_timeline)
+        finally:
+            # Clean up temp file
+            if stitched_path.exists():
+                stitched_path.unlink()
+            if cleanup_tmp_dir and tmp_dir.exists():
+                try:
+                    tmp_dir.rmdir()
+                except OSError:
+                    pass
 
     @staticmethod
     def _find_dominant_speaker(
@@ -91,3 +125,52 @@ class SpeakerDiarizer:
         if not overlap:
             return "Unknown"
         return max(overlap, key=overlap.get)
+
+
+def _build_speaker_timeline(diarization) -> list[tuple[float, float, str]]:
+    """Extract speaker timeline from pyannote diarization result."""
+    timeline: list[tuple[float, float, str]] = []
+    for turn, _, speaker in diarization.itertracks(yield_label=True):
+        timeline.append((turn.start, turn.end, speaker))
+    return timeline
+
+
+def _merge_speakers(
+    segments: list[TranscriptSegment],
+    speaker_timeline: list[tuple[float, float, str]],
+) -> list[SpeakerSegment]:
+    """Assign each transcript segment to its dominant speaker."""
+    result = []
+    for seg in segments:
+        speaker = SpeakerDiarizer._find_dominant_speaker(
+            seg.start, seg.end, speaker_timeline
+        )
+        result.append(SpeakerSegment(
+            start=seg.start,
+            end=seg.end,
+            text=seg.text,
+            speaker=speaker,
+            language=seg.language,
+        ))
+    return result
+
+
+def _stitch_wav_files(chunk_paths: list[Path], output_path: Path) -> None:
+    """Concatenate multiple WAV files into a single file.
+
+    All chunks must have the same sample rate, channels, and sample width.
+    """
+    if not chunk_paths:
+        return
+
+    # Read params from first chunk
+    with wave.open(str(chunk_paths[0]), "rb") as first:
+        params = first.getparams()
+
+    with wave.open(str(output_path), "wb") as out:
+        out.setparams(params)
+        for chunk_path in chunk_paths:
+            if not chunk_path.exists():
+                continue
+            with wave.open(str(chunk_path), "rb") as chunk:
+                out.writeframes(chunk.readframes(chunk.getnframes()))

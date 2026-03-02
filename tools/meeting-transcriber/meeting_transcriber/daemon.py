@@ -16,7 +16,6 @@ from .recorder import LoopbackRecorder
 from .transcriber import WhisperTranscriber
 
 POLL_INTERVAL_SEC = 5  # How often to check for meetings
-AUDIO_RETENTION_DAYS = 7
 
 
 class MeetingDaemon:
@@ -26,7 +25,7 @@ class MeetingDaemon:
         1. Poll detector every POLL_INTERVAL_SEC
         2. When meeting detected → start loopback recorder
         3. When meeting ends → stop recorder → transcribe chunks → save to brain
-        4. Clean up old audio files
+        4. Optionally clean up old audio files based on retention policy
     """
 
     def __init__(
@@ -36,17 +35,20 @@ class MeetingDaemon:
         language: str | None = None,
         diarize: bool = False,
         hf_token: str | None = None,
+        audio_retention_days: int | None = None,
     ):
         self.brain_path = brain_path
         self.model_size = model_size
         self.language = language
         self.diarize = diarize
         self.hf_token = hf_token
+        self.audio_retention_days = audio_retention_days  # None = keep forever
 
         self._bizbrain_dir = brain_path / ".bizbrain"
         self._pid_file = self._bizbrain_dir / "meeting-daemon.pid"
         self._status_file = self._bizbrain_dir / "meeting-daemon-status.json"
         self._audio_dir = brain_path / "Operations" / "meetings" / "_audio"
+        self._recordings_dir = brain_path / "Operations" / "meetings" / "recordings"
         self._running = False
         self._current_meeting: MeetingInfo | None = None
         self._recorder: LoopbackRecorder | None = None
@@ -55,6 +57,7 @@ class MeetingDaemon:
         """Start the daemon. Writes PID file and enters main loop."""
         self._bizbrain_dir.mkdir(parents=True, exist_ok=True)
         self._audio_dir.mkdir(parents=True, exist_ok=True)
+        self._recordings_dir.mkdir(parents=True, exist_ok=True)
 
         # Check for existing daemon
         if self._pid_file.exists():
@@ -75,9 +78,15 @@ class MeetingDaemon:
         signal.signal(signal.SIGTERM, self._handle_signal)
         signal.signal(signal.SIGINT, self._handle_signal)
 
+        retention_msg = (
+            f"delete after {self.audio_retention_days} days"
+            if self.audio_retention_days is not None
+            else "keep forever"
+        )
         self._update_status(running=True)
         print(f"Meeting daemon started (PID {os.getpid()}, model: {self.model_size})")
         print(f"Brain: {self.brain_path}")
+        print(f"Audio retention: {retention_msg}")
         print("Listening for meetings...")
 
         try:
@@ -149,22 +158,28 @@ class MeetingDaemon:
             self._update_status(meeting_active=False)
             return
 
+        # Stitch chunks into a single permanent recording
+        recording_path = self._stitch_recording(chunk_paths)
+        if recording_path:
+            self._current_meeting.recording_path = recording_path
+            print(f"Recording saved: {recording_path}")
+
         # Transcribe
         print(f"Transcribing with {self.model_size} model...")
         transcriber = WhisperTranscriber(model_size=self.model_size)
         segments = transcriber.transcribe_chunks(chunk_paths, language=self.language)
         print(f"Transcribed {len(segments)} segments")
 
-        # Optional diarization
+        # Optional diarization — now uses full meeting audio
         if self.diarize:
             try:
                 from .diarizer import SpeakerDiarizer, DIARIZATION_AVAILABLE
                 if DIARIZATION_AVAILABLE:
-                    print("Running speaker diarization...")
+                    print("Running speaker diarization (full meeting)...")
                     diarizer = SpeakerDiarizer(hf_token=self.hf_token)
-                    # Diarize on first chunk as proxy (full audio would be better)
-                    segments = diarizer.diarize_and_merge(chunk_paths[0], segments)
-                    print(f"Identified speakers: {set(s.speaker for s in segments)}")
+                    segments = diarizer.diarize_full_meeting(chunk_paths, segments)
+                    speakers = {s.speaker for s in segments}
+                    print(f"Identified speakers: {speakers}")
             except Exception as e:
                 print(f"Diarization failed (continuing without): {e}")
 
@@ -175,7 +190,17 @@ class MeetingDaemon:
         self._current_meeting.transcript_path = transcript_path
         print(f"Transcript saved: {transcript_path}")
 
-        # Clean up old audio
+        # Proactive BB1 brain updates (entity history)
+        try:
+            from .brain_updater import BrainUpdater
+            updater = BrainUpdater(self.brain_path)
+            updated = updater.update_entity_histories(self._current_meeting, segments)
+            if updated:
+                print(f"Updated entity histories: {', '.join(updated)}")
+        except Exception as e:
+            print(f"Brain update skipped: {e}")
+
+        # Clean up old audio (if retention policy set)
         self._cleanup_old_audio()
 
         # Reset state
@@ -183,11 +208,38 @@ class MeetingDaemon:
         self._recorder = None
         self._update_status(meeting_active=False)
 
+    def _stitch_recording(self, chunk_paths: list[Path]) -> Path | None:
+        """Stitch audio chunks into a single clean WAV file for permanent storage."""
+        if not chunk_paths:
+            return None
+
+        date_str = self._current_meeting.started_at.strftime("%Y-%m-%d")
+        slug = self._current_meeting.slug
+        recording_path = self._recordings_dir / f"{date_str}-{slug}.wav"
+
+        try:
+            from .diarizer import _stitch_wav_files
+            _stitch_wav_files(chunk_paths, recording_path)
+            return recording_path
+        except Exception:
+            # Fallback: manual stitching without diarizer import
+            try:
+                _stitch_wav_chunks(chunk_paths, recording_path)
+                return recording_path
+            except Exception as e:
+                print(f"Warning: Could not stitch recording: {e}")
+                return None
+
     def _cleanup_old_audio(self) -> None:
-        """Delete audio chunks older than retention period."""
+        """Delete audio chunks older than retention period.
+
+        When audio_retention_days is None, audio is kept forever.
+        """
+        if self.audio_retention_days is None:
+            return
         if not self._audio_dir.exists():
             return
-        cutoff = time.time() - (AUDIO_RETENTION_DAYS * 86400)
+        cutoff = time.time() - (self.audio_retention_days * 86400)
         for session_dir in self._audio_dir.iterdir():
             if session_dir.is_dir() and session_dir.stat().st_mtime < cutoff:
                 for f in session_dir.iterdir():
@@ -210,11 +262,31 @@ class MeetingDaemon:
 
     def _cleanup(self) -> None:
         """Final cleanup on daemon exit."""
-        if self._recorder:
-            self._recorder.stop()
         if self._current_meeting:
+            # _on_meeting_end handles stopping the recorder internally
             self._on_meeting_end()
+        elif self._recorder:
+            # No active meeting but recorder running — just stop it
+            self._recorder.stop()
         if self._pid_file.exists():
             self._pid_file.unlink()
         self._update_status(running=False, meeting_active=False)
         print("Daemon stopped.")
+
+
+def _stitch_wav_chunks(chunk_paths: list[Path], output_path: Path) -> None:
+    """Concatenate WAV chunks into a single file (standalone fallback)."""
+    import wave
+
+    valid_paths = [p for p in chunk_paths if p.exists()]
+    if not valid_paths:
+        return
+
+    with wave.open(str(valid_paths[0]), "rb") as first:
+        params = first.getparams()
+
+    with wave.open(str(output_path), "wb") as out:
+        out.setparams(params)
+        for chunk_path in valid_paths:
+            with wave.open(str(chunk_path), "rb") as chunk:
+                out.writeframes(chunk.readframes(chunk.getnframes()))

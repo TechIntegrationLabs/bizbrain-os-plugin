@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import json
 import os
+import platform
 import sys
 from pathlib import Path
 
@@ -36,6 +37,7 @@ def cmd_daemon(args: list[str]) -> None:
     language = None
     diarize = False
     hf_token = os.environ.get("HF_TOKEN")
+    audio_retention_days = None  # Keep forever by default
 
     # Parse flags
     i = 0
@@ -52,6 +54,16 @@ def cmd_daemon(args: list[str]) -> None:
         elif args[i] == "--hf-token" and i + 1 < len(args):
             hf_token = args[i + 1]
             i += 2
+        elif args[i] == "--keep-audio":
+            audio_retention_days = None
+            i += 1
+        elif args[i] == "--delete-audio-after" and i + 1 < len(args):
+            try:
+                audio_retention_days = int(args[i + 1])
+            except ValueError:
+                print(f"Error: --delete-audio-after requires an integer (days), got: {args[i + 1]}")
+                sys.exit(1)
+            i += 2
         else:
             i += 1
 
@@ -63,6 +75,7 @@ def cmd_daemon(args: list[str]) -> None:
         language=language,
         diarize=diarize,
         hf_token=hf_token,
+        audio_retention_days=audio_retention_days,
     )
     daemon.start()
 
@@ -150,30 +163,41 @@ def cmd_stop(args: list[str]) -> None:
 
 
 def cmd_setup(args: list[str]) -> None:
-    """Check prerequisites and show setup instructions."""
-    print("BizBrain Meetings — Setup Check\n")
+    """Check prerequisites and show platform-specific setup instructions."""
+    current_platform = platform.system()
+    print(f"BizBrain Meetings — Setup Check ({current_platform})\n")
 
     # Check brain
     brain = find_brain_path()
     print(f"Brain folder: {brain or 'NOT FOUND'}")
 
-    # Check Python packages
-    deps = {
+    # Core dependencies (cross-platform)
+    print("\nCore dependencies:")
+    core_deps = {
         "faster_whisper": "faster-whisper",
-        "pyaudiowpatch": "pyaudiowpatch",
         "sounddevice": "sounddevice",
         "numpy": "numpy",
         "psutil": "psutil",
     }
 
     missing = []
-    for module, package in deps.items():
+    for module, package in core_deps.items():
         try:
             __import__(module)
             print(f"  {package}: installed")
         except ImportError:
             print(f"  {package}: MISSING")
             missing.append(package)
+
+    # Platform-specific dependencies
+    print(f"\nPlatform ({current_platform}):")
+    if current_platform == "Windows":
+        _check_windows_deps(missing)
+    elif current_platform == "Darwin":
+        _check_macos_deps(missing)
+    else:
+        print(f"  Warning: {current_platform} is not officially supported.")
+        print("  Supported platforms: Windows (WASAPI), macOS (BlackHole)")
 
     # Optional deps
     print("\nOptional (for speaker diarization):")
@@ -184,13 +208,92 @@ def cmd_setup(args: list[str]) -> None:
         except ImportError:
             print(f"  {package}: not installed")
 
+    # Summary
     if missing:
         print(f"\nInstall missing deps:")
-        print(f"  cd tools/meeting-transcriber && uv pip install -e .")
+        if current_platform == "Darwin":
+            print(f"  cd tools/meeting-transcriber && uv pip install -e '.[macos]'")
+        elif current_platform == "Windows":
+            print(f"  cd tools/meeting-transcriber && uv pip install -e '.[windows]'")
+        else:
+            print(f"  cd tools/meeting-transcriber && uv pip install -e .")
     else:
         print(f"\nAll dependencies installed. Ready to use!")
         print(f"  Start daemon: bizbrain-meetings daemon")
         print(f"  Or via plugin: /meetings start")
+
+
+def _check_windows_deps(missing: list[str]) -> None:
+    """Check Windows-specific dependencies."""
+    try:
+        import pyaudiowpatch
+        print("  pyaudiowpatch (WASAPI): installed")
+    except ImportError:
+        print("  pyaudiowpatch (WASAPI): MISSING")
+        missing.append("pyaudiowpatch")
+
+    print("  Audio setup: No additional setup needed (WASAPI built into Windows)")
+
+
+def _check_macos_deps(missing: list[str]) -> None:
+    """Check macOS-specific dependencies and audio configuration."""
+    # Check pyobjc-framework-Quartz (optional but recommended)
+    try:
+        from Quartz import CGWindowListCopyWindowInfo
+        print("  pyobjc-framework-Quartz: installed (window title detection)")
+    except ImportError:
+        print("  pyobjc-framework-Quartz: not installed (optional, improves meeting detection)")
+
+    # Check BlackHole virtual audio device
+    print("\n  Audio setup (BlackHole):")
+    blackhole_found = False
+    try:
+        import sounddevice as sd
+        devices = sd.query_devices()
+        for dev in devices:
+            if "blackhole" in dev["name"].lower() and dev["max_input_channels"] > 0:
+                blackhole_found = True
+                print(f"    BlackHole device: FOUND — {dev['name']}")
+                break
+    except Exception:
+        pass
+
+    if not blackhole_found:
+        print("    BlackHole device: NOT FOUND")
+        print()
+        print("  To set up BlackHole (required for macOS audio capture):")
+        print("    1. Install BlackHole 2ch: https://existential.audio/blackhole/")
+        print("       Or via Homebrew: brew install blackhole-2ch")
+        print("    2. Open Audio MIDI Setup (Applications > Utilities)")
+        print("    3. Click '+' → Create Multi-Output Device")
+        print("    4. Check both your speakers/headphones AND BlackHole 2ch")
+        print("    5. Set the Multi-Output Device as your system output")
+        print("       (System Preferences > Sound > Output)")
+        print("    6. This routes audio to both your ears and BlackHole for capture")
+        return
+
+    # Check Multi-Output Device configuration
+    multi_output_found = False
+    try:
+        for dev in devices:
+            name_lower = dev["name"].lower()
+            if "multi-output" in name_lower or "multi output" in name_lower:
+                multi_output_found = True
+                print(f"    Multi-Output Device: FOUND — {dev['name']}")
+                break
+    except Exception:
+        pass
+
+    if not multi_output_found:
+        print("    Multi-Output Device: NOT CONFIGURED")
+        print()
+        print("  BlackHole is installed but not configured as Multi-Output Device:")
+        print("    1. Open Audio MIDI Setup (Applications > Utilities)")
+        print("    2. Click '+' → Create Multi-Output Device")
+        print("    3. Check both your speakers/headphones AND BlackHole 2ch")
+        print("    4. Set the Multi-Output Device as your system output")
+    else:
+        print("    Audio setup: Ready!")
 
 
 COMMANDS = {
@@ -211,6 +314,12 @@ def main() -> None:
         print("  status      Show daemon status")
         print("  stop        Stop the running daemon")
         print("  setup       Check prerequisites and show setup info")
+        print("\nDaemon flags:")
+        print("  --model tiny|base|small|medium|large-v3  Whisper model (default: base)")
+        print("  --language en                            Force language (default: auto)")
+        print("  --diarize                                Enable speaker diarization")
+        print("  --keep-audio                             Keep recordings forever (default)")
+        print("  --delete-audio-after N                   Delete audio chunks after N days")
         sys.exit(0)
 
     cmd = sys.argv[1]
