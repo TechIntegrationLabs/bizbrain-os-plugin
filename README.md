@@ -53,29 +53,6 @@ Every Claude Code session starts from zero. You re-explain your projects, your c
   <em>Deep dive into the event layer, compound knowledge accumulation, and entity watchdog system.</em>
 </p>
 
-<details>
-<summary><strong>More Videos</strong></summary>
-
-<p align="center">
-  <a href="https://github.com/TechIntegrationLabs/bizbrain-os-plugin/releases/download/media-v1.0/The_Mirror_Age__Thermodynamics_of_the_Artificial_Mind.mp4">
-    <img src="assets/mirror-age-thermodynamics.jpg" alt="Watch: The Mirror Age — Thermodynamics of the Artificial Mind" width="480" />
-  </a>
-  <br />
-  <strong>The Mirror Age — Thermodynamics of the Artificial Mind</strong><br />
-  <em>AI cognition through the lens of thermodynamics. The C-Star threshold and intelligence emergence.</em>
-</p>
-
-<p align="center">
-  <a href="https://github.com/TechIntegrationLabs/bizbrain-os-plugin/releases/download/media-v1.0/EDiFi__The_Blueprint_for_Dental_Revenue_Intelligence.mp4">
-    <img src="assets/edifi-dental-revenue.jpg" alt="Watch: EDiFi — The Blueprint for Dental Revenue Intelligence" width="480" />
-  </a>
-  <br />
-  <strong>EDiFi — The Blueprint for Dental Revenue Intelligence</strong><br />
-  <em>Full claims lifecycle pipeline built on BizBrain OS infrastructure.</em>
-</p>
-
-</details>
-
 ## The Solution
 
 ```
