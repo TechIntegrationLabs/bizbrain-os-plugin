@@ -45,12 +45,18 @@ Every Claude Code session starts from zero. You re-explain your projects, your c
 ## See It In Action
 
 <p align="center">
-  <a href="https://github.com/TechIntegrationLabs/bizbrain-os-plugin/releases/download/media-v1.0/Building_a_Persistent_AI_Memory_System__The_Architecture_of_Biz.mp4">
-    <img src="assets/bizbrain-architecture-demo.jpg" alt="Watch: Building a Persistent AI Memory System — The Architecture of BizBrain OS" width="640" />
+  <a href="https://www.youtube.com/watch?v=_NzW5FakGyw">
+    <img src="assets/bizbrain-architecture-demo.jpg" alt="Watch: Building a Persistent AI Memory System — The Architecture of BizBrain OS" width="700" />
   </a>
-  <br />
+</p>
+
+<p align="center">
+  <a href="https://www.youtube.com/watch?v=_NzW5FakGyw"><img src="https://img.shields.io/badge/▶_Watch_on_YouTube-Architecture_Deep_Dive_(7:38)-ff0000?style=for-the-badge&logo=youtube&logoColor=white" alt="Watch on YouTube" /></a>
+</p>
+
+<p align="center">
   <strong>Building a Persistent AI Memory System — The Architecture of BizBrain OS</strong><br />
-  <em>Deep dive into the event layer, compound knowledge accumulation, and entity watchdog system.</em>
+  <em>Event layer, compound knowledge, entity watchdog — all explained in under 8 minutes.</em>
 </p>
 
 ## The Solution
