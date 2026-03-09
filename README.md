@@ -1,278 +1,674 @@
-# BizBrain OS — Claude Code Plugin
+<p align="center">
+  <img src="assets/brain-hero.png" alt="BizBrain OS — The persistent AI knowledge layer for Claude Code" width="600" />
+</p>
 
-> The context layer that teaches AI your business.
+<p align="center">
+  <strong>The compound interest of AI context.</strong><br />
+  Every session deposits knowledge. Every future session withdraws it. The balance only grows.
+</p>
 
-**The compound interest of AI context.** Every session deposits context. Every future session withdraws it.
+<p align="center">
+  <a href="#quick-install"><img src="https://img.shields.io/badge/Install-5_minutes-22c55e?style=flat-square" alt="Install in 5 minutes"></a>
+  <a href="LICENSE"><img src="https://img.shields.io/badge/License-AGPL--3.0-blue?style=flat-square" alt="License"></a>
+  <a href="#privacy--security"><img src="https://img.shields.io/badge/Privacy-100%25_Local-8b5cf6?style=flat-square" alt="100% Local"></a>
+  <img src="https://img.shields.io/badge/Skills-17-f59e0b?style=flat-square" alt="17 Skills">
+  <img src="https://img.shields.io/badge/Integrations-34+-ec4899?style=flat-square" alt="34+ Integrations">
+  <img src="https://img.shields.io/badge/Cost-$0/month-10b981?style=flat-square" alt="$0/month">
+</p>
 
-## What is BizBrain OS?
+<br />
 
-BizBrain OS is a Claude Code plugin that builds a persistent knowledge brain from your actual work. Install it once, and Claude Code learns your projects, clients, tools, and preferences — compounding knowledge across every session.
+> **A localized context engine** that teaches Claude your business once, and gets smarter every day.
+> Open source under AGPL-3.0.
 
-No more re-explaining your tech stack. No more listing your clients again. No more "as I mentioned last time." Your brain remembers everything and injects the right context at the right time.
+---
+
+## The Problem
+
+Every Claude Code session starts from zero. You re-explain your projects, your clients, your tech stack, your decisions — every single time.
+
+```
+┌─────────────────────────────────────────────────────┐
+│  Session 1: "I'm building a Next.js app for..."     │
+│  Session 2: "As I mentioned, I'm working on..."     │
+│  Session 3: "Remember, my client Acme wants..."     │
+│  Session 4: "So my tech stack is Next.js +..."      │
+│  Session 5: "Let me explain the project again..."   │
+│              ...                                     │
+│  Session 15: "I already told you this."              │
+└─────────────────────────────────────────────────────┘
+   5-10 min × 5-15 sessions/day = up to 2.5 hours LOST
+```
+
+**BizBrain OS fixes this.** Install once, and Claude learns your business permanently.
+
+## See It In Action
+
+<p align="center">
+  <a href="https://github.com/TechIntegrationLabs/bizbrain-os-plugin/releases/download/media-v1.0/Building_a_Persistent_AI_Memory_System__The_Architecture_of_Biz.mp4">
+    <img src="assets/bizbrain-architecture-demo.jpg" alt="Watch: Building a Persistent AI Memory System — The Architecture of BizBrain OS" width="640" />
+  </a>
+  <br />
+  <strong>Building a Persistent AI Memory System — The Architecture of BizBrain OS</strong><br />
+  <em>Deep dive into the event layer, compound knowledge accumulation, and entity watchdog system.</em>
+</p>
+
+<details>
+<summary><strong>More Videos</strong></summary>
+
+<p align="center">
+  <a href="https://github.com/TechIntegrationLabs/bizbrain-os-plugin/releases/download/media-v1.0/The_Mirror_Age__Thermodynamics_of_the_Artificial_Mind.mp4">
+    <img src="assets/mirror-age-thermodynamics.jpg" alt="Watch: The Mirror Age — Thermodynamics of the Artificial Mind" width="480" />
+  </a>
+  <br />
+  <strong>The Mirror Age — Thermodynamics of the Artificial Mind</strong><br />
+  <em>AI cognition through the lens of thermodynamics. The C-Star threshold and intelligence emergence.</em>
+</p>
+
+<p align="center">
+  <a href="https://github.com/TechIntegrationLabs/bizbrain-os-plugin/releases/download/media-v1.0/EDiFi__The_Blueprint_for_Dental_Revenue_Intelligence.mp4">
+    <img src="assets/edifi-dental-revenue.jpg" alt="Watch: EDiFi — The Blueprint for Dental Revenue Intelligence" width="480" />
+  </a>
+  <br />
+  <strong>EDiFi — The Blueprint for Dental Revenue Intelligence</strong><br />
+  <em>Full claims lifecycle pipeline built on BizBrain OS infrastructure.</em>
+</p>
+
+</details>
+
+## The Solution
+
+```
+                    ╔══════════════════════════════╗
+                    ║   COMPOUND CONTEXT ENGINE    ║
+                    ╚══════════════╤═══════════════╝
+                                   │
+              ┌────────────────────┼────────────────────┐
+              │                    │                     │
+     ╔════════╧════════╗  ╔═══════╧═══════╗  ╔═════════╧════════╗
+     ║  BRAIN FOLDER   ║  ║   AUTOMATIC   ║  ║   CONTINUOUS     ║
+     ║                 ║  ║   INJECTION   ║  ║   LEARNING       ║
+     ║ Local knowledge ║  ║               ║  ║                  ║
+     ║ store: clients, ║  ║ SessionStart  ║  ║ Entity Watchdog  ║
+     ║ projects, docs, ║  ║ hook injects  ║  ║ Time Tracking    ║
+     ║ decisions, time ║  ║ full context  ║  ║ Decision Logging ║
+     ║                 ║  ║ automatically ║  ║ Action Items     ║
+     ╚═════════════════╝  ╚═══════════════╝  ╚══════════════════╝
+
+     YOUR DATA              ZERO EFFORT           GETS SMARTER
+     100% local             Every session          Every session
+     Never uploaded         Pre-loaded             Writes back
+```
+
+<br />
 
 ## Quick Install
 
 ```bash
-# Step 1: Add the marketplace
+# Add the marketplace
 claude plugin marketplace add TechIntegrationLabs/bizbrain-os-plugin
 
-# Step 2: Install the plugin
+# Install the plugin
 claude plugin install bizbrain-os
 ```
 
-Then open a **new terminal**, start Claude Code, and run your first brain setup:
+Then open a **new terminal** and run the setup wizard:
 
-```
+```bash
 claude
 > /brain setup
 ```
 
-The brain scans your machine, shows what it found, lets you choose what to track, and generates a personalized intelligence report. Every Claude Code session after that starts with your full business context automatically.
+**5 minutes later:** Every Claude Code session starts with your full business context automatically injected. You never re-explain yourself again.
 
-## Features
+<br />
 
-| Feature | Description |
-|---------|-------------|
-| **Brain Bootstrap** | Scans your machine, discovers projects/services/tools, and creates a structured knowledge brain |
-| **Session Context Injection** | SessionStart hook automatically injects your brain context into every Claude Code session |
-| **Entity Management** | Track clients, partners, vendors, and contacts with auto-detection and watchdog monitoring |
-| **Project Tracking** | Auto-discovers repos, tracks status, stack, and activity across all your projects |
-| **GSD Workflow** | Structured Get Shit Done project execution with phases, waves, and task management |
-| **Knowledge Management** | Persistent knowledge base for systems, decisions, templates, and references |
-| **Time Tracking** | Automatic session time logging with timesheet generation |
-| **Todo Management** | Aggregated task tracking across all projects and entities |
-| **Credential Management** | Secure cataloging and retrieval of API keys and service tokens |
-| **MCP Management** | Detect, configure, and manage MCP servers with profile-based switching |
-| **Intake Processing** | Drop zone for files, voice notes, and documents to be processed into the brain |
-| **Communications Hub** | Unified communication tracking across email, Slack, Discord, and more |
-| **Content Pipeline** | Content creation, scheduling, and publishing workflow |
-| **Session Archiving** | Archive Claude Code sessions for searchability and reference |
-| **Meeting Transcription** | Local meeting recording and transcription — replaces Otter.ai for $0/month |
-| **Brain Swarm** | Orchestration layer that coordinates all brain agents with event queue, staging validation, changelog audit trail, workflow pattern learning, and smart model routing |
+## What It Looks Like
 
-## How It Works
+When BizBrain OS boots, it injects your context before you type a word:
 
-### 1. Brain Folder
+```
+ user@bizbrain-os:~/launchpad$ claude
 
-BizBrain OS creates a `~/bizbrain-os/` folder with three zones optimized for different types of work:
+   ____  _     ____            _          ___  ____
+  | __ )(_)___| __ ) _ __ __ _(_)_ __    / _ \/ ___|
+  |  _ \| |_  /  _ \| '__/ _` | | '_ \  | | | \___ \
+  | |_) | |/ /| |_) | | | (_| | | | | | | |_| |___) |
+  |____/|_/___|____/|_|  \__,_|_|_| |_|  \___/|____/
+
+  ✓ Brain loaded             ~/bizbrain-os/brain/
+  ✓ Profile                  Developer (Will @ Tech Integration Labs)
+  ✓ Projects                 45 tracked (12 active this month)
+  ✓ Entities                 8 clients, 3 partners
+  ✓ Open tasks               23 across 6 projects
+  ✓ Entity Watchdog          Active
+  ✓ Time Tracking            Session started
+
+  Context injected: 120 lines | Mode: launchpad | Swarm: enabled
+
+ >
+```
+
+Claude already knows your business. Start working.
+
+<br />
+
+## What Happens During Setup
+
+```
+/brain setup
+   │
+   ├─ 1. Basic Info ─────── Your name, business, role
+   │
+   ├─ 2. Pick Profile ───── Developer / Agency / Consultant / Creator / Personal
+   │
+   ├─ 3. Choose Mode ────── Full (3-zone) or Simple (1 folder)
+   │
+   ├─ 4. Machine Scan ───── Auto-discovers repos, tools, services, collaborators
+   │     │
+   │     ├─ Found 45 repositories        ✓
+   │     ├─ Found 5 services/tools       ✓
+   │     ├─ Found Obsidian vault         ✓
+   │     └─ Found 25 Claude plugins      ✓
+   │
+   ├─ 5. You Choose ─────── Include all, or pick what to track
+   │
+   └─ 6. Intelligence ───── "You're a full-stack developer working
+      Report                  primarily in TypeScript and Next.js,
+                              maintaining 45 active repositories..."
+
+      The brain already understands you. ✓
+```
+
+<br />
+
+## Three-Zone Architecture
+
+Different work needs different context. BizBrain OS optimizes token budgets with physical directory separation:
 
 ```
 ~/bizbrain-os/
-  launchpad/          # Start all Claude Code sessions here (recommended)
-  workspaces/         # Clone/create code repos here (lean context ~80 lines)
-  brain/              # Full business intelligence
-    Knowledge/        # Systems, decisions, templates, references
-    Projects/         # Auto-discovered project workspaces
-    Entities/         # Clients, partners, vendors, people
-    Operations/       # Credentials, todos, timesheets, learning
-    _intake-dump/     # Drop zone for files to process
+│
+├── launchpad/              ★ START ALL SESSIONS HERE
+│   └── CLAUDE.md           ~120 lines of context
+│                            Entity watchdog active
+│                            Auto-capture enabled
+│                            All commands available
+│
+├── workspaces/             Code repos live here
+│   ├── my-saas-app/        ~80 lines of context
+│   ├── client-portal/      Ultra-lean, ultra-fast
+│   └── api-service/        Brain commands still work
+│
+└── brain/                  Full business intelligence
+    ├── Knowledge/          ~300 lines of context
+    │   ├── systems/        Deep operations only
+    │   ├── decisions/      Entity management
+    │   └── reports/        Intake processing
+    ├── Entities/
+    │   ├── Clients/
+    │   ├── Partners/
+    │   └── Vendors/
+    ├── Projects/
+    ├── Operations/
+    │   ├── credentials/
+    │   ├── todos/
+    │   ├── timesheets/
+    │   └── learning/
+    └── _intake-dump/
+        ├── files/
+        └── conversations/
 ```
 
-**Why three zones?** Claude Code loads context from CLAUDE.md files. Different zones inject different amounts — the launchpad gives you optimized context (~120 lines) with auto-capture, while workspaces give code repos ultra-lean context (~80 lines). This means faster startup and less token overhead for every session.
+| Zone | Context | When to Use |
+|:-----|:--------|:------------|
+| **launchpad/** | ~120 lines | Daily driver — any session, any topic |
+| **workspaces/** | ~80 lines | Active code development |
+| **brain/** | ~300 lines | Deep business operations |
 
-### 2. SessionStart Hook
+**The zones are porous.** `/knowledge`, `/entity`, `/todo`, and `/hours` work from any zone. You always have brain access — the architecture just controls how much context loads by default.
 
-Every time you open Claude Code, the SessionStart hook runs automatically:
-1. Detects your brain folder
-2. Reads config, projects, entities, action items
-3. Generates a context payload
-4. Injects it into Claude's system prompt
+<br />
 
-Claude immediately knows your business, your projects, your open tasks, and your preferences.
+## Features
 
-### 3. Continuous Learning
+### Core Intelligence
 
-The PostToolUse hook monitors your work and feeds observations back to the brain:
-- New projects discovered
-- Time tracked per session
-- Entity mentions detected
-- Action items extracted
+| | Feature | What It Does |
+|:--|:--------|:-------------|
+| **Brain** | **Entity Management** | Track clients, partners, vendors with auto-detection. The Entity Watchdog monitors every conversation and updates records automatically. |
+| **Brain** | **Project Tracking** | Auto-discovers repos, tracks status, stack, client links, and activity across all projects. |
+| **Brain** | **Knowledge Base** | Persistent store for systems docs, architectural decisions, templates, references, and reports. |
+| **Brain** | **Intake Processing** | Drop voice notes, PDFs, contracts, transcripts into `_intake-dump/`. Run `/intake` — brain classifies, extracts entities, routes to the right place. |
 
-Every session makes the next session smarter.
+### Execution & Productivity
 
-## Getting Started
+| | Feature | What It Does |
+|:--|:--------|:-------------|
+| **Execute** | **GSD Workflow** | Structured project execution: Milestones → Phases → Waves → Tasks. Waves run in parallel via subagents. |
+| **Execute** | **Todo Management** | Unified task dashboard across all projects and entities. Context-routed — mention a client and the task goes to their record. |
+| **Execute** | **Time Tracking** | Heartbeat-based — every tool call is a timestamp. Survives crashes, requires no timers, auto-detects breaks. |
+| **Execute** | **Session Archiving** | Every session archived to Obsidian with frontmatter tags, full prompts, tool stats, and auto-generated summaries. |
 
-After install and `/brain setup`, here's how to use BizBrain OS day-to-day:
+### Operations & Integrations
 
-1. **Start sessions in `~/bizbrain-os/launchpad/`** — This is your default Claude Code starting point. Open a terminal, `cd ~/bizbrain-os/launchpad && claude`. You get optimized context with auto-capture, all commands available, and entity watchdog active.
+| | Feature | What It Does |
+|:--|:--------|:-------------|
+| **Ops** | **Credential Management** | Secure local cataloging of API keys and tokens. Never auto-copied, always masked in display. |
+| **Ops** | **MCP Management** | Profile-based MCP switching. Run one-off MCP tasks via subprocess without restarting Claude Code. |
+| **Ops** | **Communications Hub** | Unified tracking across email, Slack, Discord. Entity-linked drafting with communication history. |
+| **Ops** | **Content Pipeline** | Ideation → drafting → scheduling → publishing. Tracks your content calendar across platforms. |
+| **Ops** | **Outreach Engine** | Lead pipeline with stages (Prospect → Contacted → Meeting → Won). Sequence-based follow-ups. |
 
-2. **Clone/create code repos in `~/bizbrain-os/workspaces/`** — When you need to write code, repos here get ultra-lean context (~80 lines). Just the essentials for fast development. Brain commands still work.
+### Advanced
 
-3. **Use `~/bizbrain-os/brain/` for deep operations** — Full brain context loads here (~300 lines). Use this for entity management, intake processing, or brain administration.
+| | Feature | What It Does |
+|:--|:--------|:-------------|
+| **New** | **Meeting Transcription** | Local recording + transcription via faster-whisper. Replaces Otter.ai for $0/month. 100% private. |
+| **New** | **Brain Swarm** | Orchestration layer: event queue, staging validation, conflict detection, changelog audit trail, smart model routing. |
 
-**Why this structure?** Claude Code loads CLAUDE.md files from your working directory. By starting in different zones, you control how much context gets injected — optimizing for speed when coding and richness when doing business work. The launchpad hits the sweet spot for most sessions.
+<br />
 
 ## Commands
 
-| Command | Description |
-|---------|-------------|
-| `/brain` | Brain status, scan, configure, and profile management |
-| `/brain setup` | First-time setup: scan machine, pick profile, create brain |
-| `/brain scan` | Re-scan machine for new projects and services |
-| `/brain configure` | Edit brain settings and feature toggles |
-| `/brain profile` | Switch profile or customize feature set |
-| `/knowledge <topic>` | Load specific knowledge from the brain |
-| `/todo` | View and manage tasks across all sources |
-| `/entity <name>` | Look up or add a client, partner, vendor, or contact |
-| `/hours` | Time tracking summary |
-| `/gsd` | Structured project execution workflow |
-| `/intake` | Process files dropped into the intake folder |
-| `/mcp` | MCP server management: status, enable, disable, profiles |
-| `/meetings` | Local meeting transcription: record, transcribe, review |
-| `/swarm` | Brain Swarm orchestration: status, process events, resolve conflicts, view changelog |
+```
+/brain                  Brain status, setup, scan, configure, profile
+/brain setup            First-time setup wizard
+/brain scan             Re-scan machine for new projects
+
+/entity <name>          Look up client, partner, vendor, or contact
+/todo                   Unified task dashboard across all sources
+/knowledge <topic>      Search and load brain knowledge
+/hours                  Time tracking summary (today/week/month)
+
+/gsd                    Project execution: plan, execute, status
+/intake                 Process files dropped in _intake-dump
+/mcp                    MCP server management and profiles
+/archive-sessions       Archive sessions to Obsidian vault
+
+/comms                  Communication hub and follow-ups
+/content                Content pipeline management
+/outreach               Lead pipeline and sequences
+
+/meetings               Local meeting transcription
+/swarm                  Brain Swarm orchestration
+```
+
+<br />
 
 ## Profiles
 
-BizBrain OS ships with 5 profiles that tailor features and scanning to your role:
+Pick your role during setup — features and scanning adapt automatically:
 
-| Profile | Best For | Key Features |
-|---------|----------|-------------|
-| **Developer** | Software developers, indie hackers, technical founders | Full project tracking, GSD workflow, credential management |
-| **Content Creator** | Bloggers, YouTubers, social creators | Content pipeline, outreach engine, social profiles |
-| **Consultant** | Freelancers, service providers | Client entities, time tracking, communications |
-| **Agency** | Agency owners managing multiple clients | All features active, full scanning |
-| **Personal** | Anyone organizing work with AI | Minimal setup, todos, knowledge, intake |
+```
+┌────────────────────┬──────────────────────────────────────────────────────┐
+│     DEVELOPER      │  GSD workflow, repo tracking, Supabase, GitHub,     │
+│  ★ Most Popular    │  entity management, credentials, time tracking      │
+├────────────────────┼──────────────────────────────────────────────────────┤
+│   AGENCY OWNER     │  ALL features active — clients, billing, content,   │
+│                    │  outreach, comms, team tracking                     │
+├────────────────────┼──────────────────────────────────────────────────────┤
+│    CONSULTANT      │  Client entities, proposals, time tracking,         │
+│                    │  communications, billing                            │
+├────────────────────┼──────────────────────────────────────────────────────┤
+│  CONTENT CREATOR   │  Content pipeline, social scheduling, outreach,     │
+│                    │  audience management                                │
+├────────────────────┼──────────────────────────────────────────────────────┤
+│     PERSONAL       │  Minimal: knowledge base, todos, intake processing  │
+│                    │  Quick setup, easy to expand later                  │
+└────────────────────┴──────────────────────────────────────────────────────┘
+```
 
-Switch profiles any time with `/brain profile`.
+Switch any time with `/brain profile`. Every feature can be toggled independently.
+
+<br />
+
+## Background Agents
+
+Four agents work automatically while you focus on your work:
+
+```
+┌──────────────────────────────────────────────────────────────────────┐
+│                                                                      │
+│  BRAIN ORCHESTRATOR (v3.0.2)            ┌─ Entity Watchdog           │
+│  Coordinates all agents via event       │  Monitors conversations    │
+│  queue, staging, validation,    ───────►│  for entity mentions,      │
+│  changelog, conflict detection          │  auto-updates records      │
+│                                         │                            │
+│                                         ├─ Brain Learner             │
+│                                         │  Captures decisions,       │
+│                                         │  action items, patterns,   │
+│                                         │  session summaries         │
+│                                         │                            │
+│                                         └─ Brain Gateway             │
+│                                            Full brain access from    │
+│                                            any repo or directory     │
+│                                                                      │
+└──────────────────────────────────────────────────────────────────────┘
+```
+
+The Orchestrator uses **smart model routing** — simple tasks go to haiku (fast/cheap), complex tasks to sonnet — saving 40-60% on agent operations.
+
+<br />
 
 ## Integrations
 
-BizBrain OS includes a registry of 34+ service integrations with guided credential setup and automatic MCP configuration:
+BizBrain OS includes a registry of **34+ service integrations** with guided credential setup and automatic MCP configuration:
 
-**Development:** GitHub, Supabase, Stripe, Clerk, Netlify, Vercel
+| Category | Services |
+|:---------|:---------|
+| **Development** | GitHub, Supabase, Stripe, Clerk, Netlify, Vercel |
+| **Communication** | Slack, Discord, WhatsApp, Telegram, Gmail |
+| **Social** | X/Twitter, LinkedIn, Facebook, Instagram, Bluesky, TikTok, YouTube, Reddit, Threads |
+| **Productivity** | Notion, Google Drive, Google Calendar, Obsidian |
+| **AI** | OpenAI, Anthropic, ElevenLabs, HeyGen, Veo 3 |
+| **Publishing** | Postiz, Late.dev, Buffer |
+| **Research** | Firecrawl, Screenpipe |
+| **CRM** | GoHighLevel |
 
-**Communication:** Slack, Discord, WhatsApp, Telegram, Gmail
+<br />
 
-**Social:** X/Twitter, LinkedIn, Facebook, Instagram, Bluesky, TikTok, YouTube, Reddit, Threads
+## Real-World Use Cases
 
-**Productivity:** Notion, Google Drive, Google Calendar, Obsidian
+<table>
+<tr>
+<td width="50%">
 
-**AI:** OpenAI, Anthropic, ElevenLabs, HeyGen, Veo 3
+**$1,800 API Bill Dispute**
 
-**Publishing:** Postiz, Late.dev, Buffer
+Unexpected Google Cloud charge. One prompt: *"Look into this."* Brain analyzed usage logs, identified unfamiliar IP, compiled dispute package, drafted the email.
 
-**Research:** Firecrawl, Screenpipe
+**Hours → minutes.**
 
-**CRM:** GoHighLevel
+</td>
+<td width="50%">
 
-## Agents
+**Voice Notes → Engineering Specs**
 
-BizBrain OS includes four background agents:
+Client recorded 3 voice memos. Dropped into intake. One `/intake` command extracted FMCSA compliance requirements, scheduling specs, 17 action items, 8 project risks.
 
-- **Brain Orchestrator** — Coordinates all brain agents via event queue, staging validation, and changelog audit trail (NEW in v3.0.2)
-- **Entity Watchdog** — Automatically detects entity mentions in conversations and maintains brain records
-- **Brain Gateway** — Provides full brain access from any repository or project
-- **Brain Learner** — Continuous learning agent that captures observations back to the brain
+**Rambling → structured specs.**
 
-## Architecture
+</td>
+</tr>
+<tr>
+<td width="50%">
+
+**Bug → Fixed → Deployed**
+
+Bug Crusher watches Slack for "bug" / "broken" / "error". Client reports issue → clones repo → identifies root cause → fixes → deploys → verifies → posts back.
+
+**Zero human intervention.**
+
+</td>
+<td width="50%">
+
+**Meeting → Architecture Update**
+
+57-min transcript dropped into intake. Brain detected 3 entities, extracted 11 architectural gaps, captured 6-step workflow, created 6 spec documents, updated dashboard.
+
+**One transcript, full update.**
+
+</td>
+</tr>
+<tr>
+<td width="50%">
+
+**Automated Social Media**
+
+Content Autopilot runs daily: scans 84+ RSS feeds, scores against brand topics, generates platform-specific posts, creates images, publishes.
+
+**Your presence runs while you sleep.**
+
+</td>
+<td width="50%">
+
+**Multi-Instance Management**
+
+One product deployed to 3 clients with isolated databases and branding. One sync command shows what's different across all instances.
+
+**Build once, deploy many.**
+
+</td>
+</tr>
+</table>
+
+<br />
+
+## The Compound Effect
 
 ```
-bizbrain-os-plugin/
-  .claude-plugin/
-    plugin.json           # Plugin manifest
-    marketplace.json      # Marketplace distribution config
-  hooks/
-    hooks.json            # Hook definitions (SessionStart, PostToolUse)
-    run-hook.cmd          # Cross-platform polyglot wrapper (Windows + Unix)
-    scripts/
-      session-start       # Brain detection + context generation
-      post-tool-use       # Continuous learning + time tracking
-  commands/               # Slash commands (/brain, /mcp, /todo, /meetings, etc.)
-  skills/                 # Deep capabilities (brain-bootstrap, meeting-transcription, etc.)
-  agents/                 # Background agents (brain-orchestrator, entity-watchdog, brain-gateway, brain-learner)
-  tools/
-    meeting-transcriber/  # Python package: local meeting transcription daemon
-  profiles/               # Role-based feature profiles (5 built-in)
-  scripts/
-    scanner.sh            # Machine scanner for project/service discovery
-    generate-context.js   # Context generator for SessionStart injection
-  lib/
-    default-config.json   # Brain config template
-    folder-structure.json # Brain folder structure definitions
-    integrations-registry.json  # 34+ service integration definitions
+ Context
+ Value
+   ▲
+   │                                          ╱  Month 6: Claude is an
+   │                                        ╱    extension of your business
+   │                                      ╱      memory. Nothing falls
+   │                                   ╱         through the cracks.
+   │                                ╱
+   │                            ╱
+   │                         ╱     Month 3: Claude knows your entire
+   │                      ╱        business — relationships, decisions,
+   │                   ╱           workflows, preferences.
+   │                ╱
+   │             ╱       Month 1: Claude knows your clients,
+   │          ╱          preferences, architectural patterns.
+   │       ╱
+   │    ╱    Week 1: Claude knows your projects
+   │  ╱      and basic context.
+   │╱
+   └──────────────────────────────────────────────► Time
+    Setup                                    Compound Growth
+   (5 min)
 ```
 
-## Brain Swarm (NEW in v3.0.2)
+**Every session deposits context. Every future session withdraws it. The balance only grows.**
 
-The Brain Swarm orchestration layer transforms independent brain agents into a coordinated system:
+<br />
+
+## Brain Swarm (v3.0.2)
+
+The orchestration layer that coordinates all brain agents into a single system:
 
 ```
 User Session → PostToolUse → Event Queue → Orchestrator → Agents → Staging → Validation → Brain → Changelog
 ```
 
-**What it adds:**
-- **Event Queue** — Every tool use generates an event; the orchestrator processes them in order
-- **Staging Area** — Agents write proposals instead of directly modifying brain files; the orchestrator validates before applying
-- **Conflict Detection** — When two agents try to modify the same file, conflicts are flagged for user resolution
-- **Changelog Audit Trail** — Every brain change is logged with what/why/source for full traceability
-- **Workflow Patterns** — The system learns successful multi-agent sequences and replays them automatically
-- **Smart Model Routing** — Routes simple tasks to haiku (fast/cheap) and complex tasks to sonnet, saving 40-60% on agent operations
+| Capability | What It Does |
+|:-----------|:-------------|
+| **Event Queue** | Every tool use generates an event; orchestrator processes them in order |
+| **Staging Area** | Agents write proposals instead of modifying brain directly; validated before applying |
+| **Conflict Detection** | Two agents modifying the same file? Flagged for resolution |
+| **Changelog** | Every brain change logged with what/why/source for full traceability |
+| **Workflow Patterns** | Learns successful multi-agent sequences and replays them automatically |
+| **Smart Routing** | Routes simple tasks to haiku, complex to sonnet — saves 40-60% on agent ops |
 
-**Enable it:**
-```json
-// In your brain's config.json
-{ "features": { "orchestration": true } }
-```
-
-**Manage it:**
-```
-/swarm              # Status: queue depth, pending, conflicts, recent changes
+```bash
+/swarm              # Status: queue depth, pending, conflicts
 /swarm process      # Manually process event queue
 /swarm conflicts    # View and resolve staging conflicts
 /swarm changelog    # View audit trail
 /swarm patterns     # View learned workflow patterns
 ```
 
-Brain Swarm is opt-in (disabled by default). When disabled, all agents work exactly as in v3.0.1 — zero behavior change.
+Brain Swarm is **opt-in** (disabled by default). Enable with `"orchestration": true` in your brain's `config.json`.
 
-## Requirements
+<br />
 
-- Claude Code (latest version with plugin support)
-- Node.js 18+ (for context generation)
-- Bash (Git Bash on Windows, native on macOS/Linux)
-- Python 3.10+ (optional, for meeting transcription)
+## Meeting Transcription
 
-## Local-First Free Alternatives
+Replaces Otter.ai, Fireflies.ai, and similar services — for **$0/month**.
 
-BizBrain OS enables truly private, $0 versions of expensive SaaS tools by running optimized local implementations integrated with your brain.
-
-### Meeting Transcription (NEW in v3.0.1)
-
-Replaces Otter.ai, Fireflies.ai, and similar services. Records system audio via WASAPI loopback, transcribes locally with faster-whisper, and saves brain-compatible transcripts with automatic entity linking and action item extraction.
-
-- **$0/month** — No API keys, no cloud, no subscriptions
-- **100% private** — Audio and transcripts never leave your machine
-- **Platform agnostic** — Works with Zoom, Meet, Teams, Slack, Discord, or any audio source
-- **Brain integrated** — Transcripts feed into intake for entity linking and action items
+| | BizBrain OS | Otter.ai | Fireflies.ai |
+|:--|:-----------|:---------|:-------------|
+| **Cost** | $0/month | $16.99/month | $18/month |
+| **Privacy** | 100% local | Cloud-processed | Cloud-processed |
+| **Brain Integration** | Auto-linked entities + action items | Manual export | Manual export |
+| **Platforms** | Any audio source (Zoom, Meet, Teams, etc.) | Limited | Limited |
 
 ```bash
-# Install the transcriber (one-time)
-cd ~/.claude/plugins/bizbrain-os/tools/meeting-transcriber
-uv pip install -e .
-
-# Use via plugin
-/meetings start          # Start listening for meetings
-/meetings status         # Check daemon status
-/meetings list           # View recent transcripts
-/meetings stop           # Stop the daemon
+/meetings start     # Start listening for meetings
+/meetings status    # Check daemon status
+/meetings list      # View recent transcripts
+/meetings stop      # Stop the daemon
 ```
 
-Requires: Python 3.10+, Windows (WASAPI loopback)
+Requires: Python 3.10+, Windows (WASAPI loopback). Optional — only install if needed.
+
+<br />
 
 ## Privacy & Security
 
-- Your brain folder is local-only and never uploaded anywhere
-- Credentials are cataloged but never copied without explicit permission
-- Credential values are never displayed in full (always masked)
-- The brain folder should be added to `.gitignore` if placed inside a repo
-- No external API calls are made by the plugin itself
+```
+┌──────────────────────────────────────────────────────────┐
+│                                                          │
+│  ✓  Brain folder is LOCAL-ONLY — never uploaded          │
+│  ✓  No external API calls from the plugin                │
+│  ✓  No telemetry, no analytics, no phone-home            │
+│  ✓  Credentials cataloged, never auto-copied             │
+│  ✓  Values always masked in display (ghp_...abc)         │
+│  ✓  Brain folder gitignored by default                   │
+│  ✓  Open source — read every line of code                │
+│                                                          │
+│  Your business intelligence is yours alone.              │
+│                                                          │
+└──────────────────────────────────────────────────────────┘
+```
+
+<br />
+
+## Architecture
+
+```
+bizbrain-os-plugin/
+│
+├── hooks/
+│   ├── hooks.json              # SessionStart + PostToolUse + SessionEnd
+│   ├── run-hook.cmd            # Cross-platform polyglot (Windows + Unix)
+│   └── scripts/
+│       ├── session-start       # Brain detection + context generation
+│       ├── post-tool-use       # Continuous learning + time tracking
+│       └── session-end         # Session metadata + archive trigger
+│
+├── commands/                   # 14 slash commands
+│   ├── brain.md                # /brain — status, setup, scan, configure
+│   ├── entity.md               # /entity — client/partner/vendor lookup
+│   ├── todo.md                 # /todo — unified task management
+│   ├── gsd.md                  # /gsd — project execution
+│   ├── knowledge.md            # /knowledge — brain search
+│   ├── hours.md                # /hours — time tracking
+│   ├── intake.md               # /intake — file processing
+│   ├── mcp.md                  # /mcp — MCP management
+│   ├── meetings.md             # /meetings — local transcription
+│   ├── swarm.md                # /swarm — orchestration
+│   └── ...                     # comms, content, outreach, archive
+│
+├── skills/                     # 17 deep capabilities
+│   ├── brain-bootstrap/        # First-time setup wizard
+│   ├── brain-orchestration/    # Swarm coordination
+│   ├── entity-management/      # Entity CRUD + watchdog rules
+│   ├── project-tracking/       # Repo discovery + status
+│   ├── gsd-workflow/           # Phase/wave/task execution
+│   ├── time-tracking/          # Heartbeat-based logging
+│   ├── todo-management/        # Cross-source aggregation
+│   ├── knowledge-management/   # Systems, decisions, templates
+│   ├── credential-management/  # Secure local vault
+│   ├── intake-processing/      # File classification + routing
+│   ├── session-archiving/      # Obsidian export
+│   ├── meeting-transcription/  # Local audio → text
+│   └── ...                     # mcp, comms, content, outreach, learning
+│
+├── agents/                     # 4 background agents
+│   ├── brain-orchestrator.md   # Event queue + staging + changelog
+│   ├── entity-watchdog.md      # Auto-detect entity mentions
+│   ├── brain-learner.md        # Capture decisions + patterns
+│   └── brain-gateway.md        # Cross-repo brain access
+│
+├── profiles/                   # 5 role-based profiles
+├── scripts/
+│   ├── scanner.sh              # Machine discovery
+│   └── generate-context.js     # SessionStart context builder
+│
+├── tools/
+│   └── meeting-transcriber/    # Python: local audio transcription
+│
+└── lib/
+    ├── default-config.json     # Brain config template
+    ├── folder-structure.json   # Brain folder definitions
+    ├── integrations-registry.json  # 34+ service definitions
+    └── zone-templates/         # CLAUDE.md templates per zone
+```
+
+<br />
+
+## Requirements
+
+| Requirement | Version | Notes |
+|:------------|:--------|:------|
+| Claude Code | Latest | With plugin support |
+| Node.js | 18+ | For context generation |
+| Bash | Any | Git Bash on Windows, native on macOS/Linux |
+| Python | 3.10+ | *Optional* — only for meeting transcription |
+
+<br />
+
+## Contributing
+
+BizBrain OS is open source. Contributions welcome.
+
+1. Fork the repo
+2. Create your feature branch (`git checkout -b feature/amazing-thing`)
+3. Commit your changes
+4. Push to the branch
+5. Open a Pull Request
+
+See [CONTRIBUTING.md](CONTRIBUTING.md) for detailed guidelines.
+
+<br />
 
 ## License
 
-AGPL-3.0 — See [LICENSE](LICENSE) for details.
+[AGPL-3.0](LICENSE) — Free to use, modify, and distribute. Derivative works must also be open source.
 
-## Author
+<br />
 
-**Tech Integration Labs**
-- GitHub: [TechIntegrationLabs](https://github.com/TechIntegrationLabs)
-- Web: [bizbrain.os](https://bizbrain.os)
+<details>
+<summary><strong>The Brain</strong></summary>
+
+```
+
+                          [>---]    [---<]
+                     __/    {  }       \__
+                   _/  >   <]  _/  _/  _/  \(__)
+                 _/  >   <]  _/  _/  _/  \    __
+               }      {/  *{   }-   +\
+              /    )     |*       |         \
+             [   •    |  .  \  ]___   /      \   ]
+            [*/    \    *   >/   *        \
+             [    ]+_        {           +        ]
+              \      +>-*     /    \  *-(    \___    ]
+                   }\_     *------_+/     *
+               [      }*-         ___/-###........
+                           [   \||.{..}......
+                          ___|{  >+  .....
+                            |\    >....
+                              \    |}----|
+                                \..}
+
+```
+
+</details>
+
+<br />
+
+<p align="center">
+  <img src="assets/brain-hero.png" alt="BizBrain OS" width="400" />
+  <br />
+  <br />
+  <strong>Built by <a href="https://github.com/TechIntegrationLabs">Tech Integration Labs</a></strong>
+  <br />
+  <a href="https://bizbrainos.com">bizbrainos.com</a>
+  <br />
+  <br />
+  <sub>Every session deposits context. Every future session withdraws it. The balance only grows.</sub>
+</p>
