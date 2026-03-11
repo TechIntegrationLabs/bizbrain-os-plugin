@@ -17,6 +17,17 @@ BIZBRAIN_ZONE="external"
 WORKSPACES_PATH=""
 LAUNCHPAD_PATH=""
 
+# --- Convert MSYS/Git Bash paths to Windows paths for Node.js ---
+# /c/Users/... → C:/Users/...  (Node.js can't resolve MSYS paths on Windows)
+_to_node_path() {
+  local p="$1"
+  if [[ "$p" =~ ^/([a-zA-Z])/ ]]; then
+    echo "${BASH_REMATCH[1]}:/${p:3}"
+  else
+    echo "$p"
+  fi
+}
+
 # --- Find root ---
 _find_root() {
   local candidate=""
@@ -41,9 +52,11 @@ _detect_mode() {
   local root_marker="$BIZBRAIN_ROOT/.bizbrain-root.json"
 
   if [ -f "$root_marker" ] && command -v node &>/dev/null; then
+    local win_marker
+    win_marker=$(_to_node_path "$root_marker")
     BIZBRAIN_MODE=$(node -e "
       try {
-        const d = require('$root_marker');
+        const d = JSON.parse(require('fs').readFileSync('$win_marker', 'utf8'));
         console.log(d.mode || 'compact');
       } catch(e) { console.log('compact'); }
     " 2>/dev/null || echo "compact")

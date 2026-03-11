@@ -88,9 +88,10 @@ echo "$TOOL_NAME" >> "$PATTERNS_DIR/$TODAY-tools.log" 2>/dev/null || true
 
 # --- 4. Orchestration Event Queue (if enabled) ---
 if command -v node &>/dev/null; then
+  NODE_CONFIG_PATH=$(_to_node_path "$BRAIN_PATH/config.json")
   ORCH_ENABLED=$(node -e "
     try {
-      const c = require('$BRAIN_PATH/config.json');
+      const c = JSON.parse(require('fs').readFileSync('$NODE_CONFIG_PATH', 'utf8'));
       console.log(c.features && c.features.orchestration ? 'true' : 'false');
     } catch(e) { console.log('false'); }
   " 2>/dev/null || echo "false")

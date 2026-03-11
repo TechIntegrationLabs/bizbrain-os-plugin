@@ -31,7 +31,11 @@ fi
 # --- Generate Context ---
 if [ -n "$BRAIN_PATH" ] && [ -d "$BRAIN_PATH" ]; then
   if [ "$HAS_NODE" = true ]; then
-    CONTEXT=$(node "${PLUGIN_ROOT}/scripts/generate-context.js" "$BRAIN_PATH" "$BIZBRAIN_MODE" "$BIZBRAIN_ZONE" "$BIZBRAIN_ROOT" 2>/dev/null || echo "# BizBrain OS\n\nError loading brain context. Run \`/brain status\` to diagnose.")
+    # Convert MSYS paths for Node.js on Windows
+    NODE_BRAIN_PATH=$(_to_node_path "$BRAIN_PATH")
+    NODE_BIZBRAIN_ROOT=$(_to_node_path "$BIZBRAIN_ROOT")
+    NODE_PLUGIN_ROOT=$(_to_node_path "$PLUGIN_ROOT")
+    CONTEXT=$(node "${PLUGIN_ROOT}/scripts/generate-context.js" "$NODE_BRAIN_PATH" "$BIZBRAIN_MODE" "$BIZBRAIN_ZONE" "$NODE_BIZBRAIN_ROOT" 2>/dev/null || echo "# BizBrain OS\n\nError loading brain context. Run \`/brain status\` to diagnose.")
   else
     CONTEXT="# BizBrain OS\n\nBrain found at \`$BRAIN_PATH\` but Node.js is required for context generation.\nInstall Node.js 18+ and restart Claude Code.\n\n## Available Commands\n| Command | Description |\n|---------|-------------|\n| \`/brain status\` | Show brain status |\n| \`/todo\` | View tasks |\n| \`/knowledge <topic>\` | Load brain knowledge |"
   fi
