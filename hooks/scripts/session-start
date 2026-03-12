@@ -51,6 +51,19 @@ if [ -n "$BRAIN_PATH" ] && [ -d "$BRAIN_PATH/.bizbrain" ]; then
   echo "{\"lastSessionStart\":\"$TIMESTAMP\",\"sessionActive\":true,\"zone\":\"$BIZBRAIN_ZONE\",\"mode\":\"$BIZBRAIN_MODE\"}" > "$BRAIN_PATH/.bizbrain/session-state.json" 2>/dev/null || true
 fi
 
+# --- Client Sync Quick Check ---
+# Runs quick sync to detect unread client messages (non-blocking, best-effort)
+if [ "$HAS_NODE" = true ]; then
+  BB1_ROOT="C:/Users/Disruptors/Documents/Tech Integration Labs BB1"
+  SYNC_ENGINE="${BB1_ROOT}/Operations/client-sync/sync-engine.js"
+  if [ -f "$SYNC_ENGINE" ]; then
+    CLIENT_ALERTS=$(node "$SYNC_ENGINE" --quick 2>/dev/null | grep -i "alert\|unread" || true)
+    if [ -n "$CLIENT_ALERTS" ]; then
+      CONTEXT="${CONTEXT}\\n\\n## Client Alerts\\n${CLIENT_ALERTS}"
+    fi
+  fi
+fi
+
 # --- Output Context Injection ---
 SESSION_CONTEXT="<bizbrain-os-context>\\n${ESCAPED_CONTEXT}\\n</bizbrain-os-context>"
 
