@@ -53,19 +53,25 @@ fi
 
 # --- Client Sync Quick Check ---
 # Runs quick sync to detect unread client messages (non-blocking, best-effort)
+# Uses temp file because Node.js stdout piping is unreliable in Git Bash on Windows
+CLIENT_ALERT_SECTION=""
 if [ "$HAS_NODE" = true ]; then
   BB1_ROOT="C:/Users/Disruptors/Documents/Tech Integration Labs BB1"
   SYNC_ENGINE="${BB1_ROOT}/Operations/client-sync/sync-engine.js"
   if [ -f "$SYNC_ENGINE" ]; then
-    CLIENT_ALERTS=$(node "$SYNC_ENGINE" --quick 2>/dev/null | grep -i "alert\|unread" || true)
+    SYNC_TMP=$(mktemp 2>/dev/null || echo "/tmp/bbos-sync-$$")
+    node "$SYNC_ENGINE" --quick > "$SYNC_TMP" 2>/dev/null || true
+    CLIENT_ALERTS=$(grep -i "Alert\|unread" "$SYNC_TMP" 2>/dev/null || true)
+    rm -f "$SYNC_TMP" 2>/dev/null || true
     if [ -n "$CLIENT_ALERTS" ]; then
-      CONTEXT="${CONTEXT}\\n\\n## Client Alerts\\n${CLIENT_ALERTS}"
+      ESCAPED_ALERTS=$(escape_for_json "$CLIENT_ALERTS")
+      CLIENT_ALERT_SECTION="\\n\\n## Client Alerts\\n${ESCAPED_ALERTS}"
     fi
   fi
 fi
 
 # --- Output Context Injection ---
-SESSION_CONTEXT="<bizbrain-os-context>\\n${ESCAPED_CONTEXT}\\n</bizbrain-os-context>"
+SESSION_CONTEXT="<bizbrain-os-context>\\n${ESCAPED_CONTEXT}${CLIENT_ALERT_SECTION}\\n</bizbrain-os-context>"
 
 cat <<EOF
 {

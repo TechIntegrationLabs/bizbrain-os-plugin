@@ -1,3 +1,8 @@
+---
+name: event-asset-studio
+description: Create complete event marketing asset suites — brochures, interactive apps, posters, dashboards — from speaker lists and event details. Static HTML, print-ready, zero dependencies.
+---
+
 # Event Asset Studio
 
 Create complete event marketing asset suites — brochures, interactive apps, posters, dashboards — from speaker lists and event details. All assets are static HTML with inline CSS, print-ready, zero dependencies.
