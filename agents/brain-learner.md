@@ -127,6 +127,48 @@ Check `config.json` for `features.orchestration`:
 **If orchestration is DISABLED (default):**
 - Write directly to brain files as described above (existing behavior, unchanged)
 
+## Schema Evolution Signal Forwarding
+
+When processing intake files or conversations, watch for repeated references to a new category of trackable items that don't fit existing record types (entities, projects, knowledge). If you detect a pattern, forward a signal to the schema-evolution system.
+
+**How to forward:**
+
+Write a signal file to `<BRAIN_PATH>/Records/_proposals/_signals/<potential-type>-signals.json`:
+
+```json
+{
+  "type_name": "vehicles",
+  "signals": [
+    {
+      "source": "intake",
+      "agent": "brain-learner",
+      "timestamp": "ISO-8601",
+      "weight": 0.3,
+      "context": "Intake file 'fleet-report.pdf' contains structured data about 12 vehicles with make, model, year, VIN, mileage — suggests a dedicated record type",
+      "detected_fields": ["make", "model", "year", "vin", "mileage", "last_service"],
+      "source_file": "_intake-dump/files/fleet-report.pdf"
+    }
+  ]
+}
+```
+
+If the signal file already exists, append to the `signals` array rather than overwriting.
+
+**Signal sources and when to use them:**
+
+| Source | When | Weight |
+|--------|------|--------|
+| `intake` | Intake file contains structured data for an unrecognized category | 0.3 |
+| `conversation` | User repeatedly references a trackable category (3+ mentions across sessions) | 0.1 |
+| `cross_reference` | Multiple brain files reference the same untracked category | 0.15 |
+
+**When NOT to forward:**
+- Items that fit as entities (people, companies)
+- Items that fit as projects
+- Items that fit as knowledge articles
+- One-off mentions without structured data
+- Categories already tracked by a custom record type
+
 ## Rules
 
 - **Be concise** — brain entries should be scannable, not essays

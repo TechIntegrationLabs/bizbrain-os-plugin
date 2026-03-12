@@ -37,7 +37,8 @@
     "project_onboarding": { "agent": "brain-learner", "tier": "haiku" },
     "session_summary": { "agent": "brain-learner", "tier": "haiku" },
     "conflict_resolution": { "agent": "brain-orchestrator", "tier": "haiku" },
-    "brain_access": { "agent": "brain-gateway", "tier": "sonnet" }
+    "brain_access": { "agent": "brain-gateway", "tier": "sonnet" },
+    "schema_evolution": { "agent": "schema-evolution", "tier": "sonnet" }
   },
   "auto_behaviors": {
     "entity_detection": "auto_update",
@@ -51,6 +52,30 @@
   "integrations": {
     "detected_plugins": [],
     "recommended_plugins": []
+  },
+  "record_types": {
+    "builtin": ["entities", "projects", "knowledge"],
+    "custom": {}
+  },
+  "schema_evolution": {
+    "enabled": true,
+    "confidence_threshold": 0.8,
+    "undo_window_hours": 24,
+    "auto_create": true,
+    "signal_weights": {
+      "intake": 0.3,
+      "conversation": 0.1,
+      "entity_overflow": 0.2,
+      "explicit": 0.5,
+      "cross_reference": 0.15
+    },
+    "signal_caps": {
+      "intake": 0.6,
+      "conversation": 0.4,
+      "entity_overflow": 0.4,
+      "explicit": 1.0,
+      "cross_reference": 0.3
+    }
   },
   "scan_cache": {
     "lastScanAt": null,

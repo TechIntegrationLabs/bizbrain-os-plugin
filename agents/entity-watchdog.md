@@ -84,6 +84,43 @@ Check `config.json` for `features.orchestration`:
 **If orchestration is DISABLED (default):**
 - Write directly to entity files as described above (existing behavior, unchanged)
 
+## Schema Evolution Signal Forwarding
+
+When you detect entity fields that don't fit the entity type's expected schema (e.g., a Person record with `insurance_provider`, `last_visit`, `copay_amount` fields — data that suggests a "Patient" or "Medical Record" type), forward a signal to the schema-evolution system.
+
+**How to forward:**
+
+Write a signal file to `<BRAIN_PATH>/Records/_proposals/_signals/<potential-type>-signals.json`:
+
+```json
+{
+  "type_name": "patients",
+  "signals": [
+    {
+      "source": "entity_overflow",
+      "agent": "entity-watchdog",
+      "timestamp": "ISO-8601",
+      "weight": 0.2,
+      "context": "Person entity 'John Doe' has fields: insurance_provider, last_visit, copay_amount — suggests a dedicated record type",
+      "detected_fields": ["insurance_provider", "last_visit", "copay_amount"],
+      "source_entity": "Entities/People/John-Doe/_meta.json"
+    }
+  ]
+}
+```
+
+If the signal file already exists, append to the `signals` array rather than overwriting.
+
+**When to forward:**
+- Entity `_meta.json` has 3+ fields that don't match the standard entity schema
+- Multiple entities of the same type share unusual fields (e.g., 2+ People all have `policy_number`)
+- User explicitly adds custom fields that suggest a pattern
+
+**When NOT to forward:**
+- One-off custom tags or notes
+- Standard entity fields (name, email, phone, role, aliases)
+- Fields that are already covered by an existing record type
+
 ## Entity File Structure
 
 Each entity lives at `<BRAIN_PATH>/Entities/<Type>/<Name>/`:

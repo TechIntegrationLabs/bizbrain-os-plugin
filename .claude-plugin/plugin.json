@@ -10,5 +10,12 @@
   "homepage": "https://github.com/TechIntegrationLabs/bizbrain-os-plugin",
   "repository": "https://github.com/TechIntegrationLabs/bizbrain-os-plugin",
   "license": "AGPL-3.0",
-  "keywords": ["knowledge-management", "context", "brain", "productivity", "entities", "projects"]
+  "keywords": ["knowledge-management", "context", "brain", "productivity", "entities", "projects"],
+  "agents": [
+    {
+      "name": "schema-evolution",
+      "path": "agents/schema-evolution.md",
+      "description": "Watches for patterns indicating new record types are needed and auto-creates them"
+    }
+  ]
 }
