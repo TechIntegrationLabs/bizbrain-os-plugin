@@ -137,18 +137,28 @@ Write a signal file to `<BRAIN_PATH>/Records/_proposals/_signals/<potential-type
 
 ```json
 {
-  "type_name": "vehicles",
+  "slug": "vehicles",
+  "proposed_name": "Vehicles",
+  "confidence": 0,
   "signals": [
     {
-      "source": "intake",
-      "agent": "brain-learner",
-      "timestamp": "ISO-8601",
-      "weight": 0.3,
-      "context": "Intake file 'fleet-report.pdf' contains structured data about 12 vehicles with make, model, year, VIN, mileage — suggests a dedicated record type",
-      "detected_fields": ["make", "model", "year", "vin", "mileage", "last_service"],
-      "source_file": "_intake-dump/files/fleet-report.pdf"
+      "type": "intake",
+      "source": "_intake-dump/files/fleet-report.pdf",
+      "detail": "Intake file 'fleet-report.pdf' contains structured data about 12 vehicles with make, model, year, VIN, mileage — suggests a dedicated record type",
+      "points": 0.3,
+      "timestamp": "ISO-8601"
     }
-  ]
+  ],
+  "proposed_fields": [
+    { "key": "make", "type": "text", "evidence": "intake CSV column" },
+    { "key": "model", "type": "text", "evidence": "intake CSV column" },
+    { "key": "year", "type": "number", "evidence": "intake CSV column" },
+    { "key": "vin", "type": "text", "evidence": "intake CSV column" },
+    { "key": "mileage", "type": "number", "evidence": "intake CSV column" },
+    { "key": "last_service", "type": "date", "evidence": "intake CSV column" }
+  ],
+  "first_signal": "ISO-8601",
+  "last_signal": "ISO-8601"
 }
 ```
 

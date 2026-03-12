@@ -13,9 +13,38 @@
   "keywords": ["knowledge-management", "context", "brain", "productivity", "entities", "projects"],
   "agents": [
     {
+      "name": "brain-orchestrator",
+      "path": "agents/brain-orchestrator.md",
+      "description": "Conducts all brain agents — event queue processing, staging validation, changelog, pattern learning"
+    },
+    {
+      "name": "brain-learner",
+      "path": "agents/brain-learner.md",
+      "description": "Captures learnings across sessions — decisions, action items, project status, session summaries"
+    },
+    {
+      "name": "entity-watchdog",
+      "path": "agents/entity-watchdog.md",
+      "description": "Monitors conversations for entity mentions and automatically maintains brain records"
+    },
+    {
+      "name": "brain-gateway",
+      "path": "agents/brain-gateway.md",
+      "description": "Full brain access from any directory — entities, projects, knowledge, todos, intake"
+    },
+    {
       "name": "schema-evolution",
       "path": "agents/schema-evolution.md",
       "description": "Watches for patterns indicating new record types are needed and auto-creates them"
+    }
+  ],
+  "skills": [
+    {
+      "name": "document-session",
+      "path": "skills/document-session/SKILL.md",
+      "description": "Comprehensive session documentation — captures reasoning, decisions, architecture, and implementation details for important sessions",
+      "command": "document-session",
+      "aliases": ["doc-session"]
     }
   ]
 }

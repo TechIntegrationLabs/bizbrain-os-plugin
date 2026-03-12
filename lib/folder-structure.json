@@ -108,8 +108,7 @@
       { "path": "Records", "description": "Custom record types and their instances" },
       { "path": "Records/_schema.json", "description": "Master schema definitions for all custom record types" },
       { "path": "Records/_proposals", "description": "Schema evolution proposals" },
-      { "path": "Records/_proposals/pending", "description": "Signal accumulation for potential types" },
-      { "path": "Records/_proposals/_signals", "description": "Per-type signal files" },
+      { "path": "Records/_proposals/_signals", "description": "Per-type signal accumulation files" },
       { "path": "Records/_proposals/applied", "description": "Auto-created types with undo window" },
       { "path": "Records/_proposals/undone", "description": "Types that were undone" },
       { "path": "Records/_archived", "description": "Preserved data from undone types" }

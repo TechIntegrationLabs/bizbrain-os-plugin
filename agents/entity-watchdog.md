@@ -94,18 +94,25 @@ Write a signal file to `<BRAIN_PATH>/Records/_proposals/_signals/<potential-type
 
 ```json
 {
-  "type_name": "patients",
+  "slug": "patients",
+  "proposed_name": "Patients",
+  "confidence": 0,
   "signals": [
     {
-      "source": "entity_overflow",
-      "agent": "entity-watchdog",
-      "timestamp": "ISO-8601",
-      "weight": 0.2,
-      "context": "Person entity 'John Doe' has fields: insurance_provider, last_visit, copay_amount — suggests a dedicated record type",
-      "detected_fields": ["insurance_provider", "last_visit", "copay_amount"],
-      "source_entity": "Entities/People/John-Doe/_meta.json"
+      "type": "entity_overflow",
+      "source": "Entities/People/John-Doe/_meta.json",
+      "detail": "Person entity 'John Doe' has fields: insurance_provider, last_visit, copay_amount — suggests a dedicated record type",
+      "points": 0.2,
+      "timestamp": "ISO-8601"
     }
-  ]
+  ],
+  "proposed_fields": [
+    { "key": "insurance_provider", "type": "text", "evidence": "entity overflow field" },
+    { "key": "last_visit", "type": "date", "evidence": "entity overflow field" },
+    { "key": "copay_amount", "type": "number", "evidence": "entity overflow field" }
+  ],
+  "first_signal": "ISO-8601",
+  "last_signal": "ISO-8601"
 }
 ```
 
