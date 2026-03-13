@@ -7,7 +7,7 @@ const os = require('os');
 const app = express();
 const PORT = 3850;
 
-app.use(express.json());
+app.use(express.json({ limit: '150mb' }));
 app.use(express.static(path.join(__dirname, 'public')));
 
 // --- Brain Discovery ---
@@ -198,6 +198,127 @@ app.post('/api/launch-claude', (req, res) => {
     }
     res.json({ ok: true, dir: launchDir });
   } catch (e) { res.status(500).json({ error: e.message }); }
+});
+
+// --- Ingestion API Routes ---
+
+const MAX_FILE_SIZE = 100 * 1024 * 1024; // 100MB
+
+app.post('/api/ingest/upload', (req, res) => {
+  const brainPath = findBrainPath();
+  if (!brainPath) return res.status(400).json({ error: 'No brain found' });
+
+  const uploadDir = path.join(brainPath, '_intake-dump', 'uploads');
+  if (!fs.existsSync(uploadDir)) fs.mkdirSync(uploadDir, { recursive: true });
+
+  try {
+    const { name, relativePath, data } = req.body;
+    const buffer = Buffer.from(data, 'base64');
+
+    if (buffer.length > MAX_FILE_SIZE) {
+      return res.status(413).json({ error: 'File too large (>100MB)' });
+    }
+
+    const destDir = relativePath ? path.join(uploadDir, relativePath) : uploadDir;
+    if (!fs.existsSync(destDir)) fs.mkdirSync(destDir, { recursive: true });
+    fs.writeFileSync(path.join(destDir, name), buffer);
+
+    res.json({ ok: true, size: buffer.length });
+  } catch (e) {
+    res.status(400).json({ error: e.message });
+  }
+});
+
+app.post('/api/ingest/scrape-url', (req, res) => {
+  const brainPath = findBrainPath();
+  if (!brainPath) return res.status(400).json({ error: 'No brain found' });
+
+  const urlExtractsDir = path.join(brainPath, '_intake-dump', 'url-extracts');
+  if (!fs.existsSync(urlExtractsDir)) fs.mkdirSync(urlExtractsDir, { recursive: true });
+
+  const { url } = req.body;
+  if (!url || !url.startsWith('http')) {
+    return res.status(400).json({ error: 'Invalid URL' });
+  }
+
+  const https = require('https');
+  const http = require('http');
+  const { URL } = require('url');
+
+  function fetchUrl(targetUrl, redirects = 0) {
+    return new Promise((resolve, reject) => {
+      if (redirects > 3) return reject(new Error('Too many redirects'));
+      const parsedUrl = new URL(targetUrl);
+      const protocol = parsedUrl.protocol === 'https:' ? https : http;
+
+      const req = protocol.get(targetUrl, {
+        headers: {
+          'User-Agent': 'BizBrain-OS/3.3 IntelligenceGatherer',
+          'Accept': 'text/html,text/plain,application/json',
+        },
+        timeout: 15000,
+      }, (res) => {
+        if (res.statusCode >= 300 && res.statusCode < 400 && res.headers.location) {
+          const redirectUrl = res.headers.location.startsWith('http')
+            ? res.headers.location
+            : `${parsedUrl.protocol}//${parsedUrl.host}${res.headers.location}`;
+          fetchUrl(redirectUrl, redirects + 1).then(resolve).catch(reject);
+          return;
+        }
+        if (res.statusCode !== 200) return reject(new Error(`HTTP ${res.statusCode}`));
+        let data = '';
+        res.setEncoding('utf8');
+        res.on('data', chunk => { data += chunk; });
+        res.on('end', () => resolve(data));
+      });
+      req.on('error', reject);
+      req.on('timeout', () => { req.destroy(); reject(new Error('timeout')); });
+    });
+  }
+
+  fetchUrl(url)
+    .then(html => {
+      // Strip scripts/styles, extract text
+      let text = html
+        .replace(/<script[\s\S]*?<\/script>/gi, '')
+        .replace(/<style[\s\S]*?<\/style>/gi, '')
+        .replace(/<[^>]+>/g, ' ')
+        .replace(/&nbsp;/g, ' ')
+        .replace(/&amp;/g, '&')
+        .replace(/&lt;/g, '<')
+        .replace(/&gt;/g, '>')
+        .replace(/&#\d+;/g, '')
+        .replace(/\s+/g, ' ')
+        .trim()
+        .slice(0, 50000);
+
+      const parsedUrl = new URL(url);
+      const filename = parsedUrl.hostname.replace(/[^a-z0-9.-]/gi, '_');
+      fs.writeFileSync(
+        path.join(urlExtractsDir, `${filename}.txt`),
+        `URL: ${url}\nDomain: ${parsedUrl.hostname}\n\n${text}`,
+        'utf8'
+      );
+
+      res.json({ ok: true, chars: text.length });
+    })
+    .catch(e => {
+      res.json({ ok: false, error: e.message });
+    });
+});
+
+app.get('/api/ingest/stats', (req, res) => {
+  const brainPath = findBrainPath();
+  if (!brainPath) return res.json({ uploads: 0, urls: 0 });
+
+  let uploads = 0, urls = 0;
+  const uploadDir = path.join(brainPath, '_intake-dump', 'uploads');
+  const urlDir = path.join(brainPath, '_intake-dump', 'url-extracts');
+
+  if (fs.existsSync(uploadDir)) uploads = countFiles(uploadDir);
+  if (fs.existsSync(urlDir)) urls = fs.readdirSync(urlDir).filter(f => f.endsWith('.txt')).length;
+
+  res.json({ uploads, urls });
 });
 
 // SPA fallback

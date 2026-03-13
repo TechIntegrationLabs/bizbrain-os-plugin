@@ -23,7 +23,15 @@
 
 ---
 
-## What's New in v3.3.0 — Visual Dashboard
+## What's New in v3.4.0 — Intelligence Gathering
+
+### Intelligence Gathering (`/brain ingest`)
+- **Teach your brain about your business:** Paste URLs and drag-and-drop documents — website, LinkedIn, proposals, branding docs, contracts, invoices
+- **Dashboard module:** New "Intelligence" tab in the visual dashboard at `http://localhost:3850/#/ingest`
+- **Integrated into setup:** `/brain setup` now offers intelligence gathering as an optional step after machine scanning
+- **URL scraping:** Fetches and extracts text from any public URL server-side
+- **File upload:** Drag-and-drop or browse for files/folders — everything goes to `_intake-dump/uploads/`
+- **100% local:** URLs fetched server-side, files copied (never moved), nothing leaves your machine
 
 ### Visual Dashboard (`/dashboard`)
 - **Setup Checklist:** 37 tasks across 8 categories (Foundations, Memory, Communication, Productivity, Development, Business, Content, Advanced) with AI-generated icons

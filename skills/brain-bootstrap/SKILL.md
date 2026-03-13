@@ -473,7 +473,29 @@ Based on detected services (GitHub authenticated? Notion docs found?), recommend
 
 If yes, help set up each one conversationally. The user can also type custom MCP names or skip entirely.
 
-### Step 10.5: Obsidian Session Archiving
+### Step 10.5: Intelligence Gathering
+
+After technical scanning, offer the user a chance to teach the brain about their **business** context:
+
+```
+Want to teach your brain more about your business?
+
+  [1] Open Intelligence Page — drag-and-drop documents, paste URLs
+      (opens in your browser — website, LinkedIn, proposals, branding docs, etc.)
+  [2] Skip for now — you can always run /brain ingest later
+
+Everything stays 100% local. Files go to _intake-dump/uploads/, URLs are scraped server-side.
+```
+
+If the user selects option 1:
+1. Launch the dashboard if not already running (same process as `/dashboard` command)
+2. Open `http://localhost:3850/#/ingest` in the browser
+3. Tell the user: "Drop in files and paste URLs in the Intelligence page. When you're done, come back here and we'll continue."
+4. Wait for the user to say they're done, then proceed
+
+This step captures business context that the machine scan can't find — branding, proposals, client docs, social profiles, etc.
+
+### Step 10.6: Obsidian Session Archiving
 
 If the scanner detected Obsidian vaults (look for `OBSIDIAN|` lines in scan output), offer to set up automatic session archiving:
 

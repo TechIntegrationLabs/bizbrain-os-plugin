@@ -1,7 +1,7 @@
 ---
 name: brain
-description: BizBrain OS brain management — status, setup, scan, configure, profiles
-argument-hint: [setup|status|scan|configure|profile]
+description: BizBrain OS brain management — status, setup, scan, configure, profiles, ingest
+argument-hint: [setup|status|scan|configure|profile|ingest]
 ---
 
 You are managing the user's BizBrain OS brain.
@@ -13,6 +13,7 @@ You are managing the user's BizBrain OS brain.
 - `/brain scan` — Re-scan the machine and update the brain with new discoveries
 - `/brain configure` — Edit brain settings (auto-behaviors, feature toggles, communication style)
 - `/brain profile` — Switch profile or customize feature set
+- `/brain ingest` — Open the Intelligence Gathering page to teach your brain about your business (URLs, documents)
 
 **Arguments:** $ARGUMENTS
 
@@ -43,3 +44,20 @@ Read current config.json and present settings as an interactive menu using AskUs
 
 **If "profile":**
 Show current profile and allow switching. Read profiles from `${CLAUDE_PLUGIN_ROOT}/profiles/`.
+
+**If "ingest":**
+Open the Intelligence Gathering page in the dashboard. This lets users teach their brain about their business by pasting URLs and dragging in documents.
+
+1. Launch the dashboard server if not already running (same as `/dashboard`)
+2. Open `http://localhost:3850/#/ingest` in the browser
+3. Tell the user:
+   ```
+   Intelligence Gathering page is open in your browser.
+
+   What you can do:
+     • Paste URLs — your website, LinkedIn, GitHub, portfolio, social profiles
+     • Drag & drop documents — proposals, branding docs, contracts, invoices
+
+   Everything stays 100% local. Files go to your brain's _intake-dump/ folder.
+   The brain will process them and extract business context automatically.
+   ```
