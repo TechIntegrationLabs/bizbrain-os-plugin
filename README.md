@@ -10,9 +10,9 @@
 
 <p align="center">
   <a href="LICENSE"><img src="https://img.shields.io/badge/License-AGPL--3.0-blue?style=flat-square" alt="License"></a>
-  <img src="https://img.shields.io/badge/Version-3.4.0-22c55e?style=flat-square" alt="v3.4.0">
-  <img src="https://img.shields.io/badge/Skills-21-f59e0b?style=flat-square" alt="21 Skills">
-  <img src="https://img.shields.io/badge/Commands-15-ec4899?style=flat-square" alt="15 Commands">
+  <img src="https://img.shields.io/badge/Version-3.5.0-22c55e?style=flat-square" alt="v3.5.0">
+  <img src="https://img.shields.io/badge/Skills-23-f59e0b?style=flat-square" alt="23 Skills">
+  <img src="https://img.shields.io/badge/Commands-16-ec4899?style=flat-square" alt="16 Commands">
   <img src="https://img.shields.io/badge/Integrations-37+-8b5cf6?style=flat-square" alt="37+ Integrations">
   <a href="#privacy--security"><img src="https://img.shields.io/badge/Privacy-100%25_Local-10b981?style=flat-square" alt="100% Local"></a>
 </p>
@@ -91,7 +91,7 @@ Launch the visual dashboard:
 
 ## Features
 
-### 21 Skills
+### 23 Skills
 
 | Category | Skills |
 |:---------|:-------|
@@ -99,13 +99,15 @@ Launch the visual dashboard:
 | **Execution** | GSD workflow, todo management, time tracking, session archiving |
 | **Operations** | Credential management, intake processing, MCP management, communications hub |
 | **Content** | Content pipeline, outreach engine, meeting transcription |
+| **Visual** | Visual companion, plugin release |
 | **Advanced** | Brain orchestration, Google Workspace, browser automation, intelligence gathering |
 
-### 15 Commands
+### 16 Commands
 
 ```
 /brain          Brain status, setup, scan, configure
 /dashboard      Visual command center in your browser
+/visual         Real-time diagrams, mockups, and dashboards
 /entity         Client / partner / vendor lookup
 /todo           Unified task dashboard
 /knowledge      Search and load brain knowledge
@@ -121,7 +123,7 @@ Launch the visual dashboard:
 /swarm          Brain Swarm orchestration
 ```
 
-### 4 Background Agents
+### 5 Background Agents
 
 | Agent | Purpose |
 |:------|:--------|
@@ -129,6 +131,22 @@ Launch the visual dashboard:
 | **Entity Watchdog** | Monitors conversations for entity mentions, auto-updates records |
 | **Brain Learner** | Captures decisions, action items, patterns, and session summaries |
 | **Brain Gateway** | Full brain access from any repository or directory |
+| **Visual Presenter** | Converts concepts into visual formats and pushes to the Visual Companion |
+
+### Visual Companion
+
+Type `/visual` and a real-time visualization browser app opens at `localhost:3851`:
+
+- **Mermaid diagrams** — architecture, flowcharts, sequences, entity relationships
+- **Side-by-side comparisons** — option A vs B with formatted content
+- **Kanban boards** — task status visualization with columns
+- **Timelines** — project roadmaps, milestones, phase progress
+- **Dashboards** — KPI stats, progress metrics, utilization charts
+- **Cards** — feature grids, contact cards, option lists
+- **Mockups** — UI concepts rendered in sandboxed iframes
+- **WebSocket streaming** — content pushes instantly from your conversation
+
+Any skill or agent can push visual content. Keep the tab open alongside your terminal.
 
 ### Visual Dashboard
 

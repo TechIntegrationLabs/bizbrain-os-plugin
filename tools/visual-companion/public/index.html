@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BizBrain OS — Visual Companion</title>
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎨</text></svg>">
+</head>
+<body>
+  <div id="app">
+    <header id="topbar">
+      <div class="topbar-brand">
+        <span class="brand-icon">🎨</span>
+        <span class="brand-name">Visual Companion</span>
+        <span class="brand-tag">BizBrain OS</span>
+      </div>
+      <div class="topbar-status">
+        <span class="status-indicator" id="ws-status"></span>
+        <span class="status-text" id="ws-status-text">Connecting...</span>
+      </div>
+      <div class="topbar-actions">
+        <button class="btn-icon" id="btn-history" title="History">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 8v4l3 3"/><circle cx="12" cy="12" r="9"/></svg>
+        </button>
+        <button class="btn-icon" id="btn-fullscreen" title="Fullscreen">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 3H5a2 2 0 00-2 2v3m18 0V5a2 2 0 00-2-2h-3m0 18h3a2 2 0 002-2v-3M3 16v3a2 2 0 002 2h3"/></svg>
+        </button>
+      </div>
+    </header>
+
+    <main id="content">
+      <div id="welcome" class="welcome-screen">
+        <div class="welcome-icon">🎨</div>
+        <h1>Visual Companion</h1>
+        <p>Waiting for content from your Claude Code session...</p>
+        <div class="welcome-hint">
+          <p>The AI will push diagrams, mockups, comparisons, and dashboards here in real-time.</p>
+          <p class="hint-subtle">Keep this tab open alongside your terminal.</p>
+        </div>
+      </div>
+      <div id="viewer" class="viewer" style="display:none;">
+        <div class="viewer-header">
+          <h2 id="viewer-title"></h2>
+          <span class="viewer-type" id="viewer-type"></span>
+        </div>
+        <div id="viewer-content" class="viewer-content"></div>
+      </div>
+    </main>
+
+    <aside id="history-panel" class="history-panel" style="display:none;">
+      <div class="history-header">
+        <h3>History</h3>
+        <button class="btn-icon" id="btn-close-history">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg>
+        </button>
+      </div>
+      <div id="history-list" class="history-list"></div>
+    </aside>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/marked@15/marked.min.js"></script>
+  <script src="/js/renderer.js"></script>
+  <script src="/js/app.js"></script>
+</body>
+</html>
