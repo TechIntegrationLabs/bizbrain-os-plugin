@@ -1,3 +1,9 @@
+---
+name: archive-sessions
+description: Archive Claude Code sessions to brain knowledge base and Obsidian vault
+argument-hint: [--force|--dry-run|stats]
+---
+
 # Archive Sessions
 
 Archive Claude Code sessions to brain knowledge base and Obsidian vault.
