@@ -44,30 +44,44 @@ Every session deposits context. Every future session withdraws it. The balance o
 
 ---
 
-## Quick Install
+## Install in 4 Steps
+
+### Step 1 — Open a terminal
+
+Any terminal works: Terminal, Command Prompt, PowerShell, iTerm, Warp, etc.
+
+> **Prerequisite:** You need [Claude Code CLI](https://docs.anthropic.com/en/docs/claude-code/overview) installed. If you don't have it yet: `npm install -g @anthropic-ai/claude-code`
+
+### Step 2 — Copy & paste these two commands
 
 ```bash
-# Add the marketplace
 claude plugin marketplace add TechIntegrationLabs/bizbrain-os-plugin
-
-# Install the plugin
 claude plugin install bizbrain-os
 ```
 
-Then open a new terminal:
+### Step 3 — Start Claude Code and run setup
 
 ```bash
 claude
-> /brain setup
 ```
 
-**5 minutes later:** Every Claude Code session starts pre-loaded with your full business context.
+Once Claude Code is running, type:
 
-Launch the visual dashboard:
-
-```bash
-> /dashboard
 ```
+/brain setup
+```
+
+This takes ~5 minutes. It asks your name, business, and role — then builds your brain.
+
+### Step 4 — Launch your dashboard
+
+```
+/dashboard
+```
+
+Opens a visual command center in your browser. **You're done!**
+
+Every Claude Code session now starts pre-loaded with your full business context.
 
 ---
 
