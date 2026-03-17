@@ -10,7 +10,7 @@
 
 <p align="center">
   <a href="LICENSE"><img src="https://img.shields.io/badge/License-AGPL--3.0-blue?style=flat-square" alt="License"></a>
-  <img src="https://img.shields.io/badge/Version-3.5.0-22c55e?style=flat-square" alt="v3.5.0">
+  <img src="https://img.shields.io/badge/Version-3.5.1-22c55e?style=flat-square" alt="v3.5.0">
   <img src="https://img.shields.io/badge/Skills-23-f59e0b?style=flat-square" alt="23 Skills">
   <img src="https://img.shields.io/badge/Commands-16-ec4899?style=flat-square" alt="16 Commands">
   <img src="https://img.shields.io/badge/Integrations-37+-8b5cf6?style=flat-square" alt="37+ Integrations">
