@@ -70,8 +70,52 @@ if [ "$HAS_NODE" = true ]; then
   fi
 fi
 
+# --- Update Check (once per day, 2s timeout, non-blocking) ---
+UPDATE_NOTICE=""
+PLUGIN_VERSION=""
+if [ -f "${PLUGIN_ROOT}/.claude-plugin/plugin.json" ]; then
+  PLUGIN_VERSION=$(grep '"version"' "${PLUGIN_ROOT}/.claude-plugin/plugin.json" 2>/dev/null | head -1 | sed 's/.*"version"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/')
+fi
+
+if [ -n "$PLUGIN_VERSION" ] && [ -n "$BRAIN_PATH" ] && [ -d "$BRAIN_PATH" ]; then
+  CACHE_DIR="$BRAIN_PATH/.bizbrain"
+  CACHE_FILE="$CACHE_DIR/update-check.json"
+  TODAY=$(date +"%Y-%m-%d" 2>/dev/null || true)
+  SHOULD_CHECK=true
+
+  # Only check once per day
+  if [ -f "$CACHE_FILE" ]; then
+    CACHED_DATE=$(grep '"checkedDate"' "$CACHE_FILE" 2>/dev/null | sed 's/.*"checkedDate"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/' || true)
+    if [ "$CACHED_DATE" = "$TODAY" ]; then
+      SHOULD_CHECK=false
+      # Read cached result
+      CACHED_LATEST=$(grep '"latestVersion"' "$CACHE_FILE" 2>/dev/null | sed 's/.*"latestVersion"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/' || true)
+      if [ -n "$CACHED_LATEST" ] && [ "$CACHED_LATEST" != "$PLUGIN_VERSION" ]; then
+        UPDATE_NOTICE="\\n\\n> **Update available:** BizBrain OS v${CACHED_LATEST} (you have v${PLUGIN_VERSION}). Run \`claude plugin update bizbrain-os\` to update."
+      fi
+    fi
+  fi
+
+  if [ "$SHOULD_CHECK" = true ]; then
+    # Fetch latest tag from GitHub (2s timeout)
+    LATEST_TAG=$(curl -s --connect-timeout 2 --max-time 2 \
+      "https://api.github.com/repos/TechIntegrationLabs/bizbrain-os-plugin/tags?per_page=1" 2>/dev/null \
+      | grep '"name"' | head -1 | sed 's/.*"name"[[:space:]]*:[[:space:]]*"v\?\([^"]*\)".*/\1/' || true)
+
+    if [ -n "$LATEST_TAG" ]; then
+      # Cache the result
+      mkdir -p "$CACHE_DIR" 2>/dev/null || true
+      echo "{\"checkedDate\":\"$TODAY\",\"latestVersion\":\"$LATEST_TAG\",\"installedVersion\":\"$PLUGIN_VERSION\"}" > "$CACHE_FILE" 2>/dev/null || true
+
+      if [ "$LATEST_TAG" != "$PLUGIN_VERSION" ]; then
+        UPDATE_NOTICE="\\n\\n> **Update available:** BizBrain OS v${LATEST_TAG} (you have v${PLUGIN_VERSION}). Run \`claude plugin update bizbrain-os\` to update."
+      fi
+    fi
+  fi
+fi
+
 # --- Output Context Injection ---
-SESSION_CONTEXT="<bizbrain-os-context>\\n${ESCAPED_CONTEXT}${CLIENT_ALERT_SECTION}\\n</bizbrain-os-context>"
+SESSION_CONTEXT="<bizbrain-os-context>\\n${ESCAPED_CONTEXT}${CLIENT_ALERT_SECTION}${UPDATE_NOTICE}\\n</bizbrain-os-context>"
 
 cat <<EOF
 {

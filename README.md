@@ -85,6 +85,22 @@ Every Claude Code session now starts pre-loaded with your full business context.
 
 ---
 
+## Keeping BizBrain Updated
+
+BizBrain OS checks for updates automatically — once per day, on session start. If a new version is available, you'll see a notification like:
+
+> **Update available:** BizBrain OS v3.6.0 (you have v3.5.1). Run `claude plugin update bizbrain-os` to update.
+
+To update manually at any time:
+
+```bash
+claude plugin update bizbrain-os
+```
+
+Your brain data, settings, and configurations are never touched during updates — only the plugin code is refreshed. After updating, restart Claude Code to pick up new features.
+
+---
+
 ## What Happens During Setup
 
 ```
