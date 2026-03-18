@@ -2,6 +2,23 @@
 
 All notable changes to the BizBrain OS Claude Code Plugin.
 
+## [3.5.1] - 2026-03-17
+
+### Added
+- **Auto-Update Notifications** — SessionStart hook checks GitHub for new versions once per day. If newer exists, shows a one-line notification in your session context.
+- **37 AI-Generated Infographic Icons** — every dashboard module now has a unique Flux 1.1 Pro generated icon with category-colored neon accents on dark backgrounds.
+- **`/report` command** — generates an anonymous usage report (session counts, tool usage, brain stats) you can share with the BizBrain team. No private data ever included.
+- **`/health` command** — comprehensive installation health check validating brain structure, hooks, dependencies, and config with PASS/WARN/FAIL indicators.
+- **Opt-in Telemetry Beacon** — enable in `/brain configure` to automatically send anonymous usage data to the BizBrain team once per day via Discord webhook.
+- **Changelog Notifications** — after updating, your next session shows what changed in the new version.
+- **Brain Schema Versioning** — `BRAIN_SCHEMA_VERSION` in `.bizbrain-root.json` enables safe future migrations without breaking existing data.
+
+### Changed
+- README rewritten with clear 4-step numbered install guide
+- Marketplace.json version synced (was stuck at 3.4.0)
+- Dashboard images compressed from 23MB → 0.4MB (WebP) on site, 7.3MB on plugin
+- Command count: 16 → 18
+
 ## [3.5.0] - 2026-03-15
 
 ### Added

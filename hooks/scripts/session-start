@@ -114,8 +114,35 @@ if [ -n "$PLUGIN_VERSION" ] && [ -n "$BRAIN_PATH" ] && [ -d "$BRAIN_PATH" ]; the
   fi
 fi
 
+# --- Brain Schema Migration (runs if needed, idempotent) ---
+if [ "$HAS_NODE" = true ] && [ -n "$BRAIN_PATH" ] && [ -d "$BRAIN_PATH" ]; then
+  NODE_BRAIN_PATH=$(_to_node_path "$BRAIN_PATH")
+  node "${PLUGIN_ROOT}/scripts/brain-migrate.js" "$NODE_BRAIN_PATH" 2>/dev/null || true
+fi
+
+# --- Changelog Notification (shows what's new after an update) ---
+CHANGELOG_NOTICE=""
+if [ "$HAS_NODE" = true ] && [ -n "$BRAIN_PATH" ] && [ -n "$PLUGIN_VERSION" ]; then
+  NODE_BRAIN_PATH=$(_to_node_path "$BRAIN_PATH")
+  NODE_PLUGIN_ROOT=$(_to_node_path "$PLUGIN_ROOT")
+  CHANGELOG_TMP=$(mktemp 2>/dev/null || echo "/tmp/bbos-changelog-$$")
+  node "${PLUGIN_ROOT}/scripts/changelog-notify.js" "$NODE_BRAIN_PATH" "$NODE_PLUGIN_ROOT" "$PLUGIN_VERSION" > "$CHANGELOG_TMP" 2>/dev/null || true
+  CHANGELOG_RAW=$(cat "$CHANGELOG_TMP" 2>/dev/null || true)
+  rm -f "$CHANGELOG_TMP" 2>/dev/null || true
+  if [ -n "$CHANGELOG_RAW" ]; then
+    ESCAPED_CHANGELOG=$(escape_for_json "$CHANGELOG_RAW")
+    CHANGELOG_NOTICE="\\n\\n${ESCAPED_CHANGELOG}"
+  fi
+fi
+
+# --- Telemetry Beacon (opt-in, once per day, non-blocking) ---
+if [ "$HAS_NODE" = true ] && [ -n "$BRAIN_PATH" ] && [ -n "$PLUGIN_VERSION" ]; then
+  NODE_BRAIN_PATH=$(_to_node_path "$BRAIN_PATH")
+  node "${PLUGIN_ROOT}/scripts/telemetry-beacon.js" "$NODE_BRAIN_PATH" "$PLUGIN_VERSION" 2>/dev/null &
+fi
+
 # --- Output Context Injection ---
-SESSION_CONTEXT="<bizbrain-os-context>\\n${ESCAPED_CONTEXT}${CLIENT_ALERT_SECTION}${UPDATE_NOTICE}\\n</bizbrain-os-context>"
+SESSION_CONTEXT="<bizbrain-os-context>\\n${ESCAPED_CONTEXT}${CLIENT_ALERT_SECTION}${UPDATE_NOTICE}${CHANGELOG_NOTICE}\\n</bizbrain-os-context>"
 
 cat <<EOF
 {
