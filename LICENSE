@@ -1,0 +1,84 @@
+BizBrain OS Plugin - Proprietary License
+Copyright (c) 2025-2026 Tech Integration Labs. All rights reserved.
+
+TERMS AND CONDITIONS
+
+1. GRANT OF LICENSE
+
+   Subject to the terms of this License, Tech Integration Labs ("Licensor")
+   grants you a limited, non-exclusive, non-transferable, non-sublicensable
+   license to:
+
+   a) Install and use the BizBrain OS Plugin ("Software") for your own
+      personal or internal business purposes through the Claude Code CLI.
+
+   b) View the source code solely for the purpose of understanding how
+      the Software operates in connection with your permitted use.
+
+2. RESTRICTIONS
+
+   You may NOT, and may not permit any third party to:
+
+   a) Fork, copy, reproduce, or create derivative works of the Software
+      or any portion thereof.
+
+   b) Redistribute, sublicense, sell, lease, rent, lend, or otherwise
+      transfer the Software or any portion thereof to any third party.
+
+   c) Modify, adapt, translate, reverse engineer, decompile, or
+      disassemble the Software, except to the extent that applicable
+      law expressly permits such activity notwithstanding this limitation.
+
+   d) Use the Software, in whole or in part, to create any product,
+      service, or software that competes with or is substantially
+      similar to the Software or any other product of the Licensor.
+
+   e) Remove, alter, or obscure any copyright, trademark, or other
+      proprietary rights notices contained in or on the Software.
+
+   f) Use the Software to provide services to third parties (SaaS,
+      hosting, managed service, or similar offering) without prior
+      written consent from the Licensor.
+
+   g) Publish, share, or distribute modified or unmodified copies of
+      the Software's source code, documentation, skills, commands,
+      agents, or any other component.
+
+3. INTELLECTUAL PROPERTY
+
+   The Software and all copies thereof are proprietary to and the
+   property of Tech Integration Labs. All right, title, and interest
+   in and to the Software, including all intellectual property rights
+   therein, are and shall remain with the Licensor. This License does
+   not convey any rights of ownership in the Software.
+
+4. ENFORCEMENT
+
+   Any use of the Software in violation of this License will
+   automatically terminate your rights under this License. The Licensor
+   reserves the right to pursue all available legal remedies, including
+   but not limited to DMCA takedown requests, injunctive relief, and
+   claims for damages.
+
+5. NO WARRANTY
+
+   THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+   EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+   MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, AND
+   NONINFRINGEMENT. IN NO EVENT SHALL THE LICENSOR BE LIABLE FOR ANY
+   CLAIM, DAMAGES, OR OTHER LIABILITY ARISING FROM THE SOFTWARE.
+
+6. TERMINATION
+
+   This License is effective until terminated. It will terminate
+   automatically if you fail to comply with any term of this License.
+   Upon termination, you must destroy all copies of the Software in
+   your possession.
+
+7. GOVERNING LAW
+
+   This License shall be governed by and construed in accordance with
+   the laws of the State of Hawaii, United States of America.
+
+For licensing inquiries: hello@techintegrationlabs.com
+Website: https://bizbrain-os.com

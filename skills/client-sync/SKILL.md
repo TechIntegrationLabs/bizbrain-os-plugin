@@ -1,9 +1,9 @@
 ---
 name: client-sync
 description: |
-  Sync client intelligence from external sources (Gmail, Drive, Slack, meetings) into
-  BizBrain OS client records. Fetches new emails, shared documents, meeting reports, and
-  updates client context automatically. Triggers on: /client-sync, "sync client",
+  Sync client intelligence from external sources (Gmail, Drive, Slack, WhatsApp, meetings) into
+  BizBrain OS client records. Fetches new emails, shared documents, WhatsApp messages, meeting
+  reports, and updates client context automatically. Triggers on: /client-sync, "sync client",
   "refresh client data", "check for new client messages", client intelligence operations.
 version: 1.0.0
 ---
@@ -24,6 +24,7 @@ External Sources          Sync Engine              Brain Destinations
 ─────────────────         ──────────────           ──────────────────
 Gmail (gwcli)      ──→   Fetch & Diff    ──→     _dump/emails/
 Google Drive       ──→   Extract Intel   ──→     _dump/google-drive/
+WhatsApp (SQLite)  ──→   Query & Match   ──→     _dump/whatsapp/
 Slack (MCP)        ──→   Route & File    ──→     _dump/attachments/
 Meeting Reports    ──→   Update Context  ──→     _context/ (history, contacts, actions)
                           Update Pulse    ──→     _pulse/STATUS.md
@@ -95,7 +96,23 @@ Read `Operations/client-sync/config.json` for:
 2. Search for recent messages mentioning client keywords
 3. Extract new intel, save to `_dump/slack/`
 
-#### 2d. Meeting Reports
+#### 2d. WhatsApp Sync
+1. Read client's WhatsApp config from `config.json` — `dbPath`, `monitorJids`, `keywords`
+2. Open WhatsApp SQLite DB (read-only) at `~/Repos/whatsapp-mcp/data/whatsapp.db`
+3. Query messages matching monitored JIDs or keyword patterns
+4. Deduplicate against `_dump/whatsapp/.synced-ids.json` manifest
+5. Save to `_dump/whatsapp/<date>_<chat-slug>.md` with frontmatter
+6. Each file groups messages by chat and date with timestamps and sender info
+
+**WhatsApp MCP:** Registered in `~/.claude.json` as `whatsapp-mcp` (stdio, Node.js)
+- Uses `jlucaso1/whatsapp-mcp-ts` with Baileys WebSocket library
+- QR auth required on first run — opens browser for QR code scanning
+- Group monitoring enabled (including Network Dental group chats)
+- MCP tools: `search_contacts`, `list_messages`, `list_chats`, `search_messages`, `send_message`
+
+**Setup:** Clone `~/Repos/whatsapp-mcp/`, run `npm install`, start once for QR auth.
+
+#### 2e. Meeting Reports
 1. Search Gmail for Read AI / Fireflies reports mentioning client
    ```bash
    node ~/Repos/google-workspace-cli/dist/index.js gmail search "from:notifications@read.ai <client-keywords> after:<last-sync-date>" --format json
@@ -120,6 +137,7 @@ Write sync results to `Operations/client-sync/state/<client-slug>.json`:
     "gmail": { "lastSync": "...", "newItems": 3, "status": "ok" },
     "drive": { "lastSync": "...", "newItems": 1, "status": "ok" },
     "slack": { "lastSync": "...", "newItems": 0, "status": "skipped" },
+    "whatsapp": { "lastSync": "...", "newItems": 5, "status": "ok" },
     "meetings": { "lastSync": "...", "newItems": 2, "status": "ok" }
   },
   "totalNewItems": 6,
@@ -134,6 +152,7 @@ Client Sync: Darius Somekhian
 ────────────────────────────────
 Gmail:    3 new emails (2 from Darius, 1 from Chris Kelly)
 Drive:    1 new file (Updated Automation Journeys sheet)
+WhatsApp: 5 new messages (Network Dental group)
 Meetings: 2 new reports archived
 Slack:    No new mentions
 
@@ -145,10 +164,12 @@ Status pulse refreshed.
 
 During SessionStart hook, a lightweight check runs:
 1. Read `Operations/client-sync/config.json` for active clients
-2. For each client, quick Gmail check: `gmail search "from:<primary-email> is:unread" --format json`
+2. For each client:
+   - Quick Gmail check: `gmail search "from:<primary-email> is:unread" --format json`
+   - Quick WhatsApp check: query SQLite for recent messages matching keywords
 3. If new unread messages found, inject into session context:
    ```
-   Client Alert: 2 unread from Darius Somekhian (latest: "Re: HubSpot workflow question")
+   Client Alert: 2 unread emails, 3 new WhatsApp messages from Darius Somekhian
    ```
 4. Does NOT process or file — just alerts. User can run `/client-sync` for full processing.
 
@@ -186,6 +207,12 @@ During SessionStart hook, a lightweight check runs:
         "slack": {
           "channels": [],
           "keywords": ["darius", "pair dental", "network dental"]
+        },
+        "whatsapp": {
+          "enabled": true,
+          "dbPath": "C:/Users/Disruptors/Repos/whatsapp-mcp/data/whatsapp.db",
+          "monitorJids": [],
+          "keywords": ["darius", "pair dental", "network dental", "dds founders"]
         }
       }
     }
@@ -212,6 +239,7 @@ If the BizBrain OS brain is at `~/bizbrain-os/brain/`, entity paths map to `Enti
 
 ## Error Handling
 
+- **WhatsApp DB missing:** Log skip, continue — DB only exists after first QR auth
 - **gwcli not available:** Log error, skip Gmail/Drive sources, continue with other sources
 - **OAuth expired:** Report "Gmail auth expired — run `gwcli profiles login`"
 - **Network error:** Log, retry once, then skip source with warning

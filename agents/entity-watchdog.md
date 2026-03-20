@@ -137,3 +137,25 @@ overview.md     # What they do, relationship summary
 history.md      # Interaction timeline
 action-items.md # Open tasks related to them
 ```
+
+## C² Internal/External Separation (HARD RULE)
+
+When the brain belongs to a C² client (check for `c2` key in config or brain path under `c2-clients/`), enforce strict separation:
+
+**`_internal/`** = C² eyes only. Never share with client.
+- Strategic analysis about the client → `_internal/strategy/`
+- Engagement notes with our commentary → `_internal/strategy/`
+- Internal action items (referencing review queues, pricing strategy, internal processes) → `_internal/todos/`
+
+**Main brain** = Client-safe. Factual data only.
+- Factual contact records → `Entities/`
+- Factual interaction logs (dates, topics discussed, no strategic commentary) → entity `history.md`
+- Clean action items without internal process references → entity `action-items.md`
+
+**The Test:** Before writing any file, ask: "Would it be a problem if the client read this?" If yes → `_internal/`.
+
+**Examples:**
+- "Met with client, discussed project timeline" → `history.md` (factual, safe)
+- "Client seems price-sensitive, should offer discount first" → `_internal/strategy/` (strategic, internal)
+- "Follow up on contract signature" → `action-items.md` (safe)
+- "Review risk score thresholds for this client" → `_internal/todos/` (internal process)

@@ -9,7 +9,7 @@
 </p>
 
 <p align="center">
-  <a href="LICENSE"><img src="https://img.shields.io/badge/License-AGPL--3.0-blue?style=flat-square" alt="License"></a>
+  <a href="LICENSE"><img src="https://img.shields.io/badge/License-Proprietary-red?style=flat-square" alt="License"></a>
   <img src="https://img.shields.io/badge/Version-3.5.1-22c55e?style=flat-square" alt="v3.5.0">
   <img src="https://img.shields.io/badge/Skills-23-f59e0b?style=flat-square" alt="23 Skills">
   <img src="https://img.shields.io/badge/Commands-16-ec4899?style=flat-square" alt="16 Commands">
@@ -260,7 +260,7 @@ Zones control how much context loads by default. All commands work from any zone
   No telemetry, no analytics, no phone-home
   Credentials cataloged locally, never auto-copied
   Values always masked in display
-  Open source — read every line of code
+  Source-available — inspect the code you're running
 ```
 
 ---
@@ -276,22 +276,13 @@ Zones control how much context loads by default. All commands work from any zone
 
 ---
 
-## Contributing
-
-Contributions welcome.
-
-1. Fork the repo
-2. Create your feature branch (`git checkout -b feature/amazing-thing`)
-3. Commit your changes
-4. Open a Pull Request
-
-See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
-
----
-
 ## License
 
-[AGPL-3.0](LICENSE) — Free to use, modify, and distribute. Derivative works must also be open source.
+**Proprietary** — Copyright (c) 2025-2026 Tech Integration Labs. All rights reserved.
+
+You may install and use this plugin for personal or internal business purposes. Forking, redistribution, modification for distribution, and creation of competing products are strictly prohibited. See [LICENSE](LICENSE) for full terms.
+
+For licensing inquiries: hello@techintegrationlabs.com
 
 ---
 
