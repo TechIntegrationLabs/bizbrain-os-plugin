@@ -5,7 +5,7 @@ description = "Local meeting transcription for BizBrain OS — replaces Otter.ai
 readme = "README.md"
 requires-python = ">=3.10"
 license = "AGPL-3.0-only"
-authors = [{ name = "Tech Integration Labs", email = "hello@techintegrationlabs.com" }]
+authors = [{ name = "Tech Integration Labs", email = "hello@bizbrain-os.com" }]
 dependencies = [
     "faster-whisper>=1.0.0",
     "sounddevice>=0.4.6",

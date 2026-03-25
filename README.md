@@ -282,7 +282,7 @@ Zones control how much context loads by default. All commands work from any zone
 
 You may install and use this plugin for personal or internal business purposes. Forking, redistribution, modification for distribution, and creation of competing products are strictly prohibited. See [LICENSE](LICENSE) for full terms.
 
-For licensing inquiries: hello@techintegrationlabs.com
+For licensing inquiries: hello@bizbrain-os.com
 
 ---
 

@@ -96,12 +96,12 @@ Generated: [date]
 
 ---
 *This report contains no private data — only aggregate counts and tool usage patterns.*
-*Share with: hello@techintegrationlabs.com or paste in Discord #help*
+*Share with: hello@bizbrain-os.com or paste in Discord #help*
 ```
 
 ## Behavior
 
-1. **Default / "generate"**: Generate the report and display it to the user. Tell them they can copy it and email to `hello@techintegrationlabs.com` or paste in the BizBrain OS Discord `#help` channel.
+1. **Default / "generate"**: Generate the report and display it to the user. Tell them they can copy it and email to `hello@bizbrain-os.com` or paste in the BizBrain OS Discord `#help` channel.
 
 2. **"preview"**: Show what data will be collected (the list above) WITHOUT actually reading any files. Let the user confirm before generating.
 
