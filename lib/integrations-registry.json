@@ -746,6 +746,29 @@
         "url": "https://github.com/microsoft/playwright-mcp"
       },
       "what_it_enables": ["Cross-browser testing", "E2E test automation", "Visual QA screenshots", "Device emulation", "Headless automation", "PDF generation", "Form testing", "Web scraping"]
+    },
+    {
+      "id": "google-stitch",
+      "name": "Google Stitch",
+      "category": "design",
+      "description": "AI-powered UI design generation from Google Labs. Generates full-page designs, extracts design DNA from URLs, exports HTML/CSS code and DESIGN.md tokens. Powered by Gemini.",
+      "logo": "stitch.svg",
+      "logoColor": "#4285F4",
+      "setupType": "api-key",
+      "envVars": [
+        { "key": "STITCH_API_KEY", "label": "Stitch API Key", "secret": true }
+      ],
+      "mcpServer": {
+        "name": "stitch",
+        "type": "http",
+        "url": "https://stitch.googleapis.com/mcp",
+        "headers": { "X-Goog-Api-Key": "{{STITCH_API_KEY}}" }
+      },
+      "credentialGuide": {
+        "steps": ["Go to stitch.withgoogle.com", "Sign in with Google", "Click profile icon → Stitch Settings", "Go to API Keys section", "Click Create Key and copy immediately"],
+        "url": "https://stitch.withgoogle.com"
+      },
+      "what_it_enables": ["Full-page UI design generation", "Site redesign workflows", "Design DNA extraction from URLs", "HTML/CSS code export", "DESIGN.md token export", "Multi-screen flow generation", "Design system creation"]
     }
   ]
 }
