@@ -122,7 +122,7 @@ Key changes:
 - Change 2
 - Change 3
 
-Update: `claude plugin update bizbrain-os`
+Update: `/plugin update bizbrain-os`
 ```
 
 ### 10. Social Media Drafts
@@ -141,5 +141,5 @@ Update the user's auto-memory (`~/.claude/projects/.../memory/MEMORY.md`) with:
 ## Post-Release
 
 - Verify the GitHub release page shows the tag
-- Check that `claude plugin update bizbrain-os` pulls the new version
+- Check that `/plugin update bizbrain-os` pulls the new version
 - Monitor Discord for user feedback

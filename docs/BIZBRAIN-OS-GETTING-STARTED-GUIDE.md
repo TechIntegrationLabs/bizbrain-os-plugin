@@ -133,18 +133,20 @@ That's it.
 
 ## Step 1: Install the Plugin
 
-One command:
+Open Claude Code (`claude` in your terminal), then type these slash commands:
 
-```bash
-claude plugin marketplace add TechIntegrationLabs/bizbrain-os-plugin
-claude plugin install bizbrain-os
 ```
+/plugin marketplace add TechIntegrationLabs/bizbrain-os-plugin
+/plugin install bizbrain-os
+```
+
+> **Important:** These are slash commands inside Claude Code, not terminal commands.
 
 The plugin registers its hooks, commands, skills, and agents automatically. No configuration needed.
 
 ## Step 2: Run the Setup Wizard
 
-Open a new Claude Code session and type:
+Close and reopen Claude Code, then type:
 
 ```
 /brain setup
@@ -512,16 +514,19 @@ This is compound interest — applied to AI context. And unlike financial compou
 
 ## Install
 
-```bash
-claude plugin marketplace add TechIntegrationLabs/bizbrain-os-plugin
-claude plugin install bizbrain-os
+Open Claude Code, then type these slash commands:
+
+```
+/plugin marketplace add TechIntegrationLabs/bizbrain-os-plugin
+/plugin install bizbrain-os
 ```
 
 ## Setup (5 minutes)
 
-```bash
-claude
-> /brain setup
+Restart Claude Code, then type:
+
+```
+/brain setup
 ```
 
 ## Start Every Session From Your Launchpad

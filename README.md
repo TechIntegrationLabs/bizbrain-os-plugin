@@ -46,26 +46,28 @@ Every session deposits context. Every future session withdraws it. The balance o
 
 ## Install in 4 Steps
 
-### Step 1 — Open a terminal
-
-Any terminal works: Terminal, Command Prompt, PowerShell, iTerm, Warp, etc.
+### Step 1 — Open Claude Code
 
 > **Prerequisite:** You need [Claude Code CLI](https://docs.anthropic.com/en/docs/claude-code/overview) installed. If you don't have it yet: `npm install -g @anthropic-ai/claude-code`
-
-### Step 2 — Copy & paste these two commands
-
-```bash
-claude plugin marketplace add TechIntegrationLabs/bizbrain-os-plugin
-claude plugin install bizbrain-os
-```
-
-### Step 3 — Start Claude Code and run setup
 
 ```bash
 claude
 ```
 
-Once Claude Code is running, type:
+### Step 2 — Install the plugin (inside Claude Code)
+
+Type these **slash commands** at the Claude Code prompt (they start with `/`):
+
+```
+/plugin marketplace add TechIntegrationLabs/bizbrain-os-plugin
+/plugin install bizbrain-os
+```
+
+> **Important:** These are slash commands inside Claude Code, not terminal commands. Type them at the `>` prompt after starting Claude Code.
+
+### Step 3 — Restart Claude Code and run setup
+
+Close and reopen Claude Code, then type:
 
 ```
 /brain setup
@@ -89,12 +91,12 @@ Every Claude Code session now starts pre-loaded with your full business context.
 
 BizBrain OS checks for updates automatically — once per day, on session start. If a new version is available, you'll see a notification like:
 
-> **Update available:** BizBrain OS v3.6.0 (you have v3.5.1). Run `claude plugin update bizbrain-os` to update.
+> **Update available:** BizBrain OS v3.6.0 (you have v3.5.1). Run `/plugin update bizbrain-os` to update.
 
-To update manually at any time:
+To update manually at any time (inside Claude Code):
 
-```bash
-claude plugin update bizbrain-os
+```
+/plugin update bizbrain-os
 ```
 
 Your brain data, settings, and configurations are never touched during updates — only the plugin code is refreshed. After updating, restart Claude Code to pick up new features.

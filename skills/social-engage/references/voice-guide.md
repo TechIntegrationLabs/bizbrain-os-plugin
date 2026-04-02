@@ -49,6 +49,6 @@
 - Runs locally, zero cloud dependencies, 100% private
 - Website: bizbrain-os.com
 - GitHub: TechIntegrationLabs/bizbrain-os-plugin
-- Install: claude plugin add TechIntegrationLabs/bizbrain-os-plugin
+- Install: /plugin marketplace add TechIntegrationLabs/bizbrain-os-plugin
 - 21 skills, 4 agents, visual dashboard
 - William built this solo

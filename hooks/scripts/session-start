@@ -91,7 +91,7 @@ if [ -n "$PLUGIN_VERSION" ] && [ -n "$BRAIN_PATH" ] && [ -d "$BRAIN_PATH" ]; the
       # Read cached result
       CACHED_LATEST=$(grep '"latestVersion"' "$CACHE_FILE" 2>/dev/null | sed 's/.*"latestVersion"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/' || true)
       if [ -n "$CACHED_LATEST" ] && [ "$CACHED_LATEST" != "$PLUGIN_VERSION" ]; then
-        UPDATE_NOTICE="\\n\\n> **Update available:** BizBrain OS v${CACHED_LATEST} (you have v${PLUGIN_VERSION}). Run \`claude plugin update bizbrain-os\` to update."
+        UPDATE_NOTICE="\\n\\n> **Update available:** BizBrain OS v${CACHED_LATEST} (you have v${PLUGIN_VERSION}). Run \`/plugin update bizbrain-os\` to update."
       fi
     fi
   fi
@@ -108,7 +108,7 @@ if [ -n "$PLUGIN_VERSION" ] && [ -n "$BRAIN_PATH" ] && [ -d "$BRAIN_PATH" ]; the
       echo "{\"checkedDate\":\"$TODAY\",\"latestVersion\":\"$LATEST_TAG\",\"installedVersion\":\"$PLUGIN_VERSION\"}" > "$CACHE_FILE" 2>/dev/null || true
 
       if [ "$LATEST_TAG" != "$PLUGIN_VERSION" ]; then
-        UPDATE_NOTICE="\\n\\n> **Update available:** BizBrain OS v${LATEST_TAG} (you have v${PLUGIN_VERSION}). Run \`claude plugin update bizbrain-os\` to update."
+        UPDATE_NOTICE="\\n\\n> **Update available:** BizBrain OS v${LATEST_TAG} (you have v${PLUGIN_VERSION}). Run \`/plugin update bizbrain-os\` to update."
       fi
     fi
   fi
