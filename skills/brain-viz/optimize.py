@@ -24,6 +24,26 @@ from pathlib import Path
 
 SKILL_DIR = Path(__file__).parent
 TEMPLATE = SKILL_DIR / 'viewer-template.html'
+VENDOR_DIR = SKILL_DIR / 'vendor'
+SW_TEMPLATE = SKILL_DIR / 'sw-template.js'
+
+# HTML fragments injected into the public bundle
+LOADING_OVERLAY = """<div id="boot-loader" style="position:fixed;inset:0;background:#000008;z-index:999;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:16px;color:#38bdf8;font-family:monospace;transition:opacity .5s">
+  <div style="font-size:10px;letter-spacing:4px;color:#64748b;text-transform:uppercase">Loading neural map</div>
+  <div style="width:220px;height:2px;background:rgba(56,189,248,0.1);overflow:hidden;border-radius:1px"><div id="boot-bar" style="width:0%;height:100%;background:linear-gradient(90deg,#38bdf8,#a78bfa);transition:width .3s"></div></div>
+  <div id="boot-status" style="font-size:9px;color:#475569;letter-spacing:2px">fetching graph</div>
+</div>
+<script>
+(function(){
+  let p=0;const bar=document.getElementById('boot-bar'),status=document.getElementById('boot-status');
+  window._bootStep=function(pct,msg){p=Math.max(p,pct);bar.style.width=p+'%';if(msg)status.textContent=msg;};
+  window._bootDone=function(){const el=document.getElementById('boot-loader');if(!el)return;el.style.opacity='0';setTimeout(()=>el.remove(),600);};
+})();
+</script>"""
+
+SW_REGISTER = """<script>
+if('serviceWorker' in navigator){window.addEventListener('load',()=>{navigator.serviceWorker.register('./sw.js').catch(()=>{});});}
+</script>"""
 
 # Fields we remove from public graph
 SENSITIVE_NODE_FIELDS = (
@@ -177,25 +197,55 @@ def write_public_html(brain: Path, public_dir: Path) -> None:
     else:
         brand = {'title': brain.name, 'subtitle': f'{brain.name} — 3D Neural Map'}
 
-    html = html.replace('{{TITLE}}', brand.get('title', brain.name))
-    html = html.replace('{{SUBTITLE}}', brand.get('subtitle', ''))
+    title = brand.get('title', brain.name)
+    subtitle = brand.get('subtitle', '')
+    html = html.replace('{{TITLE}}', title)
+    html = html.replace('{{SUBTITLE}}', subtitle)
     html = html.replace('{{BRAIN_ID}}', brain.name.lower().replace(' ', '-'))
 
-    # Public tweaks — switch to gzipped graph, skip physics warmup
+    # Self-host 3d-force-graph if vendor file present
+    if (VENDOR_DIR / '3d-force-graph.min.js').exists():
+        html = html.replace(
+            '<script src="https://cdn.jsdelivr.net/npm/3d-force-graph@1/dist/3d-force-graph.min.js"></script>',
+            '<script src="./vendor/3d-force-graph.min.js"></script>'
+        )
+
+    # Inject OG meta + preload hints into <head>
+    meta = f"""<meta name="description" content="{subtitle}">
+<meta property="og:title" content="{title}">
+<meta property="og:description" content="{subtitle}">
+<meta property="og:type" content="website">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="theme-color" content="#000008">
+<link rel="preload" href="graph.json.gz" as="fetch" crossorigin>
+<link rel="preload" href="communities.json" as="fetch" crossorigin>
+<link rel="preload" href="brand.json" as="fetch" crossorigin>
+"""
+    html = html.replace('<meta charset="utf-8">', '<meta charset="utf-8">\n' + meta)
+
+    # Inject loading overlay right after <body>
+    html = html.replace('<body>', '<body>\n' + LOADING_OVERLAY)
+
+    # Register service worker at end of body
+    html = html.replace('</body>', SW_REGISTER + '\n</body>')
+
+    # Public tweaks — switch to gzipped graph, skip physics warmup, progress events
     html = html.replace(
         "const resp=await fetch('graph.json');const rawData=await resp.json();",
         """// PUBLIC MODE: fetch gzipped graph, use pre-baked positions
+window._bootStep&&_bootStep(15,'downloading graph');
 const resp=await fetch('graph.json.gz');
 const buf=await resp.arrayBuffer();
+window._bootStep&&_bootStep(55,'decompressing');
 let rawData;
 try{
   const ds=new DecompressionStream('gzip');
   const stream=new Response(new Blob([buf]).stream().pipeThrough(ds));
   rawData=await stream.json();
 }catch(e){
-  // Fallback: try uncompressed
   const r2=await fetch('graph.json');rawData=await r2.json();
-}"""
+}
+window._bootStep&&_bootStep(80,'rendering');"""
     )
 
     # Skip warmup ticks since positions are pre-baked
@@ -210,8 +260,28 @@ try{
         "Graph.d3Force('charge').strength(-40);Graph.d3Force('link').distance(20);"
     )
 
+    # Trigger bootDone once the graph is initialized
+    html = html.replace(
+        "setTimeout(()=>startS('pulse'),6000);",
+        "setTimeout(()=>{window._bootDone&&_bootDone();startS('pulse');},1200);"
+    )
+
     (public_dir / 'index.html').write_text(html, encoding='utf-8')
     print(f'  public/index.html ({len(html)} chars)')
+
+    # Copy vendor libs
+    if VENDOR_DIR.exists():
+        dest_vendor = public_dir / 'vendor'
+        dest_vendor.mkdir(exist_ok=True)
+        for v in VENDOR_DIR.iterdir():
+            if v.is_file():
+                shutil.copy(v, dest_vendor / v.name)
+                print(f'  vendor/{v.name} ({v.stat().st_size:,}B)')
+
+    # Copy service worker
+    if SW_TEMPLATE.exists():
+        shutil.copy(SW_TEMPLATE, public_dir / 'sw.js')
+        print('  sw.js')
 
 
 def write_netlify_toml(public_dir: Path) -> None:
