@@ -2,6 +2,24 @@
 
 All notable changes to the BizBrain OS Claude Code Plugin.
 
+## [3.6.0] - 2026-04-14
+
+### Added
+- **`/brain-viz` command & skill** — generate a full-featured 3D Three.js neural explorer for any BizBrain instance. Auto-detects brain root, runs/updates graphify, labels top 40 communities, renders an interactive viewer with timeline growth animation, search (Ctrl+K), multi-brain selector, draggable panels, and 6 animation presets (Calm, Active, Neural Storm, Demo, Heartbeat, Growth Replay).
+- **Public deploy pipeline** — `/brain-viz --public` strips sensitive fields, bakes 3D positions offline (vectorized Fruchterman-Reingold), gzips output, injects service worker + boot loader + OG meta, and self-hosts `3d-force-graph.min.js`. Achieves **99% graph size reduction** (10.7MB → 157KB).
+- **`/brain-viz --deploy [site-name]`** — one-shot deploy to Netlify with immutable cache headers on graph.json.gz.
+- **Parameterized viewer template** — single HTML template works for BB1 and any C² client brain. Reads `communities.json` + `brand.json` sidecars at runtime so you can customize colors/titles without touching the template.
+- **Service worker** — caches graph data + HTML + vendor libs for instant repeat visits.
+
+### Changed
+- Skill count: 23 → **31**
+- Command count: 16 → **24**
+- README badges updated to reflect current counts (were stale since 3.5.0)
+
+### Reference deploy
+- BB1 main brain: <https://bb1-brain-viewer.netlify.app>
+- Load time: 333ms HTML / 400ms graph (11,806 nodes capped to 3,000 hubs, 157KB gzipped)
+
 ## [3.5.1] - 2026-03-17
 
 ### Added

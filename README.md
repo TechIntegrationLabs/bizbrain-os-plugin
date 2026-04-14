@@ -10,9 +10,9 @@
 
 <p align="center">
   <a href="LICENSE"><img src="https://img.shields.io/badge/License-Proprietary-red?style=flat-square" alt="License"></a>
-  <img src="https://img.shields.io/badge/Version-3.5.1-22c55e?style=flat-square" alt="v3.5.0">
-  <img src="https://img.shields.io/badge/Skills-23-f59e0b?style=flat-square" alt="23 Skills">
-  <img src="https://img.shields.io/badge/Commands-16-ec4899?style=flat-square" alt="16 Commands">
+  <img src="https://img.shields.io/badge/Version-3.6.0-22c55e?style=flat-square" alt="v3.6.0">
+  <img src="https://img.shields.io/badge/Skills-31-f59e0b?style=flat-square" alt="31 Skills">
+  <img src="https://img.shields.io/badge/Commands-24-ec4899?style=flat-square" alt="24 Commands">
   <img src="https://img.shields.io/badge/Integrations-37+-8b5cf6?style=flat-square" alt="37+ Integrations">
   <a href="#privacy--security"><img src="https://img.shields.io/badge/Privacy-100%25_Local-10b981?style=flat-square" alt="100% Local"></a>
 </p>
