@@ -210,21 +210,50 @@ def write_public_html(brain: Path, public_dir: Path) -> None:
             '<script src="./vendor/3d-force-graph.min.js"></script>'
         )
 
-    # Inject OG meta + preload hints into <head>
+    # Inject OG meta + preload/preconnect/favicon hints into <head>
+    favicon = (
+        "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E"
+        "%3Ccircle cx='32' cy='32' r='18' fill='%23fbbf24' opacity='0.9'/%3E"
+        "%3Ccircle cx='16' cy='20' r='4' fill='%2338bdf8'/%3E"
+        "%3Ccircle cx='48' cy='22' r='3' fill='%23a78bfa'/%3E"
+        "%3Ccircle cx='18' cy='48' r='3' fill='%23f472b6'/%3E"
+        "%3Ccircle cx='50' cy='46' r='4' fill='%2334d399'/%3E"
+        "%3Cline x1='32' y1='32' x2='16' y2='20' stroke='%2338bdf8' stroke-width='1' opacity='0.5'/%3E"
+        "%3Cline x1='32' y1='32' x2='48' y2='22' stroke='%23a78bfa' stroke-width='1' opacity='0.5'/%3E"
+        "%3Cline x1='32' y1='32' x2='18' y2='48' stroke='%23f472b6' stroke-width='1' opacity='0.5'/%3E"
+        "%3Cline x1='32' y1='32' x2='50' y2='46' stroke='%2334d399' stroke-width='1' opacity='0.5'/%3E"
+        "%3C/svg%3E"
+    )
     meta = f"""<meta name="description" content="{subtitle}">
 <meta property="og:title" content="{title}">
 <meta property="og:description" content="{subtitle}">
 <meta property="og:type" content="website">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="theme-color" content="#000008">
+<meta name="color-scheme" content="dark">
+<link rel="icon" type="image/svg+xml" href="{favicon}">
+<link rel="preconnect" href="https://esm.sh" crossorigin>
+<link rel="dns-prefetch" href="https://cdn.jsdelivr.net">
+<link rel="modulepreload" href="https://esm.sh/three">
+<link rel="modulepreload" href="https://esm.sh/three/examples/jsm/postprocessing/UnrealBloomPass.js">
 <link rel="preload" href="graph.json.gz" as="fetch" crossorigin>
 <link rel="preload" href="communities.json" as="fetch" crossorigin>
 <link rel="preload" href="brand.json" as="fetch" crossorigin>
+<link rel="preload" href="./vendor/3d-force-graph.min.js" as="script">
 """
     html = html.replace('<meta charset="utf-8">', '<meta charset="utf-8">\n' + meta)
 
-    # Inject loading overlay right after <body>
-    html = html.replace('<body>', '<body>\n' + LOADING_OVERLAY)
+    # Nebula background — GPU-cheap (single gradient div, no per-frame cost)
+    NEBULA = """<div style="position:fixed;inset:0;pointer-events:none;z-index:0;background:radial-gradient(ellipse 80% 60% at 30% 20%,rgba(56,189,248,0.08),transparent 50%),radial-gradient(ellipse 60% 80% at 70% 80%,rgba(167,139,250,0.06),transparent 50%),radial-gradient(ellipse 40% 40% at 50% 50%,rgba(244,114,182,0.04),transparent 50%);mix-blend-mode:screen"></div>"""
+    KEYHINT = """<div id="key-hint" style="position:fixed;bottom:54px;left:50%;transform:translateX(-50%);z-index:50;display:flex;gap:14px;padding:6px 14px;background:rgba(8,12,28,0.60);border:1px solid rgba(56,189,248,0.08);border-radius:20px;backdrop-filter:blur(10px);font-family:'Consolas',monospace;font-size:9px;color:#64748b;letter-spacing:2px;text-transform:uppercase;opacity:0.7;transition:opacity .3s" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0.7'">
+<span><kbd style="background:rgba(56,189,248,0.15);color:#38bdf8;padding:1px 5px;border-radius:3px;font-family:inherit">drag</kbd> orbit</span>
+<span><kbd style="background:rgba(56,189,248,0.15);color:#38bdf8;padding:1px 5px;border-radius:3px;font-family:inherit">scroll</kbd> zoom</span>
+<span><kbd style="background:rgba(56,189,248,0.15);color:#38bdf8;padding:1px 5px;border-radius:3px;font-family:inherit">click</kbd> inspect</span>
+<span><kbd style="background:rgba(56,189,248,0.15);color:#38bdf8;padding:1px 5px;border-radius:3px;font-family:inherit">^K</kbd> search</span>
+</div>"""
+
+    # Inject loading overlay + nebula + key hint right after <body>
+    html = html.replace('<body>', '<body>\n' + NEBULA + LOADING_OVERLAY + KEYHINT)
 
     # Register service worker at end of body
     html = html.replace('</body>', SW_REGISTER + '\n</body>')

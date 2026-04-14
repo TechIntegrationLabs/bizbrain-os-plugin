@@ -202,28 +202,50 @@ uniform vec3 baseColor;uniform vec3 rimColor;uniform float rimPower;uniform floa
 varying vec3 vNormal;varying vec3 vViewDir;
 void main(){float rim=1.0-max(0.0,dot(vNormal,vViewDir));rim=pow(rim,rimPower)*rimIntensity;vec3 col=mix(baseColor,rimColor,rim);gl_FragColor=vec4(col,opacity+(rim*0.3));}`;
 
+/* ═══ SHARED RESOURCES — massive perf win: ~11k allocations → ~30 ═══ */
+const SHARED_GEO={
+  normal:new THREE.SphereGeometry(1,8,6),  // unit sphere, scaled per mesh (was 12,12 = 4.5x tris)
+  god:new THREE.DodecahedronGeometry(1,1),
+  nucleus:new THREE.IcosahedronGeometry(1,2),
+};
+const matCache=new Map();
+function sharedMat(communityId,hexColor){
+  const key=communityId;
+  let m=matCache.get(key);
+  if(!m){
+    const c=new THREE.Color(hexColor);
+    m=new THREE.MeshPhysicalMaterial({color:c,emissive:c,emissiveIntensity:0.25,metalness:0.3,roughness:0.6,clearcoat:0.3,transparent:true,opacity:0.88});
+    matCache.set(key,m);
+  }
+  return m;
+}
+// Nucleus + god node materials instantiated once (small count)
+let nucleusMat=null,godMatTemplate=null;
+function getNucleusMat(){
+  if(!nucleusMat){const c=new THREE.Color(BRAND.nucleus_color);nucleusMat=new THREE.MeshPhysicalMaterial({color:c,emissive:c,emissiveIntensity:0.4,metalness:0.9,roughness:0.15,clearcoat:1.0,clearcoatRoughness:0.1,transparent:true,opacity:0.95});}
+  return nucleusMat;
+}
+function makeGodMat(color){return new THREE.ShaderMaterial({uniforms:{baseColor:{value:color},rimColor:{value:new THREE.Color(BRAND.god_rim_color)},rimPower:{value:2.5},rimIntensity:{value:1.2},opacity:{value:0.92}},vertexShader:fresnelVert,fragmentShader:fresnelFrag,transparent:true});}
+
 function makeNodeMesh(n){
-  const color=new THREE.Color(n.id==='__nucleus__'?BRAND.nucleus_color:n.isGod?'#ffffff':gc(n.community||0));
-  const rimCol=new THREE.Color(n.isGod?BRAND.god_rim_color:'#ffffff');
   const size=n.id==='__nucleus__'?8:n.isGod?Math.log2(n.degree+1)*0.9:Math.max(1.2,Math.log2(n.degree+1)*0.55);
 
   if(n.id==='__nucleus__'){
-    // Nucleus: icosahedron with metallic clearcoat
-    const geo=new THREE.IcosahedronGeometry(size,2);
-    const mat=new THREE.MeshPhysicalMaterial({color:new THREE.Color(BRAND.nucleus_color),emissive:new THREE.Color(BRAND.nucleus_color),emissiveIntensity:0.4,metalness:0.9,roughness:0.15,clearcoat:1.0,clearcoatRoughness:0.1,transparent:true,opacity:0.95});
-    return new THREE.Mesh(geo,mat);
+    const mesh=new THREE.Mesh(SHARED_GEO.nucleus,getNucleusMat());
+    mesh.scale.setScalar(size);
+    return mesh;
   }
   if(n.isGod){
-    // God nodes: dodecahedron with fresnel rim glow
-    const geo=new THREE.DodecahedronGeometry(size,1);
-    const mat=new THREE.ShaderMaterial({uniforms:{baseColor:{value:color},rimColor:{value:new THREE.Color(BRAND.god_rim_color)},rimPower:{value:2.5},rimIntensity:{value:1.2},opacity:{value:0.92}},vertexShader:fresnelVert,fragmentShader:fresnelFrag,transparent:true});
-    return new THREE.Mesh(geo,mat);
+    // Per-god unique shader (only ~10 of these — fine to have unique materials)
+    const mat=makeGodMat(new THREE.Color('#ffffff'));
+    const mesh=new THREE.Mesh(SHARED_GEO.god,mat);
+    mesh.scale.setScalar(size);
+    return mesh;
   }
-  // Regular nodes: sphere with physical material + emissive glow
-  const geo=new THREE.SphereGeometry(size,12,12);
-  const emissiveI=Math.min(0.5,n.degree*0.02);
-  const mat=new THREE.MeshPhysicalMaterial({color:color,emissive:color,emissiveIntensity:emissiveI,metalness:0.3,roughness:0.6,clearcoat:0.3,transparent:true,opacity:0.88});
-  return new THREE.Mesh(geo,mat);
+  // Regular: shared geo + per-community shared material
+  const mesh=new THREE.Mesh(SHARED_GEO.normal,sharedMat(n.community||0,gc(n.community||0)));
+  mesh.scale.setScalar(size);
+  return mesh;
 }
 
 /* ═══ AMBIENT STARFIELD ═══ */
@@ -263,9 +285,11 @@ const dirLight=new THREE.DirectionalLight(new THREE.Color(BRAND.god_rim_color),0
 dirLight.position.set(200,300,400);
 scene.add(dirLight);
 
-/* ═══ POST-PROCESSING ═══ */
+/* ═══ POST-PROCESSING (LAZY — attached after first frame to unblock paint) ═══ */
 const bloomPass=new UnrealBloomPass(new THREE.Vector2(window.innerWidth,window.innerHeight),1.6,0.5,0.20);
-Graph.postProcessingComposer().addPass(bloomPass);
+requestAnimationFrame(()=>requestAnimationFrame(()=>{
+  Graph.postProcessingComposer().addPass(bloomPass);
+}));
 let synapseMode='off',synapseInt=null,fireRate=3;
 function startS(m){stopS();synapseMode=m;document.querySelectorAll('[data-mode]').forEach(b=>b.classList.toggle('active',b.dataset.mode===m));document.getElementById('synapse-status').textContent=m==='off'?'Neural Sync: Standby':'Neural Sync: '+m.charAt(0).toUpperCase()+m.slice(1);if(m==='pulse')synapseInt=setInterval(()=>Graph.emitParticle(rawData.links[Math.floor(Math.random()*rawData.links.length)]),1000/fireRate);if(m==='cascade')synapseInt=setInterval(()=>{const g=Array.from(godIds);cascade(g[Math.floor(Math.random()*g.length)],0,3);},2000/Math.max(1,fireRate/3));if(m==='storm')synapseInt=setInterval(()=>{for(let i=0;i<Math.min(fireRate,15);i++)Graph.emitParticle(rawData.links[Math.floor(Math.random()*rawData.links.length)]);},80);}
 function cascade(nid,d,mx){if(d>=mx)return;const ls=adj[nid]||[];(ls.length>5?ls.sort(()=>Math.random()-.5).slice(0,5):ls).forEach((l,i)=>{setTimeout(()=>{Graph.emitParticle(l);const s=l.source?.id||l.source,t=l.target?.id||l.target;cascade(s===nid?t:s,d+1,mx);},d*300+i*80);});}
