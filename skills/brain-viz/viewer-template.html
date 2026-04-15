@@ -156,7 +156,10 @@ const FACTORY={global:4,cluster:6,repulsion:-150,linkdist:35,linkalpha:55,linkw:
 const resp=await fetch('graph.json');const rawData=await resp.json();
 const degreeMap={};rawData.links.forEach(l=>{degreeMap[l.source]=(degreeMap[l.source]||0)+1;degreeMap[l.target]=(degreeMap[l.target]||0)+1;});
 const godIds=new Set(Object.entries(degreeMap).sort((a,b)=>b[1]-a[1]).slice(0,10).map(e=>e[0]));
-rawData.nodes.forEach(n=>{n.degree=degreeMap[n.id]||0;n.isGod=godIds.has(n.id);});
+rawData.nodes.forEach(n=>{n.degree=degreeMap[n.id]||0;n.isGod=godIds.has(n.id);
+  // Pin baked positions — d3-force will skip physics for these (huge perf win on 10k+ nodes)
+  if(n.x!==undefined&&n.y!==undefined&&n.z!==undefined){n.fx=n.x;n.fy=n.y;n.fz=n.z;}
+});
 const dateRe=/(\d{4})-(\d{2})-(\d{2})/;const folderEpoch={'.claude':0,setup:5,Brand:10,Vendors:20,Partners:30,Clients:40,Communications:50,Operations:60};const baseDate=new Date('2025-06-01').getTime();const dayMs=86400000;
 rawData.nodes.forEach(n=>{const sf=n.source_file||'';const m=dateRe.exec(sf);if(m){n._ts=new Date(+m[1],m[2]-1,+m[3]).getTime();return;}let off=45;for(const[f,o]of Object.entries(folderEpoch)){if(sf.startsWith(f)){off=o;break;}}let h=0;for(let i=0;i<n.id.length;i++)h=((h<<5)-h)+n.id.charCodeAt(i);n._ts=baseDate+(off*dayMs)+((Math.abs(h)%30)*dayMs);});
 const allTs=rawData.nodes.map(n=>n._ts).sort((a,b)=>a-b);const minTs=allTs[0],maxTs=allTs[allTs.length-1];
