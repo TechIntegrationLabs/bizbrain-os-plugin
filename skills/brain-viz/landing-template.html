@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>{{TITLE}} — Knowledge Graph Explorer</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{height:100%}
+body{
+  background:#000008;color:#e2e8f0;
+  font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  min-height:100vh;padding:20px;overflow-x:hidden;position:relative;
+}
+/* Ambient nebula background */
+.nebula{
+  position:fixed;inset:0;pointer-events:none;z-index:0;
+  background:
+    radial-gradient(ellipse 70% 50% at 25% 20%,rgba(56,189,248,0.10),transparent 55%),
+    radial-gradient(ellipse 55% 70% at 75% 80%,rgba(52,211,153,0.07),transparent 55%),
+    radial-gradient(ellipse 35% 35% at 50% 50%,rgba(251,191,36,0.05),transparent 55%);
+  mix-blend-mode:screen;
+}
+/* Animated stars */
+.stars{position:fixed;inset:0;pointer-events:none;z-index:0;opacity:0.6}
+.star{position:absolute;border-radius:50%;background:#fff;animation:twinkle 4s ease-in-out infinite}
+@keyframes twinkle{0%,100%{opacity:0.2}50%{opacity:0.8}}
+/* Container */
+.wrap{position:relative;z-index:10;width:100%;max-width:980px;display:flex;flex-direction:column;gap:36px;align-items:center}
+/* Brand */
+.brand{text-align:center;display:flex;flex-direction:column;gap:10px;align-items:center}
+.brand-mark{
+  width:64px;height:64px;border-radius:50%;
+  background:radial-gradient(circle at 30% 30%,#fbbf24,#f59e0b 50%,#b45309 100%);
+  box-shadow:0 0 40px rgba(251,191,36,0.4),inset 0 0 20px rgba(255,255,255,0.2);
+  position:relative;animation:pulse-mark 3s ease-in-out infinite;
+}
+.brand-mark::before,.brand-mark::after{
+  content:'';position:absolute;border-radius:50%;
+}
+.brand-mark::before{width:14px;height:14px;background:#38bdf8;top:8px;left:-8px;box-shadow:0 0 12px rgba(56,189,248,0.6)}
+.brand-mark::after{width:10px;height:10px;background:#34d399;bottom:6px;right:-4px;box-shadow:0 0 12px rgba(52,211,153,0.6)}
+@keyframes pulse-mark{0%,100%{transform:scale(1)}50%{transform:scale(1.06)}}
+.brand-eyebrow{font-family:'Consolas','SF Mono',monospace;font-size:10px;color:#64748b;letter-spacing:4px;text-transform:uppercase}
+h1{
+  font-size:clamp(28px,5vw,52px);font-weight:800;letter-spacing:-1px;line-height:1.1;
+  background:linear-gradient(135deg,#38bdf8 0%,#34d399 50%,#fbbf24 100%);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+  padding:0 8px;
+}
+.subtitle{font-size:clamp(13px,2vw,16px);color:#94a3b8;max-width:560px;line-height:1.5}
+/* Stats */
+.stats-row{
+  display:flex;gap:8px;flex-wrap:wrap;justify-content:center;
+  padding:12px 20px;background:rgba(8,12,28,0.6);border:1px solid rgba(56,189,248,0.12);
+  border-radius:12px;backdrop-filter:blur(14px);
+}
+.stat{display:flex;flex-direction:column;align-items:center;padding:0 14px;min-width:80px}
+.stat + .stat{border-left:1px solid rgba(148,163,184,0.1)}
+.stat-value{font-size:22px;font-weight:700;color:#38bdf8;font-variant-numeric:tabular-nums;text-shadow:0 0 12px rgba(56,189,248,0.3)}
+.stat-label{font-family:'Consolas',monospace;font-size:8px;color:#64748b;letter-spacing:1.5px;text-transform:uppercase;margin-top:2px}
+/* Brain selector */
+.brain-row{
+  display:flex;align-items:center;gap:14px;flex-wrap:wrap;justify-content:center;
+  padding:10px 18px;background:rgba(8,12,28,0.7);border:1px solid rgba(52,211,153,0.18);
+  border-radius:10px;backdrop-filter:blur(14px);
+}
+.brain-row label{font-family:'Consolas',monospace;font-size:9px;color:#64748b;letter-spacing:2px;text-transform:uppercase}
+#brain-select{
+  background:rgba(15,23,42,0.8);border:1px solid rgba(52,211,153,0.3);border-radius:6px;
+  color:#34d399;font-family:'Inter',sans-serif;font-size:13px;padding:8px 14px;
+  outline:none;cursor:pointer;min-width:200px;
+}
+#brain-select:focus{border-color:#34d399;box-shadow:0 0 0 3px rgba(52,211,153,0.15)}
+#brain-select option{background:#0f172a;color:#e2e8f0;padding:6px}
+/* Choice cards */
+.choice-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px;width:100%}
+@media (max-width:640px){.choice-grid{grid-template-columns:1fr}}
+.choice{
+  display:flex;flex-direction:column;gap:14px;padding:28px 24px;
+  background:rgba(8,12,28,0.65);border:1px solid rgba(56,189,248,0.18);
+  border-radius:18px;backdrop-filter:blur(14px);
+  cursor:pointer;text-decoration:none;color:inherit;
+  transition:all .25s cubic-bezier(.2,.8,.2,1);position:relative;overflow:hidden;
+}
+.choice::before{
+  content:'';position:absolute;inset:-1px;border-radius:18px;
+  background:linear-gradient(135deg,transparent,rgba(56,189,248,0.0));
+  transition:background .25s;pointer-events:none;
+}
+.choice:hover{transform:translateY(-4px);border-color:rgba(56,189,248,0.5);box-shadow:0 20px 60px rgba(56,189,248,0.15)}
+.choice:hover::before{background:linear-gradient(135deg,rgba(56,189,248,0.08),rgba(52,211,153,0.04))}
+.choice.is-3d:hover{border-color:rgba(251,191,36,0.5);box-shadow:0 20px 60px rgba(251,191,36,0.12)}
+.choice.is-3d:hover::before{background:linear-gradient(135deg,rgba(251,191,36,0.08),rgba(56,189,248,0.04))}
+.choice-icon{width:80px;height:80px;display:flex;align-items:center;justify-content:center;position:relative}
+.choice-icon svg{width:100%;height:100%}
+.choice-title{font-size:22px;font-weight:700;color:#f8fafc;letter-spacing:-0.3px}
+.choice-tag{font-family:'Consolas',monospace;font-size:9px;color:#38bdf8;letter-spacing:2px;text-transform:uppercase;align-self:flex-start;padding:3px 8px;border:1px solid rgba(56,189,248,0.25);border-radius:4px;background:rgba(56,189,248,0.08)}
+.choice.is-3d .choice-tag{color:#fbbf24;border-color:rgba(251,191,36,0.25);background:rgba(251,191,36,0.08)}
+.choice-desc{font-size:13px;color:#94a3b8;line-height:1.5}
+.choice-features{display:flex;flex-direction:column;gap:5px;margin-top:4px}
+.choice-feature{font-size:11px;color:#64748b;display:flex;align-items:center;gap:8px}
+.choice-feature::before{content:'';width:4px;height:4px;border-radius:50%;background:#34d399;flex-shrink:0}
+.choice-cta{margin-top:8px;display:flex;align-items:center;gap:6px;font-size:12px;font-weight:600;color:#38bdf8;font-family:'Consolas',monospace;letter-spacing:1.5px;text-transform:uppercase}
+.choice.is-3d .choice-cta{color:#fbbf24}
+.choice-cta::after{content:'→';transition:transform .25s}
+.choice:hover .choice-cta::after{transform:translateX(4px)}
+/* Footer */
+.footer{display:flex;gap:18px;flex-wrap:wrap;justify-content:center;font-family:'Consolas',monospace;font-size:9px;color:#475569;letter-spacing:1.5px;text-transform:uppercase;margin-top:12px}
+.footer a{color:#64748b;text-decoration:none;transition:color .15s}
+.footer a:hover{color:#38bdf8}
+.footer-dot{color:#334155}
+/* Loading state */
+.loading-text{font-family:'Consolas',monospace;font-size:10px;color:#475569;letter-spacing:2px;text-transform:uppercase}
+@media (max-width:640px){
+  body{padding:16px;justify-content:flex-start;padding-top:30px}
+  .wrap{gap:24px}
+  .brand-mark{width:52px;height:52px}
+  .stats-row{padding:10px 12px}
+  .stat{padding:0 8px;min-width:60px}
+  .stat-value{font-size:18px}
+  .choice{padding:22px 18px}
+  .choice-icon{width:64px;height:64px}
+  .choice-title{font-size:18px}
+}
+</style>
+</head>
+<body>
+<div class="nebula"></div>
+<div class="stars" id="stars"></div>
+
+<main class="wrap">
+
+  <div class="brand">
+    <div class="brand-mark"></div>
+    <div class="brand-eyebrow">{{EYEBROW}}</div>
+    <h1>{{TITLE}}</h1>
+    <p class="subtitle">{{SUBTITLE}}</p>
+  </div>
+
+  <div class="stats-row" id="stats-row">
+    <div class="stat"><span class="stat-value" id="s-nodes">—</span><span class="stat-label">Concepts</span></div>
+    <div class="stat"><span class="stat-value" id="s-edges">—</span><span class="stat-label">Connections</span></div>
+    <div class="stat"><span class="stat-value" id="s-comm">—</span><span class="stat-label">Communities</span></div>
+    <div class="stat"><span class="stat-value" id="s-brains">—</span><span class="stat-label">Brains</span></div>
+  </div>
+
+  <div class="brain-row">
+    <label for="brain-select">Brain</label>
+    <select id="brain-select"><option value="">Loading…</option></select>
+  </div>
+
+  <div class="choice-grid">
+    <a class="choice is-2d" id="choice-2d" href="#" data-view="2d">
+      <div class="choice-icon">
+        <svg viewBox="0 0 100 100" fill="none">
+          <circle cx="20" cy="30" r="6" fill="#38bdf8"/>
+          <circle cx="50" cy="22" r="4" fill="#34d399"/>
+          <circle cx="80" cy="35" r="5" fill="#fbbf24"/>
+          <circle cx="35" cy="60" r="4" fill="#f472b6"/>
+          <circle cx="68" cy="68" r="6" fill="#38bdf8"/>
+          <circle cx="22" cy="82" r="4" fill="#34d399"/>
+          <circle cx="55" cy="80" r="5" fill="#fbbf24"/>
+          <line x1="20" y1="30" x2="50" y2="22" stroke="#38bdf8" stroke-width="1" opacity="0.5"/>
+          <line x1="50" y1="22" x2="80" y2="35" stroke="#34d399" stroke-width="1" opacity="0.5"/>
+          <line x1="20" y1="30" x2="35" y2="60" stroke="#38bdf8" stroke-width="1" opacity="0.5"/>
+          <line x1="35" y1="60" x2="68" y2="68" stroke="#f472b6" stroke-width="1" opacity="0.5"/>
+          <line x1="80" y1="35" x2="68" y2="68" stroke="#fbbf24" stroke-width="1" opacity="0.5"/>
+          <line x1="35" y1="60" x2="22" y2="82" stroke="#34d399" stroke-width="1" opacity="0.5"/>
+          <line x1="68" y1="68" x2="55" y2="80" stroke="#fbbf24" stroke-width="1" opacity="0.5"/>
+          <line x1="22" y1="82" x2="55" y2="80" stroke="#f472b6" stroke-width="1" opacity="0.5"/>
+        </svg>
+      </div>
+      <span class="choice-tag">2D · Force Graph</span>
+      <div class="choice-title">Explore in 2D</div>
+      <p class="choice-desc">Flat canvas view. Faster, easier to read, better for finding specific connections.</p>
+      <div class="choice-features">
+        <div class="choice-feature">Optimized for laptops &amp; mobile</div>
+        <div class="choice-feature">Click-and-drag, scroll to zoom</div>
+        <div class="choice-feature">Lighter on the GPU</div>
+      </div>
+      <div class="choice-cta">Open 2D View</div>
+    </a>
+
+    <a class="choice is-3d" id="choice-3d" href="#" data-view="3d">
+      <div class="choice-icon">
+        <svg viewBox="0 0 100 100" fill="none">
+          <ellipse cx="50" cy="50" rx="38" ry="14" stroke="#38bdf8" stroke-width="1" opacity="0.3" fill="none"/>
+          <ellipse cx="50" cy="50" rx="38" ry="14" stroke="#34d399" stroke-width="1" opacity="0.3" fill="none" transform="rotate(60 50 50)"/>
+          <ellipse cx="50" cy="50" rx="38" ry="14" stroke="#fbbf24" stroke-width="1" opacity="0.3" fill="none" transform="rotate(120 50 50)"/>
+          <circle cx="50" cy="50" r="9" fill="url(#nucleusGrad)"/>
+          <circle cx="14" cy="50" r="4" fill="#38bdf8"/>
+          <circle cx="86" cy="50" r="4" fill="#34d399"/>
+          <circle cx="32" cy="22" r="3" fill="#fbbf24"/>
+          <circle cx="68" cy="78" r="3" fill="#fbbf24"/>
+          <circle cx="68" cy="22" r="3" fill="#f472b6"/>
+          <circle cx="32" cy="78" r="3" fill="#f472b6"/>
+          <defs>
+            <radialGradient id="nucleusGrad">
+              <stop offset="0%" stop-color="#fef3c7"/>
+              <stop offset="60%" stop-color="#fbbf24"/>
+              <stop offset="100%" stop-color="#b45309"/>
+            </radialGradient>
+          </defs>
+        </svg>
+      </div>
+      <span class="choice-tag">3D · Neural Map</span>
+      <div class="choice-title">Explore in 3D</div>
+      <p class="choice-desc">Immersive Three.js neural network. Animated synapses, bloom, depth — the full experience.</p>
+      <div class="choice-features">
+        <div class="choice-feature">Drag to orbit, scroll to fly through</div>
+        <div class="choice-feature">Animation presets &amp; timeline</div>
+        <div class="choice-feature">Best on desktop with a GPU</div>
+      </div>
+      <div class="choice-cta">Open 3D View</div>
+    </a>
+  </div>
+
+  <div class="footer">
+    <a href="#" id="link-report">Graph Report</a>
+    <span class="footer-dot">·</span>
+    <a href="https://github.com/safishamsi/graphify" target="_blank" rel="noopener">Powered by graphify</a>
+    <span class="footer-dot">·</span>
+    <span class="loading-text" id="boot-status">Initializing</span>
+  </div>
+
+</main>
+
+<script>
+// Twinkling stars
+(function(){
+  const stars=document.getElementById('stars');
+  for(let i=0;i<60;i++){
+    const s=document.createElement('div');
+    s.className='star';
+    const size=Math.random()*1.4+0.4;
+    s.style.width=size+'px';s.style.height=size+'px';
+    s.style.left=(Math.random()*100)+'%';
+    s.style.top=(Math.random()*100)+'%';
+    s.style.animationDelay=(Math.random()*4)+'s';
+    stars.appendChild(s);
+  }
+})();
+
+// Brain manifest + stats
+const sel=document.getElementById('brain-select');
+const linkReport=document.getElementById('link-report');
+
+function updateLinks(brainId){
+  const qs = brainId ? '?brain=' + encodeURIComponent(brainId) : '';
+  document.getElementById('choice-2d').href = '2d.html' + qs;
+  document.getElementById('choice-3d').href = '3d.html' + qs;
+  // Persist for next visit
+  if(brainId) try{ localStorage.setItem('brain-viz:lastBrain', brainId); }catch(e){}
+}
+
+function setStatsForBrain(b){
+  document.getElementById('s-nodes').textContent = (b.nodes||0).toLocaleString();
+  document.getElementById('s-edges').textContent = (b.links!=null ? b.links : (b.edges||'—')).toLocaleString();
+  document.getElementById('s-comm').textContent = (b.communities!=null ? b.communities : '—');
+}
+
+(async function init(){
+  const status=document.getElementById('boot-status');
+  status.textContent='Loading brains';
+  let brains=[];
+  try{
+    const r=await fetch('brains.json',{cache:'no-cache'});
+    brains=await r.json();
+  }catch(e){
+    status.textContent='Could not load brain manifest';
+    return;
+  }
+  const usable=brains.filter(b=>b.has_graph!==false);
+  document.getElementById('s-brains').textContent=usable.length;
+
+  sel.textContent='';
+  usable.forEach(b=>{
+    const opt=document.createElement('option');
+    opt.value=b.id;
+    opt.textContent=b.name+(b.nodes?'  ('+b.nodes.toLocaleString()+' nodes)':'');
+    sel.appendChild(opt);
+  });
+
+  // Restore last picked brain, fall back to first
+  let preferred = null;
+  try{ preferred = localStorage.getItem('brain-viz:lastBrain'); }catch(e){}
+  const lastQs = new URLSearchParams(location.search).get('brain');
+  const target = (lastQs && usable.find(b=>b.id===lastQs)) ||
+                 (preferred && usable.find(b=>b.id===preferred)) ||
+                 usable[0];
+  if(target){
+    sel.value=target.id;
+    setStatsForBrain(target);
+    updateLinks(target.id);
+  }
+
+  sel.addEventListener('change',function(){
+    const b=usable.find(x=>x.id===this.value);
+    if(b){ setStatsForBrain(b); updateLinks(b.id); }
+  });
+
+  // Compute community count by sampling the active graph (one-time, fire-and-forget)
+  if(target && target.path){
+    fetch(target.path,{cache:'force-cache'}).then(r=>r.json()).then(g=>{
+      if(target.id !== sel.value) return;
+      const set=new Set();
+      (g.nodes||[]).forEach(n=>{ if(n.community!=null && n.community>=0) set.add(n.community); });
+      if(set.size>0) document.getElementById('s-comm').textContent=set.size.toLocaleString();
+    }).catch(()=>{});
+  }
+
+  // Wire report link if GRAPH_REPORT.md exists in bundle
+  fetch('GRAPH_REPORT.md',{method:'HEAD'}).then(r=>{
+    if(r.ok) linkReport.href='GRAPH_REPORT.md';
+    else linkReport.style.display='none';
+  }).catch(()=>{ linkReport.style.display='none'; });
+
+  status.textContent='Ready';
+})();
+
+// Service worker
+if('serviceWorker' in navigator){
+  window.addEventListener('load',()=>{ navigator.serviceWorker.register('./sw.js').catch(()=>{}); });
+}
+</script>
+</body>
+</html>

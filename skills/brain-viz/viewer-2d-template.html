@@ -1,0 +1,581 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>{{TITLE}} — 2D Knowledge Graph</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{height:100%}
+body{background:#000008;color:#e2e8f0;font-family:'Inter',-apple-system,sans-serif;overflow:hidden;user-select:none}
+#graph-2d{position:fixed;inset:0;z-index:1}
+.panel{position:fixed;z-index:50;background:rgba(8,12,28,0.78);border:1px solid rgba(56,189,248,0.15);border-radius:10px;backdrop-filter:blur(14px);box-shadow:0 4px 30px rgba(0,0,0,0.4)}
+.panel-header{display:flex;justify-content:space-between;align-items:center;padding:6px 10px;cursor:grab;border-bottom:1px solid rgba(56,189,248,0.08);border-radius:10px 10px 0 0}
+.panel-header:active{cursor:grabbing}
+.panel-title{font-family:'Consolas',monospace;font-size:8px;color:#64748b;letter-spacing:2px;text-transform:uppercase;pointer-events:none}
+.panel-collapse{background:none;border:none;color:#475569;cursor:pointer;font-size:13px;line-height:1;padding:0 2px}
+.panel-collapse:hover{color:#94a3b8}
+.panel-body{padding:10px 12px}
+.panel.collapsed .panel-body{display:none}
+.panel.collapsed .panel-header{border-bottom:none;border-radius:10px}
+
+#topbar{position:fixed;top:12px;left:50%;transform:translateX(-50%);z-index:100;display:flex;align-items:center;gap:10px;padding:6px 12px;background:rgba(8,12,28,0.85);border:1px solid rgba(52,211,153,0.18);border-radius:10px;backdrop-filter:blur(14px);max-width:calc(100vw - 24px);flex-wrap:wrap;justify-content:center}
+#brand{font-family:'Consolas',monospace;font-size:9px;color:#64748b;letter-spacing:2px;text-transform:uppercase;display:flex;align-items:center;gap:6px}
+#brand a{color:#64748b;text-decoration:none}
+#brand a:hover{color:#34d399}
+.divider{width:1px;height:18px;background:rgba(148,163,184,0.15)}
+.brain-label{font-family:'Consolas',monospace;font-size:9px;color:#64748b;letter-spacing:1.5px;text-transform:uppercase}
+#brain-select{background:rgba(15,23,42,0.8);border:1px solid rgba(52,211,153,0.3);border-radius:5px;color:#34d399;font-family:'Inter',sans-serif;font-size:12px;padding:5px 10px;outline:none;cursor:pointer;min-width:160px}
+#brain-select:focus{border-color:#34d399}
+#brain-select option{background:#0f172a;color:#e2e8f0}
+
+.view-toggle{display:flex;background:rgba(15,23,42,0.6);border-radius:6px;padding:2px;border:1px solid rgba(56,189,248,0.15)}
+.view-toggle a{font-family:'Consolas',monospace;font-size:10px;letter-spacing:1.5px;text-transform:uppercase;padding:5px 12px;border-radius:4px;text-decoration:none;color:#64748b;transition:all .15s}
+.view-toggle a:hover{color:#94a3b8}
+.view-toggle a.active{background:rgba(56,189,248,0.18);color:#38bdf8}
+.view-toggle a.active.is-3d{background:rgba(251,191,36,0.18);color:#fbbf24}
+
+#hud-panel{top:74px;left:12px;min-width:220px;max-width:240px}
+@media (min-width:768px){#hud-panel{top:12px}}
+#hud-panel h1{font-size:15px;font-weight:700;background:linear-gradient(135deg,#38bdf8,#34d399,#fbbf24);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;letter-spacing:-0.3px;line-height:1.1}
+.subtitle-text{font-family:'Consolas',monospace;font-size:9px;color:#64748b;letter-spacing:1.5px;margin-top:4px}
+#stats-bar{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:10px}
+.stat{display:flex;flex-direction:column;align-items:center;padding:5px 8px;background:rgba(15,23,42,0.5);border:1px solid rgba(56,189,248,0.1);border-radius:5px}
+.stat-value{font-size:14px;font-weight:700;color:#38bdf8;font-variant-numeric:tabular-nums}
+.stat-label{font-family:'Consolas',monospace;font-size:7px;color:#64748b;letter-spacing:1.5px;text-transform:uppercase;margin-top:1px}
+
+#search-panel{top:74px;right:12px;min-width:220px;max-width:280px}
+@media (min-width:768px){#search-panel{top:12px}}
+#search-input{width:100%;padding:7px 10px;background:rgba(15,23,42,0.6);border:1px solid rgba(56,189,248,0.2);border-radius:5px;color:#e2e8f0;font-family:'Inter',sans-serif;font-size:12px;outline:none}
+#search-input:focus{border-color:#38bdf8}
+#search-input::placeholder{color:#475569}
+#search-results{max-height:240px;overflow-y:auto;margin-top:4px;display:none}
+.search-item{padding:5px 8px;cursor:pointer;font-size:11px;border-bottom:1px solid rgba(56,189,248,0.04);display:flex;align-items:center;gap:6px}
+.search-item:hover{background:rgba(56,189,248,0.08)}
+.type-badge{display:inline-block;padding:1px 4px;border-radius:2px;font-family:'Consolas',monospace;font-size:7px;text-transform:uppercase;background:rgba(56,189,248,0.12);color:#38bdf8;flex-shrink:0}
+
+#controls-panel{top:300px;right:12px;width:240px;display:none}
+@media (min-width:768px){#controls-panel{display:block;top:170px}}
+.ctrl-section{margin-bottom:10px;padding-bottom:8px;border-bottom:1px solid rgba(148,163,184,0.05)}
+.ctrl-section:last-child{border-bottom:none;margin-bottom:0;padding-bottom:0}
+.ctrl-stitle{font-family:'Consolas',monospace;font-size:7px;color:#536080;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:5px}
+.ctrl-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:3px}
+.ctrl-label{font-size:10px;color:#94a3b8}
+.ctrl-value{font-size:10px;color:#38bdf8;min-width:30px;text-align:right;font-variant-numeric:tabular-nums}
+input[type="range"]{-webkit-appearance:none;width:100%;height:3px;margin:2px 0 6px;background:rgba(56,189,248,0.12);border-radius:2px;outline:none}
+input[type="range"]::-webkit-slider-thumb{-webkit-appearance:none;width:11px;height:11px;border-radius:50%;background:#38bdf8;cursor:pointer;box-shadow:0 0 4px rgba(56,189,248,0.4)}
+input[type="range"]::-moz-range-thumb{width:11px;height:11px;border-radius:50%;background:#38bdf8;cursor:pointer;border:none}
+.ctrl-btn{padding:4px 8px;border-radius:4px;cursor:pointer;font-family:'Consolas',monospace;font-size:9px;letter-spacing:.5px;text-transform:uppercase;background:rgba(56,189,248,0.08);border:1px solid rgba(56,189,248,0.18);color:#38bdf8}
+.ctrl-btn:hover{background:rgba(56,189,248,0.18)}
+.ctrl-btn.active{background:rgba(52,211,153,0.15);border-color:rgba(52,211,153,0.35);color:#34d399}
+
+#info-panel{position:fixed;bottom:14px;left:12px;max-width:340px;display:none;z-index:80;background:rgba(8,12,28,0.85);border:1px solid rgba(56,189,248,0.2);border-radius:10px;padding:14px 16px;backdrop-filter:blur(14px);box-shadow:0 4px 30px rgba(0,0,0,0.5)}
+#info-panel.visible{display:block}
+#info-panel h3{font-size:13px;font-weight:700;margin-bottom:6px;background:linear-gradient(135deg,#38bdf8,#34d399);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+#info-close{position:absolute;top:8px;right:10px;background:none;border:none;color:#475569;cursor:pointer;font-size:16px;line-height:1}
+#info-close:hover{color:#94a3b8}
+.info-row{display:flex;justify-content:space-between;padding:2px 0;font-size:10px;color:#94a3b8;border-bottom:1px solid rgba(148,163,184,0.04)}
+.info-label{color:#64748b;text-transform:uppercase;letter-spacing:1px;font-family:'Consolas',monospace;font-size:8px}
+.info-god{color:#fbbf24}
+.connections-list{margin-top:8px;max-height:140px;overflow-y:auto;padding-right:4px}
+.conn-item{font-size:10px;padding:2px 0;color:#cbd5e1;cursor:pointer;display:flex;align-items:center;gap:6px}
+.conn-item:hover{color:#38bdf8}
+.conn-relation{display:inline-block;padding:0 4px;border-radius:2px;font-family:'Consolas',monospace;font-size:7px;background:rgba(56,189,248,0.08);color:#38bdf8;flex-shrink:0}
+
+#legend-panel{position:fixed;bottom:14px;right:12px;width:200px;max-height:50vh;overflow-y:auto;display:none;z-index:60}
+@media (min-width:768px){#legend-panel{display:block}}
+.legend-item{display:flex;align-items:center;gap:6px;padding:2px 0;font-size:10px;color:#94a3b8;cursor:pointer}
+.legend-item:hover{color:#e2e8f0}
+.legend-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.legend-count{color:#475569;font-family:'Consolas',monospace;font-size:8px;margin-left:auto}
+.legend-empty{font-size:10px;color:#64748b}
+
+#boot-loader{position:fixed;inset:0;background:#000008;z-index:999;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:18px;color:#38bdf8;font-family:'Consolas',monospace;transition:opacity .5s}
+#boot-loader .ring{width:60px;height:60px;border:2px solid rgba(56,189,248,0.15);border-top-color:#38bdf8;border-radius:50%;animation:spin 1s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+#boot-loader .label{font-size:10px;letter-spacing:4px;color:#64748b;text-transform:uppercase}
+#boot-loader .status{font-size:9px;color:#475569;letter-spacing:2px}
+
+::-webkit-scrollbar{width:4px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:rgba(56,189,248,0.18);border-radius:2px}
+
+@media (max-width:640px){
+  #topbar{flex-direction:column;gap:6px;padding:8px 10px}
+  #hud-panel{top:auto;bottom:12px;left:12px;right:12px;max-width:none;min-width:0}
+  #search-panel{display:none}
+  #info-panel{left:12px;right:12px;bottom:auto;top:80px;max-width:none}
+}
+</style>
+</head>
+<body>
+
+<div id="boot-loader">
+  <div class="ring"></div>
+  <div class="label">Loading Knowledge Graph</div>
+  <div class="status" id="boot-status">fetching graph</div>
+</div>
+
+<div id="graph-2d"></div>
+
+<div id="topbar">
+  <div id="brand"><a href="index.html">← {{TITLE}}</a></div>
+  <div class="divider"></div>
+  <span class="brain-label">Brain</span>
+  <select id="brain-select"><option value="{{BRAIN_ID}}">{{TITLE}}</option></select>
+  <div class="divider"></div>
+  <div class="view-toggle">
+    <a href="" id="view-2d" class="active">2D</a>
+    <a href="" id="view-3d" class="is-3d">3D</a>
+  </div>
+</div>
+
+<div class="panel" id="hud-panel">
+  <div class="panel-header"><span class="panel-title">Dashboard</span><button class="panel-collapse">&minus;</button></div>
+  <div class="panel-body">
+    <h1 id="hud-title">{{TITLE}}</h1>
+    <div class="subtitle-text" id="hud-subtitle">{{SUBTITLE}}</div>
+    <div id="stats-bar">
+      <div class="stat"><span class="stat-value" id="s-nodes">—</span><span class="stat-label">Nodes</span></div>
+      <div class="stat"><span class="stat-value" id="s-edges">—</span><span class="stat-label">Edges</span></div>
+      <div class="stat"><span class="stat-value" id="s-comm">—</span><span class="stat-label">Communities</span></div>
+      <div class="stat"><span class="stat-value" id="s-vis">—</span><span class="stat-label">Visible</span></div>
+    </div>
+  </div>
+</div>
+
+<div class="panel" id="search-panel">
+  <div class="panel-header"><span class="panel-title">Search</span><button class="panel-collapse">&minus;</button></div>
+  <div class="panel-body">
+    <input type="text" id="search-input" placeholder="Search nodes... (Ctrl+K)" autocomplete="off">
+    <div id="search-results"></div>
+  </div>
+</div>
+
+<div class="panel" id="controls-panel">
+  <div class="panel-header"><span class="panel-title">Controls</span><button class="panel-collapse">&minus;</button></div>
+  <div class="panel-body">
+    <div class="ctrl-section">
+      <div class="ctrl-stitle">Forces</div>
+      <div class="ctrl-row"><span class="ctrl-label">Charge</span><span class="ctrl-value" id="cv-charge">-60</span></div>
+      <input type="range" id="cr-charge" min="-300" max="-5" value="-60" step="5">
+      <div class="ctrl-row"><span class="ctrl-label">Link distance</span><span class="ctrl-value" id="cv-linkdist">30</span></div>
+      <input type="range" id="cr-linkdist" min="5" max="200" value="30" step="5">
+    </div>
+    <div class="ctrl-section">
+      <div class="ctrl-stitle">Appearance</div>
+      <div class="ctrl-row"><span class="ctrl-label">Node size</span><span class="ctrl-value" id="cv-nodesize">3.0</span></div>
+      <input type="range" id="cr-nodesize" min="5" max="80" value="30" step="1">
+      <div class="ctrl-row"><span class="ctrl-label">Link opacity</span><span class="ctrl-value" id="cv-linkop">0.30</span></div>
+      <input type="range" id="cr-linkop" min="5" max="100" value="30" step="5">
+      <div class="ctrl-row"><span class="ctrl-label">Labels</span></div>
+      <div style="display:flex;gap:4px;margin-top:2px">
+        <button class="ctrl-btn" id="btn-labels-off">Off</button>
+        <button class="ctrl-btn active" id="btn-labels-hubs">Hubs</button>
+        <button class="ctrl-btn" id="btn-labels-all">All</button>
+      </div>
+    </div>
+    <div class="ctrl-section">
+      <div class="ctrl-stitle">Actions</div>
+      <div style="display:flex;gap:4px;flex-wrap:wrap">
+        <button class="ctrl-btn" id="btn-zoomfit">Zoom Fit</button>
+        <button class="ctrl-btn" id="btn-reheat">Reheat</button>
+        <button class="ctrl-btn" id="btn-pause">Pause</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="info-panel">
+  <button id="info-close">&times;</button>
+  <h3 id="info-title">—</h3>
+  <div id="info-rows"></div>
+  <div class="connections-list" id="connections-list"></div>
+</div>
+
+<div class="panel" id="legend-panel">
+  <div class="panel-header"><span class="panel-title">Top Communities</span><button class="panel-collapse">&minus;</button></div>
+  <div class="panel-body" id="legend-body"></div>
+</div>
+
+<script src="./vendor/force-graph.min.js"></script>
+<script>
+'use strict';
+
+let PALETTE = ['#38bdf8','#34d399','#fbbf24','#f472b6','#fb923c','#f87171','#2dd4bf','#a3e635','#60a5fa','#fb7185','#4ade80','#facc15','#f97316','#ef4444','#06b6d4','#10b981','#ec4899','#f59e0b','#14b8a6'];
+const CL = {};
+const BRAND = { nucleus_color:'#fbbf24', god_rim_color:'#38bdf8' };
+
+function gc(c){ return PALETTE[((+c)||0) % PALETTE.length]; }
+
+let Graph = null;
+let rawData = { nodes:[], links:[] };
+let adj = {};
+let godIds = new Set();
+let labelsMode = 'hubs';
+let paused = false;
+
+const $ = id => document.getElementById(id);
+const setStep = msg => { const s=$('boot-status'); if(s) s.textContent=msg; };
+
+// Safe DOM helpers — never use innerHTML with data
+function el(tag, cls, text){
+  const e = document.createElement(tag);
+  if(cls) e.className = cls;
+  if(text != null) e.textContent = text;
+  return e;
+}
+
+async function boot(){
+  setStep('loading brand');
+  try{
+    const r = await fetch('brand.json',{cache:'force-cache'});
+    if(r.ok){
+      const b=await r.json();
+      if(b.palette) PALETTE = b.palette;
+      if(b.nucleus_color) BRAND.nucleus_color = b.nucleus_color;
+      if(b.god_rim_color) BRAND.god_rim_color = b.god_rim_color;
+    }
+  }catch(e){}
+  try{
+    const r = await fetch('communities.json',{cache:'force-cache'});
+    if(r.ok){
+      const cj=await r.json();
+      for(const [k,v] of Object.entries(cj)) CL[+k]=v;
+    }
+  }catch(e){}
+
+  const params = new URLSearchParams(location.search);
+  const wantedBrain = params.get('brain');
+  let brains = [];
+  try{
+    setStep('loading brain manifest');
+    const r = await fetch('brains.json',{cache:'no-cache'});
+    brains = await r.json();
+  }catch(e){
+    brains = [{id:'default', name:'{{TITLE}}', path:'graph.json', nodes:0}];
+  }
+  brains = brains.filter(b => b.has_graph !== false);
+
+  populateBrainSelect(brains);
+  const brain = (wantedBrain && brains.find(b=>b.id===wantedBrain)) || brains[0];
+  if(!brain){ setStep('no brains available'); return; }
+  $('brain-select').value = brain.id;
+
+  await loadBrain(brain);
+  wireViewLinks(brain.id);
+  $('brain-select').addEventListener('change', async function(){
+    const b = brains.find(x=>x.id===this.value);
+    if(!b) return;
+    await loadBrain(b);
+    wireViewLinks(b.id);
+    try{ localStorage.setItem('brain-viz:lastBrain', b.id); }catch(e){}
+  });
+}
+
+function populateBrainSelect(brains){
+  const sel = $('brain-select');
+  sel.textContent='';
+  brains.forEach(b=>{
+    const opt = document.createElement('option');
+    opt.value = b.id;
+    opt.textContent = b.name + (b.nodes ? '  ('+b.nodes.toLocaleString()+')' : '');
+    sel.appendChild(opt);
+  });
+}
+
+function wireViewLinks(brainId){
+  const qs = brainId ? '?brain=' + encodeURIComponent(brainId) : '';
+  $('view-2d').href = '2d.html' + qs;
+  $('view-3d').href = '3d.html' + qs;
+}
+
+async function loadBrain(brain){
+  setStep('loading ' + brain.name);
+  $('hud-title').textContent = brain.name;
+  $('hud-subtitle').textContent = brain.subtitle || '';
+
+  let data;
+  try{
+    if(brain.path && brain.path.indexOf('://') === -1 && brain.path.indexOf(':/') > -1){
+      data = await (await fetch(brain.path,{cache:'force-cache'})).json();
+    } else if(brain.path && brain.path !== 'graph.json'){
+      data = await (await fetch(brain.path,{cache:'force-cache'})).json();
+    } else {
+      try{
+        const resp = await fetch('graph.json.gz',{cache:'force-cache'});
+        if(!resp.ok) throw 0;
+        const buf = await resp.arrayBuffer();
+        const ds = new DecompressionStream('gzip');
+        const stream = new Response(new Blob([buf]).stream().pipeThrough(ds));
+        data = await stream.json();
+      }catch(e){
+        data = await (await fetch('graph.json',{cache:'force-cache'})).json();
+      }
+    }
+  }catch(e){
+    setStep('failed to load graph');
+    return;
+  }
+
+  rawData = normalize(data);
+  buildIndices();
+  renderGraph();
+  buildLegend();
+  updateStats();
+  finishBoot();
+}
+
+function normalize(g){
+  const nodes = g.nodes || [];
+  const links = g.links || g.edges || [];
+  const dm = {};
+  links.forEach(l=>{
+    const s = typeof l.source==='object' ? l.source.id : l.source;
+    const t = typeof l.target==='object' ? l.target.id : l.target;
+    dm[s] = (dm[s]||0)+1; dm[t] = (dm[t]||0)+1;
+  });
+  godIds = new Set(Object.entries(dm).sort((a,b)=>b[1]-a[1]).slice(0,10).map(e=>e[0]));
+  nodes.forEach(n => { n.degree = dm[n.id] || 0; n.isGod = godIds.has(n.id); });
+  return { nodes, links };
+}
+
+function buildIndices(){
+  adj = {};
+  rawData.links.forEach(l => {
+    const s = typeof l.source==='object' ? l.source.id : l.source;
+    const t = typeof l.target==='object' ? l.target.id : l.target;
+    (adj[s] = adj[s] || []).push(l);
+    (adj[t] = adj[t] || []).push(l);
+  });
+}
+
+function renderGraph(){
+  const container = $('graph-2d');
+  container.textContent='';
+  Graph = ForceGraph()(container)
+    .backgroundColor('#000008')
+    .graphData(rawData)
+    .nodeId('id')
+    .nodeLabel(n => (n.label||n.id) + ' · ' + (n.file_type||'?') + ' · ' + n.degree + ' links')
+    .nodeVal(n => Math.max(1, Math.sqrt(n.degree||1) * 1.2))
+    .nodeRelSize(+($('cr-nodesize').value)/10)
+    .nodeColor(n => n.isGod ? BRAND.god_rim_color : gc(n.community))
+    .nodeCanvasObjectMode(n => labelsMode==='all' || (labelsMode==='hubs' && n.degree>=8) ? 'after' : undefined)
+    .nodeCanvasObject((node, ctx, scale) => {
+      if(scale < 1.2 && !node.isGod) return;
+      const label = (node.label || node.id || '').toString().slice(0, 32);
+      const fontSize = Math.max(8, Math.min(13, 11 / scale * 1.2));
+      ctx.font = fontSize + 'px Inter, sans-serif';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'top';
+      const r = Math.max(2, Math.sqrt(node.degree||1) * 1.2);
+      ctx.fillStyle = node.isGod ? '#fef3c7' : 'rgba(226,232,240,0.85)';
+      ctx.shadowColor = '#000';
+      ctx.shadowBlur = 4;
+      ctx.fillText(label, node.x, node.y + r + 2);
+      ctx.shadowBlur = 0;
+    })
+    .linkColor(l => {
+      const sc = (l.source && l.source.community != null) ? l.source.community : 0;
+      return hexA(gc(sc), +($('cr-linkop').value)/100);
+    })
+    .linkWidth(l => l.relation==='core' ? 1.2 : 0.5)
+    .linkDirectionalParticles(0)
+    .d3AlphaDecay(0.025)
+    .d3VelocityDecay(0.35)
+    .cooldownTicks(150)
+    .onNodeClick(n => { showInfo(n); Graph.centerAt(n.x, n.y, 600); Graph.zoom(Graph.zoom()*1.4, 600); })
+    .onBackgroundClick(() => $('info-panel').classList.remove('visible'));
+
+  Graph.d3Force('charge').strength(+($('cr-charge').value));
+  Graph.d3Force('link').distance(+($('cr-linkdist').value));
+
+  setTimeout(() => Graph.zoomToFit(800, 40), 1500);
+}
+
+function hexA(hex, a){
+  const h = hex.replace('#','');
+  const r = parseInt(h.substring(0,2),16);
+  const g = parseInt(h.substring(2,4),16);
+  const b = parseInt(h.substring(4,6),16);
+  return 'rgba(' + r + ',' + g + ',' + b + ',' + a.toFixed(2) + ')';
+}
+
+function updateStats(){
+  $('s-nodes').textContent = rawData.nodes.length.toLocaleString();
+  $('s-edges').textContent = rawData.links.length.toLocaleString();
+  const cs = new Set(rawData.nodes.map(n => n.community).filter(c => c != null && c >= 0));
+  $('s-comm').textContent = cs.size.toLocaleString();
+  $('s-vis').textContent = rawData.nodes.length.toLocaleString();
+}
+
+function buildLegend(){
+  const counts = {};
+  rawData.nodes.forEach(n => {
+    if(n.community != null && n.community >= 0) counts[n.community] = (counts[n.community]||0) + 1;
+  });
+  const top = Object.entries(counts).sort((a,b) => b[1]-a[1]).slice(0, 12);
+  const body = $('legend-body');
+  body.textContent='';
+  if(top.length === 0){
+    body.appendChild(el('div', 'legend-empty', 'No community data'));
+    return;
+  }
+  top.forEach(entry => {
+    const cid = entry[0], count = entry[1];
+    const item = el('div', 'legend-item');
+    const dot = el('span', 'legend-dot');
+    dot.style.background = gc(cid);
+    item.appendChild(dot);
+    item.appendChild(el('span', null, CL[+cid] || ('Community ' + cid)));
+    item.appendChild(el('span', 'legend-count', String(count)));
+    item.addEventListener('click', () => {
+      const member = rawData.nodes.find(n => n.community === +cid);
+      if(member && member.x != null){
+        Graph.centerAt(member.x, member.y, 800);
+        Graph.zoom(2, 800);
+      }
+    });
+    body.appendChild(item);
+  });
+}
+
+function showInfo(node){
+  $('info-title').textContent = node.label || node.id;
+  const rows = $('info-rows');
+  rows.textContent='';
+
+  const addRow = (label, value, valueClass) => {
+    const row = el('div', 'info-row');
+    row.appendChild(el('span', 'info-label', label));
+    row.appendChild(el('span', valueClass || null, value));
+    rows.appendChild(row);
+  };
+  addRow('Type', node.file_type || '—');
+  addRow('Community', CL[node.community] || (node.community != null ? 'C' + node.community : '—'));
+  addRow('Degree', String(node.degree || 0));
+  if(node.isGod) addRow('Status', '* God Node', 'info-god');
+
+  const list = $('connections-list');
+  list.textContent='';
+  const conns = (adj[node.id] || []).slice(0, 24);
+  conns.forEach(l => {
+    const sId = typeof l.source==='object' ? l.source.id : l.source;
+    const tId = typeof l.target==='object' ? l.target.id : l.target;
+    const otherId = sId === node.id ? tId : sId;
+    const other = rawData.nodes.find(n => n.id === otherId);
+    if(!other) return;
+    const item = el('div', 'conn-item');
+    item.appendChild(el('span', 'conn-relation', l.relation || 'rel'));
+    item.appendChild(el('span', null, other.label || other.id));
+    item.addEventListener('click', () => {
+      Graph.centerAt(other.x, other.y, 600);
+      Graph.zoom(Graph.zoom()*1.2, 600);
+      showInfo(other);
+    });
+    list.appendChild(item);
+  });
+  $('info-panel').classList.add('visible');
+}
+
+function finishBoot(){
+  const overlay = $('boot-loader');
+  if(!overlay) return;
+  overlay.style.opacity = '0';
+  setTimeout(() => overlay.remove(), 500);
+}
+
+const search = $('search-input');
+const results = $('search-results');
+let searchTO = null;
+search.addEventListener('input', () => {
+  clearTimeout(searchTO);
+  searchTO = setTimeout(() => {
+    const q = search.value.trim().toLowerCase();
+    if(!q || q.length < 2){ results.style.display='none'; return; }
+    const matches = rawData.nodes
+      .filter(n => (n.label||n.id||'').toString().toLowerCase().includes(q))
+      .sort((a,b) => (b.degree||0) - (a.degree||0))
+      .slice(0, 25);
+    results.textContent='';
+    matches.forEach(n => {
+      const item = el('div', 'search-item');
+      item.appendChild(el('span', 'type-badge', (n.file_type||'?').slice(0,4)));
+      item.appendChild(el('span', null, n.label || n.id));
+      item.addEventListener('click', () => {
+        if(n.x != null){ Graph.centerAt(n.x, n.y, 700); Graph.zoom(3, 700); }
+        showInfo(n);
+        results.style.display='none';
+      });
+      results.appendChild(item);
+    });
+    results.style.display = matches.length ? 'block' : 'none';
+  }, 150);
+});
+window.addEventListener('keydown', e => {
+  if((e.ctrlKey || e.metaKey) && e.key === 'k'){
+    e.preventDefault(); search.focus();
+  }
+  if(e.key === 'Escape'){
+    $('info-panel').classList.remove('visible');
+    results.style.display='none';
+    search.blur();
+  }
+});
+
+function bind(rid, vid, fmt, onChange){
+  const r = $(rid), v = $(vid);
+  r.addEventListener('input', () => {
+    const val = +r.value;
+    v.textContent = fmt(val);
+    if(onChange) onChange(val);
+  });
+}
+bind('cr-charge','cv-charge', v => v, v => { if(Graph){ Graph.d3Force('charge').strength(v); Graph.d3ReheatSimulation(); } });
+bind('cr-linkdist','cv-linkdist', v => v, v => { if(Graph){ Graph.d3Force('link').distance(v); Graph.d3ReheatSimulation(); } });
+bind('cr-nodesize','cv-nodesize', v => (v/10).toFixed(1), v => { if(Graph) Graph.nodeRelSize(v/10); });
+bind('cr-linkop','cv-linkop', v => (v/100).toFixed(2), () => { if(Graph) Graph.refresh(); });
+
+['btn-labels-off','btn-labels-hubs','btn-labels-all'].forEach(id => {
+  $(id).addEventListener('click', () => {
+    document.querySelectorAll('#controls-panel .ctrl-btn').forEach(b => {
+      if(['btn-labels-off','btn-labels-hubs','btn-labels-all'].indexOf(b.id) > -1) b.classList.remove('active');
+    });
+    $(id).classList.add('active');
+    labelsMode = id.replace('btn-labels-','');
+    if(Graph) Graph.refresh();
+  });
+});
+
+$('btn-zoomfit').addEventListener('click', () => Graph && Graph.zoomToFit(800, 40));
+$('btn-reheat').addEventListener('click', () => Graph && Graph.d3ReheatSimulation());
+$('btn-pause').addEventListener('click', () => {
+  if(!Graph) return;
+  paused = !paused;
+  if(paused){ Graph.pauseAnimation(); $('btn-pause').textContent='Resume'; $('btn-pause').classList.add('active'); }
+  else { Graph.resumeAnimation(); $('btn-pause').textContent='Pause'; $('btn-pause').classList.remove('active'); }
+});
+
+$('info-close').addEventListener('click', () => $('info-panel').classList.remove('visible'));
+
+document.querySelectorAll('.panel-collapse').forEach(btn => {
+  btn.addEventListener('click', e => {
+    e.stopPropagation();
+    btn.closest('.panel').classList.toggle('collapsed');
+    btn.textContent = btn.closest('.panel').classList.contains('collapsed') ? '+' : '−';
+  });
+});
+
+window.addEventListener('resize', () => {
+  if(Graph){ Graph.width(window.innerWidth).height(window.innerHeight); }
+});
+
+if('serviceWorker' in navigator){
+  window.addEventListener('load',()=>{ navigator.serviceWorker.register('./sw.js').catch(()=>{}); });
+}
+
+boot();
+</script>
+</body>
+</html>

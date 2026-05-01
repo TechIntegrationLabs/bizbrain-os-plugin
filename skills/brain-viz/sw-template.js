@@ -1,14 +1,18 @@
 // Service worker for brain-viz public bundle.
 // Caches graph data + HTML + vendor libs for instant repeat visits.
-const CACHE = 'brain-viz-v1';
+// v2: added landing page (index.html) + 2D viewer (2d.html, force-graph.min.js)
+const CACHE = 'brain-viz-v2';
 const PRECACHE = [
   './',
   './index.html',
+  './2d.html',
+  './3d.html',
   './graph.json.gz',
   './communities.json',
   './brand.json',
   './brains.json',
   './vendor/3d-force-graph.min.js',
+  './vendor/force-graph.min.js',
 ];
 
 self.addEventListener('install', e => {

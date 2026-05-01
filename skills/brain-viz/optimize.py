@@ -23,7 +23,9 @@ import sys
 from pathlib import Path
 
 SKILL_DIR = Path(__file__).parent
-TEMPLATE = SKILL_DIR / 'viewer-template.html'
+TEMPLATE = SKILL_DIR / 'viewer-template.html'              # 3D viewer (existing)
+TEMPLATE_2D = SKILL_DIR / 'viewer-2d-template.html'        # 2D viewer (new)
+TEMPLATE_LANDING = SKILL_DIR / 'landing-template.html'     # Front page (new)
 VENDOR_DIR = SKILL_DIR / 'vendor'
 SW_TEMPLATE = SKILL_DIR / 'sw-template.js'
 
@@ -186,8 +188,32 @@ def bake_positions_3d(graph: dict, iterations: int = 200) -> None:
         node['z'] = float(round(pos[i, 2], 1))
 
 
+def _render_landing(brand: dict, brain_id: str) -> str:
+    """Render the landing/selector page (index.html)."""
+    html = TEMPLATE_LANDING.read_text(encoding='utf-8')
+    title = brand.get('title', 'Knowledge Graph')
+    subtitle = brand.get('subtitle', 'Interactive knowledge map.')
+    eyebrow = brand.get('eyebrow', 'Knowledge Graph Explorer')
+    html = html.replace('{{TITLE}}', title)
+    html = html.replace('{{SUBTITLE}}', subtitle)
+    html = html.replace('{{EYEBROW}}', eyebrow)
+    html = html.replace('{{BRAIN_ID}}', brain_id)
+    return html
+
+
+def _render_2d(brand: dict, brain_id: str) -> str:
+    """Render the 2D viewer page (2d.html)."""
+    html = TEMPLATE_2D.read_text(encoding='utf-8')
+    title = brand.get('title', 'Knowledge Graph')
+    subtitle = brand.get('subtitle', '2D Knowledge Graph')
+    html = html.replace('{{TITLE}}', title)
+    html = html.replace('{{SUBTITLE}}', subtitle)
+    html = html.replace('{{BRAIN_ID}}', brain_id)
+    return html
+
+
 def write_public_html(brain: Path, public_dir: Path) -> None:
-    """Render the template with public-mode tweaks (lazy bloom, skip warmup)."""
+    """Render landing + 2D + 3D pages with public-mode tweaks (lazy bloom, skip warmup)."""
     html = TEMPLATE.read_text(encoding='utf-8')
 
     # Load brand
@@ -199,9 +225,10 @@ def write_public_html(brain: Path, public_dir: Path) -> None:
 
     title = brand.get('title', brain.name)
     subtitle = brand.get('subtitle', '')
+    brain_id = brain.name.lower().replace(' ', '-')
     html = html.replace('{{TITLE}}', title)
     html = html.replace('{{SUBTITLE}}', subtitle)
-    html = html.replace('{{BRAIN_ID}}', brain.name.lower().replace(' ', '-'))
+    html = html.replace('{{BRAIN_ID}}', brain_id)
 
     # Self-host 3d-force-graph if vendor file present
     if (VENDOR_DIR / '3d-force-graph.min.js').exists():
@@ -295,10 +322,29 @@ window._bootStep&&_bootStep(80,'rendering');"""
         "setTimeout(()=>{window._bootDone&&_bootDone();startS('pulse');},1200);"
     )
 
-    (public_dir / 'index.html').write_text(html, encoding='utf-8')
-    print(f'  public/index.html ({len(html)} chars)')
+    # Write 3D viewer at /3d.html (was previously /index.html)
+    (public_dir / '3d.html').write_text(html, encoding='utf-8')
+    print(f'  public/3d.html ({len(html)} chars)')
 
-    # Copy vendor libs
+    # Render and write 2D viewer at /2d.html
+    if TEMPLATE_2D.exists():
+        html_2d = _render_2d(brand, brain_id)
+        (public_dir / '2d.html').write_text(html_2d, encoding='utf-8')
+        print(f'  public/2d.html ({len(html_2d)} chars)')
+    else:
+        print(f'  WARNING: {TEMPLATE_2D.name} not found - skipping 2D viewer')
+
+    # Render and write landing page at /index.html (the new front door)
+    if TEMPLATE_LANDING.exists():
+        html_landing = _render_landing(brand, brain_id)
+        (public_dir / 'index.html').write_text(html_landing, encoding='utf-8')
+        print(f'  public/index.html ({len(html_landing)} chars) [landing]')
+    else:
+        # Fallback: keep 3D as the index if landing template is missing
+        (public_dir / 'index.html').write_text(html, encoding='utf-8')
+        print(f'  WARNING: {TEMPLATE_LANDING.name} not found - using 3D viewer as index')
+
+    # Copy vendor libs (3d-force-graph for 3D, force-graph for 2D)
     if VENDOR_DIR.exists():
         dest_vendor = public_dir / 'vendor'
         dest_vendor.mkdir(exist_ok=True)
